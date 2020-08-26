@@ -1,5 +1,5 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, LinearEncoding, NoToneMapping, Scene, WebGLRenderer} from "three";
+import {Camera, Group, LinearEncoding, NoToneMapping, Scene, WebGLRenderer} from "three";
 import {Subject} from "rxjs";
 
 @Singleton

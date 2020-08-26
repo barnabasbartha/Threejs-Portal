@@ -1,6 +1,6 @@
 import {Group} from "three";
 
-export abstract class AbstractObject {
+export abstract class MeshObject {
    protected readonly group = new Group();
 
    getGroup(): Group {

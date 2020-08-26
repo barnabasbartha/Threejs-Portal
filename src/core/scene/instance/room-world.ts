@@ -1,6 +1,6 @@
-import {MeshObject} from "../../object/mesh-object";
+import {WorldObject} from "../../object/world-object";
 
-export class RoomWorld extends MeshObject {
+export class RoomWorld extends WorldObject {
    constructor() {
       super();
    }

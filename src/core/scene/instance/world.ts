@@ -1,13 +1,10 @@
-import {MeshObject} from "../../object/mesh-object";
-import {Object3D, Scene} from "three";
+import {WorldObject} from "../../object/world-object";
+import {Scene} from "three";
+import {AbstractObject} from "../../object/abstract-object";
 
-export abstract class World {
-   protected readonly scene = new Scene();
-   private readonly objects = new Set<MeshObject>();
-
-   getScene(): Scene {
-      return this.scene;
-   }
+export abstract class World extends AbstractObject<Scene> {
+   protected readonly group = new Scene();
+   private readonly objects = new Set<WorldObject>();
 
    step(delta: number) {
       for (const object of this.objects.values()) {
@@ -15,25 +12,17 @@ export abstract class World {
       }
    }
 
-   addObject(object: MeshObject) {
+   addObject(object: WorldObject) {
       if (!this.objects.has(object)) {
          this.objects.add(object);
          this.add(object.getGroup());
       }
    }
 
-   removeObject(object: MeshObject) {
+   removeObject(object: WorldObject) {
       if (this.objects.has(object)) {
          this.objects.delete(object);
-         this.scene.remove(object.getGroup());
+         this.group.remove(object.getGroup());
       }
-   }
-
-   add(object: Object3D) {
-      this.scene.add(object);
-   }
-
-   remove(object: Object3D) {
-      this.scene.remove(object);
    }
 }

@@ -7,7 +7,7 @@ export class SceneComponent {
    private readonly scene1 = new SkyWorld();
 
    getScene(): Scene {
-      return this.scene1.getScene();
+      return this.scene1.getGroup();
    }
 
    step(delta: number) {

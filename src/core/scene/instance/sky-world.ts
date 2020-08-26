@@ -1,12 +1,14 @@
 import {AmbientLight, DirectionalLight, Vector3} from "three";
 import {Sky} from "three/examples/jsm/objects/Sky";
 import {World} from "./world";
+import {PortalWorldObject} from "../../object/portal-world-object";
 
 export class SkyWorld extends World {
    constructor() {
       super();
       this.initLight();
       this.initSky();
+      this.addObject(new PortalWorldObject());
    }
 
    private initLight() {

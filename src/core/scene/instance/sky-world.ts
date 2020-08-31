@@ -1,14 +1,21 @@
-import {AmbientLight, DirectionalLight, Vector3} from "three";
+import {AmbientLight, BoxBufferGeometry, DirectionalLight, Mesh, MeshNormalMaterial, Vector3} from "three";
 import {Sky} from "three/examples/jsm/objects/Sky";
 import {World} from "./world";
 import {PortalWorldObject} from "../../object/portal-world-object";
 
 export class SkyWorld extends World {
+   private readonly portal: PortalWorldObject;
+   private readonly box: Mesh;
+
    constructor() {
-      super();
+      super("SkyWorld");
       this.initLight();
       this.initSky();
-      this.addObject(new PortalWorldObject());
+      this.addPortal(this.portal = new PortalWorldObject("SkyWorld.portal", "RoomWorld", "RoomWorld.portal"));
+      this.portal.getPosition().set(1, -1, 1);
+
+      this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial()));
+      this.box.position.set(5, 0, 5);
    }
 
    private initLight() {

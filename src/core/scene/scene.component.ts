@@ -10,8 +10,8 @@ export class SceneComponent {
    private readonly mainWorld: World;
 
    constructor() {
-      this.add(this.mainWorld = new SkyWorld());
-      this.add(new RoomWorld());
+      this.add(this.mainWorld = new RoomWorld());
+      this.add(new SkyWorld());
    }
 
    getWorld(): World {
@@ -30,12 +30,6 @@ export class SceneComponent {
       const portals = new Map<string, PortalWorldObject>();
       Array.from(this.worlds.values()).forEach(scene => scene.getPortals().forEach(portal => portals.set(portal.getName(), portal)));
       return portals;
-   }
-
-   getPortalList(): PortalWorldObject[] {
-      const portalList: PortalWorldObject[] = [];
-      Array.from(this.worlds.values()).forEach(scene => scene.getPortals().forEach(portal => portalList.push(portal)));
-      return portalList;
    }
 
    private add(world: World) {

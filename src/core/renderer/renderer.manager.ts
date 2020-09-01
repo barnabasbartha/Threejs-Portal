@@ -12,7 +12,7 @@ export class RendererManager {
                @Inject private readonly camera: CameraComponent,
                @Inject private readonly timer: TimerComponent,
                @Inject private readonly controller: CoreControllerComponent) {
-      timer.step$.subscribe(() => component.render(scene.getWorlds(), scene.getWorld(), camera.getCamera(), scene.getPortalList()));
+      timer.step$.subscribe(() => component.render(scene.getWorlds(), scene.getWorld(), camera.getCamera()));
       controller.resize$.subscribe(size => component.setSize(size.x, size.y));
    }
 }

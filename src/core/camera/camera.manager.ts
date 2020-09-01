@@ -15,7 +15,6 @@ export class CameraManager {
       controller.resize$.subscribe(size => component.setAspectRatio(size.x / size.y));
 
       this.update();
-      component.getCamera().position.set(1, 0, 1);
    }
 
    private move(x: number, y: number) {
@@ -25,9 +24,9 @@ export class CameraManager {
 
    private update() {
       const target = MathUtil.minMax(this.targetAngle, -this.limit, this.limit)
-      this.component.getCamera().rotation.y = target * 2;
+      this.component.getCamera().position.y = 1;
       this.component.getCamera().position.x = target * 50;
-      this.component.getCamera().position.z = -2;
-      this.component.getCamera().lookAt(1, 0, 1);
+      this.component.getCamera().position.z = -5;
+      this.component.getCamera().lookAt(0, 0, 0);
    }
 }

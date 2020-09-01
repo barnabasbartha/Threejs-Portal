@@ -1,5 +1,5 @@
 import {WorldObject} from "./world-object";
-import {Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
+import {DoubleSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
 
 export class PortalWorldObject extends WorldObject {
    private readonly mesh: Mesh;
@@ -9,7 +9,11 @@ export class PortalWorldObject extends WorldObject {
                private destinationSceneName: string,
                private destinationPortalName: string) {
       super();
-      this.add(this.mesh = new Mesh(new PlaneBufferGeometry(3, 3, 1, 1), new MeshBasicMaterial()));
+      this.add(this.mesh = new Mesh(new PlaneBufferGeometry(3, 3, 1, 1), new MeshBasicMaterial({
+         side: DoubleSide,
+         transparent: true,
+         opacity: 0
+      })));
    }
 
    getDestinationSceneName(): string {

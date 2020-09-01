@@ -40,17 +40,13 @@ export class RendererComponent {
    private readonly cameraMatrixWorld = new Matrix4();
    private readonly cameraProjectionMatrix = new Matrix4();
 
-   render(worlds: Map<string, World>, world: World, camera: Camera, portals: PortalWorldObject[]) {
+   render(worlds: Map<string, World>, world: World, camera: Camera) {
       if (!this.renderer) {
          return;
       }
       const scene = world.getGroup();
       const portalsInScene = world.getPortals();
       const gl = this.context;
-
-      // make sure camera matrix is up to date
-      //cameraControlsObject.updateMatrix();
-      //cameraControlsObject.updateMatrixWorld(true);
 
       // save camera matrices because they will be modified when rending a view through a portal
       camera.updateMatrixWorld();
@@ -59,12 +55,6 @@ export class RendererComponent {
 
       // full clear (color, depth and stencil)
       this.renderer.clear(true, true, true);
-
-      // render the view through a portal inside the portal shape
-      // the portals will be rendered one a time
-      // directly manipulating the children array is faster than using add/remove
-      // this.stencilScene.children = this.singlePortal;
-
       // enable stencil test
       gl.enable(gl.STENCIL_TEST);
       // disable stencil mask
@@ -99,9 +89,7 @@ export class RendererComponent {
          // compute the view through the portal
          camera.matrixAutoUpdate = false;
          camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
-         //camera.updateMatrixWorld();
          camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-         camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal.getDestination(), camera));
 
          // render the view through the portal
          const destinationScene = worlds.get(portal.getDestinationSceneName()).getGroup();
@@ -113,8 +101,6 @@ export class RendererComponent {
          // restore original camera matrices for the next portal
          camera.matrixAutoUpdate = true;
          camera.matrixWorld.copy(this.cameraMatrixWorld);
-         //camera.updateMatrixWorld();
-         camera.projectionMatrix.copy(this.cameraProjectionMatrix);
       });
 
       // after all portals have been drawn, we can disable the stencil test
@@ -139,7 +125,6 @@ export class RendererComponent {
       this.renderer.render(scene, camera);
    }
 
-   private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
    private readonly dstInverse = new Matrix4();
    private readonly srcToCam = new Matrix4();
    private readonly srcToDst = new Matrix4();
@@ -149,46 +134,8 @@ export class RendererComponent {
       const destinationPortal = sourcePortal.getDestination();
       this.srcToCam.multiplyMatrices(camera.matrixWorldInverse, sourcePortal.getMatrix());
       this.dstInverse.getInverse(destinationPortal.getMatrix());
-      // this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.srcToDst.identity().multiply(this.srcToCam).multiply(this.dstInverse);
-      this.result.copy(this.srcToDst);
       this.result.getInverse(this.srcToDst);
       return this.result;
-   }
-
-   private readonly dstRotationMatrix = new Matrix4();
-   private readonly normal = new Vector3();
-   private readonly clipPlane = new Plane();
-   private readonly clipVector = new Vector4();
-   private readonly q = new Vector4();
-   private readonly projectionMatrix = new Matrix4();
-
-   private computePortalProjectionMatrix(destinationPortal: PortalWorldObject, camera: Camera): Matrix4 {
-      // http://www.terathon.com/code/oblique.html
-      this.dstRotationMatrix.identity();
-      this.dstRotationMatrix.extractRotation(destinationPortal.getMatrix());
-
-      this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
-
-      this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getPosition());
-      this.clipPlane.applyMatrix4(camera.matrixWorldInverse);
-
-      this.clipVector.set(this.clipPlane.normal.x, this.clipPlane.normal.y, this.clipPlane.normal.z, this.clipPlane.constant);
-
-      this.projectionMatrix.copy(camera.projectionMatrix);
-
-      this.q.x = (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) / this.projectionMatrix.elements[0];
-      this.q.y = (Math.sign(this.clipVector.y) + this.projectionMatrix.elements[9]) / this.projectionMatrix.elements[5];
-      this.q.z = -1.0;
-      this.q.w = (1.0 + this.projectionMatrix.elements[10]) / camera.projectionMatrix.elements[14];
-
-      this.clipVector.multiplyScalar(2 / this.clipVector.dot(this.q));
-
-      this.projectionMatrix.elements[2] = this.clipVector.x;
-      this.projectionMatrix.elements[6] = this.clipVector.y;
-      this.projectionMatrix.elements[10] = this.clipVector.z + 1.0;
-      this.projectionMatrix.elements[14] = this.clipVector.w;
-
-      return this.projectionMatrix;
    }
 }

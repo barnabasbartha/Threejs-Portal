@@ -12,9 +12,9 @@ export class SkyWorld extends World {
       this.initLight();
       this.initSky();
       this.addPortal(this.portal = new PortalWorldObject("SkyWorld.portal", "RoomWorld", "RoomWorld.portal"));
-      this.portal.getPosition().set(1, -1, 1);
+      this.portal.getGroup().rotation.y = Math.PI;
 
-      this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial()));
+      this.add(this.box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial()));
       this.box.position.set(5, 0, 5);
    }
 
@@ -57,5 +57,10 @@ export class SkyWorld extends World {
       uniforms["sunPosition"].value.copy(sun);
 
       this.add(sky);
+   }
+
+   step(delta: number) {
+      this.box.rotation.y -= 0.015;
+      this.box.rotation.x += 0.015;
    }
 }

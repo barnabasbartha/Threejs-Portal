@@ -5,14 +5,15 @@ import {RendererManager} from "./renderer/renderer.manager";
 import {SceneManager} from "./scene/scene.manager";
 import {CoreControllerComponent} from "./controller/core-controller.component";
 import {CameraManager} from "./camera/camera.manager";
+import {KeyEvent} from "../common/controller/controller.model";
 
 @Singleton
 export class CoreThread {
    constructor(@Inject private readonly rendererManager: RendererManager,
-               @Inject private readonly rendererComponent: RendererComponent,
+               @Inject private readonly renderer: RendererComponent,
                @Inject private readonly sceneManager: SceneManager,
                @Inject private readonly cameraManager: CameraManager,
-               @Inject private readonly controllerComponent: CoreControllerComponent) {
+               @Inject private readonly controller: CoreControllerComponent) {
       this.waitForCanvas();
    }
 
@@ -20,7 +21,7 @@ export class CoreThread {
       onmessage = (event) => {
          const canvas: HTMLCanvasElement = event?.data?.canvas;
          if (canvas) {
-            this.rendererComponent.init(canvas);
+            this.renderer.init(canvas);
             this.setSize(canvas.width, canvas.height);
             console.log("Core thread OK");
          }
@@ -28,11 +29,15 @@ export class CoreThread {
    }
 
    setSize(width: number, height: number) {
-      this.controllerComponent.resize(width, height);
+      this.controller.resize(width, height);
    }
 
    mouseMove(x: number, y: number) {
-      this.controllerComponent.move(x, y);
+      this.controller.move(x, y);
+   }
+
+   keyEvent(keyEvent: KeyEvent) {
+      this.controller.keyEvent(keyEvent);
    }
 }
 
@@ -42,5 +47,6 @@ const coreThread = Container.get(CoreThread);
 
 expose({
    setSize: coreThread.setSize.bind(coreThread),
-   mouseMove: coreThread.mouseMove.bind(coreThread)
+   mouseMove: coreThread.mouseMove.bind(coreThread),
+   keyEvent: coreThread.keyEvent.bind(coreThread)
 });

@@ -1,5 +1,6 @@
-import {IVector2} from "../event";
+import {IVector2} from "../event.model";
 import {Subject} from "rxjs";
+import {KeyEvent} from "./controller.model";
 
 export abstract class CommonControllerComponent {
    protected readonly resizeObject: IVector2 = {x: 0, y: 0};
@@ -10,8 +11,6 @@ export abstract class CommonControllerComponent {
    protected readonly mouseMoveSubject = new Subject<IVector2>();
    public readonly mouseMove$ = this.mouseMoveSubject.pipe();
 
-   protected readonly keyDownSubject = new Subject<string>();
-   public readonly keyDown$ = this.keyDownSubject.pipe();
-   protected readonly keyUpSubject = new Subject<string>();
-   public readonly keyUp$ = this.keyUpSubject.pipe();
+   protected readonly keySubject = new Subject<KeyEvent>();
+   public readonly key$ = this.keySubject.pipe();
 }

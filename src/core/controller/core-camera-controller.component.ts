@@ -1,6 +1,6 @@
 import {Inject, Singleton} from "typescript-ioc";
 import {CoreControllerComponent} from "./core-controller.component";
-import {Object3D, Quaternion} from "three";
+import {Object3D, Quaternion, Vector3} from "three";
 import {MathUtil} from "../../util/math-util";
 import {Subject} from "rxjs";
 
@@ -12,11 +12,16 @@ export class CoreCameraControllerComponent {
    private static readonly SENSITIVITY = .002;
    private static readonly PI2 = Math.PI / 2;
    private readonly object = new Object3D();
+   private readonly direction = new Vector3();
 
    constructor(@Inject private readonly controller: CoreControllerComponent) {
       controller.mouseMove$.subscribe(delta => this.move(delta.x, delta.y));
       this.object.rotation.order = "YXZ";
       this.update();
+   }
+
+   getDirection(): Vector3 {
+      return this.direction.set(0, 0, -1).applyQuaternion(this.object.quaternion);
    }
 
    private move(deltaX: number, deltaY: number) {

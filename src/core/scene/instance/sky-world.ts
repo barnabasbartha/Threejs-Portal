@@ -15,7 +15,7 @@ export class SkyWorld extends World {
       this.portal.getGroup().rotation.y = Math.PI;
 
       this.add(this.box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial()));
-      this.box.position.set(5, 0, 5);
+      this.box.position.set(0, 0, -5);
    }
 
    private initLight() {

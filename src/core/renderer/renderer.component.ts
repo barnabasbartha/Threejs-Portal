@@ -24,7 +24,7 @@ export class RendererComponent {
          depth: true
       });
       this.renderer.autoClear = false;
-      this.renderer.setPixelRatio(.6);
+      this.renderer.setPixelRatio(.8);
       this.renderer.shadowMap.enabled = false;
       this.renderer.outputEncoding = LinearEncoding; //sRGBEncoding;
       this.renderer.toneMapping = NoToneMapping;

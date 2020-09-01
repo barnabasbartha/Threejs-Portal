@@ -1,5 +1,7 @@
 import {Singleton} from "typescript-ioc";
 import {CommonControllerComponent} from "../../common/controller/common-controller.component";
+import {KeyEvent} from "../../common/controller/controller.model";
+import {EventStatus} from "../../common/event.model";
 
 @Singleton
 export class MainControllerComponent extends CommonControllerComponent {
@@ -10,6 +12,18 @@ export class MainControllerComponent extends CommonControllerComponent {
          this.resizeObject.y = window.innerHeight;
          this.resizeSubject.next(this.resizeObject);
       });
+      MainControllerComponent.addEventListener(window, 'keydown', (event: KeyboardEvent) => {
+         this.keySubject.next({
+            status: EventStatus.ON,
+            key: event.code
+         } as KeyEvent);
+      });
+      MainControllerComponent.addEventListener(window, 'keyup', (event: KeyboardEvent) => {
+         this.keySubject.next({
+            status: EventStatus.OFF,
+            key: event.code
+         } as KeyEvent);
+      });
    }
 
    init(target: HTMLElement) {
@@ -17,6 +31,9 @@ export class MainControllerComponent extends CommonControllerComponent {
          this.mouseMoveObject.x = event.movementX;
          this.mouseMoveObject.y = event.movementY;
          this.mouseMoveSubject.next(this.mouseMoveObject);
+      });
+      MainControllerComponent.addEventListener<MouseEvent>(target, 'mousedown', event => {
+         target.requestPointerLock();
       });
    }
 

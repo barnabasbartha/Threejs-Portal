@@ -9,7 +9,7 @@ export class PortalWorldObject extends WorldObject {
                private destinationSceneName: string,
                private destinationPortalName: string) {
       super();
-      this.add(this.mesh = new Mesh(new PlaneBufferGeometry(3, 3, 1, 1), new MeshBasicMaterial({
+      this.add(this.mesh = new Mesh(new PlaneBufferGeometry(2, 2, 1, 1), new MeshBasicMaterial({
          side: DoubleSide,
          transparent: true,
          opacity: 0

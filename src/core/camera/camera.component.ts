@@ -1,5 +1,5 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, PerspectiveCamera, Quaternion} from "three";
+import {Camera, PerspectiveCamera, Quaternion, Vector3} from "three";
 
 @Singleton
 export class CameraComponent {
@@ -21,5 +21,9 @@ export class CameraComponent {
 
    setQuaternion(quaternion: Quaternion) {
       this.camera.quaternion.copy(quaternion);
+   }
+
+   setPosition(position: Vector3) {
+      this.camera.position.copy(position);
    }
 }

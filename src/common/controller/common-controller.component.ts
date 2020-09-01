@@ -9,4 +9,9 @@ export abstract class CommonControllerComponent {
    protected readonly mouseMoveObject: IVector2 = {x: 0, y: 0};
    protected readonly mouseMoveSubject = new Subject<IVector2>();
    public readonly mouseMove$ = this.mouseMoveSubject.pipe();
+
+   protected readonly keyDownSubject = new Subject<string>();
+   public readonly keyDown$ = this.keyDownSubject.pipe();
+   protected readonly keyUpSubject = new Subject<string>();
+   public readonly keyUp$ = this.keyUpSubject.pipe();
 }

@@ -5,11 +5,11 @@ import {MathUtil} from "../../util/math-util";
 import {Subject} from "rxjs";
 
 @Singleton
-export class CameraControllerComponent {
+export class CoreCameraControllerComponent {
    private readonly quaternionSubject = new Subject<Quaternion>();
    public readonly quaternion$ = this.quaternionSubject.pipe();
 
-   private static readonly MOUSE_SENSITIVITY = .002;
+   private static readonly SENSITIVITY = .002;
    private static readonly PI2 = Math.PI / 2;
    private readonly object = new Object3D();
 
@@ -20,9 +20,9 @@ export class CameraControllerComponent {
    }
 
    private move(deltaX: number, deltaY: number) {
-      this.object.rotation.y -= deltaX * CameraControllerComponent.MOUSE_SENSITIVITY;
-      this.object.rotation.x -= deltaY * CameraControllerComponent.MOUSE_SENSITIVITY;
-      this.object.rotation.x = MathUtil.minMax(this.object.rotation.x, -CameraControllerComponent.PI2, CameraControllerComponent.PI2);
+      this.object.rotation.y -= deltaX * CoreCameraControllerComponent.SENSITIVITY;
+      this.object.rotation.x -= deltaY * CoreCameraControllerComponent.SENSITIVITY;
+      this.object.rotation.x = MathUtil.minMax(this.object.rotation.x, -CoreCameraControllerComponent.PI2, CoreCameraControllerComponent.PI2);
       this.update();
    }
 

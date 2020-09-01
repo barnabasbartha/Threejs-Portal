@@ -1,5 +1,5 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, PerspectiveCamera} from "three";
+import {Camera, PerspectiveCamera, Quaternion} from "three";
 
 @Singleton
 export class CameraComponent {
@@ -7,6 +7,7 @@ export class CameraComponent {
 
    constructor() {
       this.camera = new PerspectiveCamera(70, 1, 0.01, 5000);
+      this.camera.matrixAutoUpdate = false;
    }
 
    getCamera(): Camera {
@@ -16,5 +17,9 @@ export class CameraComponent {
    setAspectRatio(ratio: number) {
       this.camera.aspect = ratio;
       this.camera.updateProjectionMatrix();
+   }
+
+   setQuaternion(quaternion: Quaternion) {
+      this.camera.quaternion.copy(quaternion);
    }
 }

@@ -1,5 +1,5 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, LinearEncoding, Matrix4, NoToneMapping, Plane, Scene, Vector3, Vector4, WebGLRenderer} from "three";
+import {Camera, LinearEncoding, Matrix4, NoToneMapping, Scene, WebGLRenderer} from "three";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {World} from "../scene/instance/world";

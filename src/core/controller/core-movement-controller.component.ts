@@ -1,6 +1,6 @@
 import {Inject, Singleton} from "typescript-ioc";
 import {Vector3} from "three";
-import {Subject} from "rxjs";
+import {ReplaySubject} from "rxjs";
 import {CoreKeyboardControllerComponent} from "./core-keyboard-controller.component";
 import {CoreCameraControllerComponent} from "./core-camera-controller.component";
 import {TimerComponent} from "../timer/timer.component";
@@ -14,14 +14,12 @@ export class CoreMovementControllerComponent {
    private static readonly KEY_BACKWARDS = "KeyS";
    private static readonly KEY_RIGHT = "KeyD";
 
-   private readonly positionSubject = new Subject<Vector3>();
-   public readonly position$ = this.positionSubject.pipe();
+   private readonly movementSubject = new ReplaySubject<Vector3>();
+   public readonly movement$ = this.movementSubject.pipe();
 
    private static readonly SENSITIVITY = .05;
-   private readonly position = new Vector3(0, 1, 5);
    private readonly lookingDirection = new Vector3();
-   private readonly moveVector = new Vector3();
-   private readonly actualMoveVector = new Vector3();
+   private readonly movement = new Vector3();
    private keyDirection = KeyDirection.IDLE;
 
    constructor(@Inject private readonly keyboardController: CoreKeyboardControllerComponent,
@@ -30,6 +28,7 @@ export class CoreMovementControllerComponent {
       keyboardController.keys$.subscribe(() => this.keyDirection = this.getKeyDirection())
       cameraController.quaternion$.subscribe(() => this.lookingDirection.copy(cameraController.getDirection()));
       timer.step$.subscribe(delta => this.step(delta));
+      this.movementSubject.next(this.movement);
    }
 
    private getKeyDirection(): KeyDirection {
@@ -54,20 +53,19 @@ export class CoreMovementControllerComponent {
 
    private step(delta: number) {
       if (this.keyDirection !== KeyDirection.IDLE) {
-         this.moveVector.copy(this.lookingDirection)
+         this.movement.copy(this.lookingDirection)
             .projectOnPlane(CoreMovementControllerComponent.PLANE_NORMAL)
             .normalize();
          const additionalAngle = this.keyDirection * CoreMovementControllerComponent.DEG_45;
-         let moveVectorDeg = Math.atan2(this.moveVector.x, this.moveVector.z);
+         let moveVectorDeg = Math.atan2(this.movement.x, this.movement.z);
          moveVectorDeg -= additionalAngle;
-         this.actualMoveVector.x = Math.sin(moveVectorDeg);
-         this.actualMoveVector.z = Math.cos(moveVectorDeg);
-         this.actualMoveVector
+         this.movement.x = Math.sin(moveVectorDeg);
+         this.movement.z = Math.cos(moveVectorDeg);
+         this.movement
             .multiplyScalar(CoreMovementControllerComponent.SENSITIVITY)
             .multiplyScalar(delta);
-         this.position.add(this.actualMoveVector);
+         this.movementSubject.next(this.movement);
       }
-      this.positionSubject.next(this.position);
    }
 }
 

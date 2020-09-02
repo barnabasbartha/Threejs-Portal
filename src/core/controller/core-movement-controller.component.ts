@@ -53,17 +53,18 @@ export class CoreMovementControllerComponent {
    }
 
    private step(delta: number) {
-      //const additionalAngle = keyDirection * CoreMovementControllerComponent.DEG_45;
-      //this.movingDirection.copy(this.lookingDirection);
-      this.moveVector.copy(this.lookingDirection)
-         .projectOnPlane(CoreMovementControllerComponent.PLANE_NORMAL)
-         .normalize()
-         .multiplyScalar(CoreMovementControllerComponent.SENSITIVITY);
-      if (this.keyDirection === KeyDirection.BACKWARDS) {
-         this.moveVector.multiplyScalar(-1);
-      }
       if (this.keyDirection !== KeyDirection.IDLE) {
-         this.actualMoveVector.copy(this.moveVector).multiplyScalar(delta);
+         this.moveVector.copy(this.lookingDirection)
+            .projectOnPlane(CoreMovementControllerComponent.PLANE_NORMAL)
+            .normalize();
+         const additionalAngle = this.keyDirection * CoreMovementControllerComponent.DEG_45;
+         let moveVectorDeg = Math.atan2(this.moveVector.x, this.moveVector.z);
+         moveVectorDeg -= additionalAngle;
+         this.actualMoveVector.x = Math.sin(moveVectorDeg);
+         this.actualMoveVector.z = Math.cos(moveVectorDeg);
+         this.actualMoveVector
+            .multiplyScalar(CoreMovementControllerComponent.SENSITIVITY)
+            .multiplyScalar(delta);
          this.position.add(this.actualMoveVector);
       }
       this.positionSubject.next(this.position);

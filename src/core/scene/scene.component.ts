@@ -3,6 +3,7 @@ import {SkyWorld} from "./instance/sky-world";
 import {World} from "./instance/world";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {RoomWorld} from "./instance/room-world";
+import TWEEN from '@tweenjs/tween.js';
 
 @Singleton
 export class SceneComponent {
@@ -24,6 +25,7 @@ export class SceneComponent {
 
    step(delta: number) {
       Array.from(this.worlds.values()).forEach(scene => scene.step(delta));
+      TWEEN.update();
    }
 
    getPortals(): Map<string, PortalWorldObject> {

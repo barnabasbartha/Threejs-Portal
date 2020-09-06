@@ -27,8 +27,9 @@ export class MovementComponent {
                      sourcePortal: collision.object,
                      collision
                   } as Teleport);
+               } else {
+                  movement.multiplyScalar(collision.ratio);
                }
-               movement.multiplyScalar(collision.ratio);
             }
             return this.position.add(movement);
          }),

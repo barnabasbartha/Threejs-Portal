@@ -19,7 +19,6 @@ export class TeleportComponent {
          scene.setCurrentWorld(targetWorld);
 
          // TODO: Set new position (MovementComponent) and camera orientation (CoreCameraControllerComponent)
-         movement.setPosition(targetPortal.getPosition());
       });
    }
 }

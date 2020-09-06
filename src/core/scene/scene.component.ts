@@ -8,15 +8,23 @@ import TWEEN from '@tweenjs/tween.js';
 @Singleton
 export class SceneComponent {
    private worlds = new Map<string, World>();
-   private readonly mainWorld: World;
+   private currentWorld: World;
 
    constructor() {
-      this.add(this.mainWorld = new RoomWorld());
+      this.add(this.currentWorld = new RoomWorld());
       this.add(new SkyWorld());
    }
 
-   getWorld(): World {
-      return this.mainWorld;
+   getCurrentWorld(): World {
+      return this.currentWorld;
+   }
+
+   setCurrentWorld(world: World) {
+      this.currentWorld = world;
+   }
+
+   getWorld(name: string): World {
+      return this.worlds.get(name);
    }
 
    getWorlds(): Map<string, World> {

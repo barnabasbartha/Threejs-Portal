@@ -6,7 +6,7 @@ import {PortalWorldObject} from "../../object/portal-world-object";
 export abstract class World extends AbstractObject<Scene> {
    protected readonly group = new Scene();
    private readonly objects = new Set<WorldObject>();
-   private portals: PortalWorldObject[] = [];
+   private portals = new Map<string, PortalWorldObject>();
 
    protected constructor(private name: string) {
       super();
@@ -32,16 +32,20 @@ export abstract class World extends AbstractObject<Scene> {
       }
    }
 
+   getName(): string {
+      return this.name;
+   }
+
    addPortal(portal: PortalWorldObject) {
-      this.portals.push(portal);
+      this.portals.set(portal.getName(), portal);
       this.addObject(portal);
    }
 
    getPortals(): PortalWorldObject[] {
-      return this.portals;
+      return Array.from(this.portals.values());
    }
 
-   getName(): string {
-      return this.name;
+   getPortal(name: string): PortalWorldObject {
+      return this.portals.get(name);
    }
 }

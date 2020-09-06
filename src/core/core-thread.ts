@@ -6,6 +6,7 @@ import {SceneManager} from "./scene/scene.manager";
 import {CoreControllerComponent} from "./controller/core-controller.component";
 import {CameraManager} from "./camera/camera.manager";
 import {KeyEvent} from "../common/controller/controller.model";
+import {TeleportComponent} from "./scene/teleport/teleport.component";
 
 @Singleton
 export class CoreThread {
@@ -13,7 +14,8 @@ export class CoreThread {
                @Inject private readonly renderer: RendererComponent,
                @Inject private readonly sceneManager: SceneManager,
                @Inject private readonly cameraManager: CameraManager,
-               @Inject private readonly controller: CoreControllerComponent) {
+               @Inject private readonly controller: CoreControllerComponent,
+               @Inject private readonly teleport: TeleportComponent) {
       this.waitForCanvas();
    }
 

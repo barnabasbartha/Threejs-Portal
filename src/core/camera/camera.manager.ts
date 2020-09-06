@@ -2,7 +2,7 @@ import {Inject, Singleton} from "typescript-ioc";
 import {CameraComponent} from "./camera.component";
 import {CoreControllerComponent} from "../controller/core-controller.component";
 import {CoreCameraControllerComponent} from "../controller/core-camera-controller.component";
-import {MovementComponent} from "../physics/movement-component";
+import {MovementComponent} from "../controller/movement-component";
 
 @Singleton
 export class CameraManager {

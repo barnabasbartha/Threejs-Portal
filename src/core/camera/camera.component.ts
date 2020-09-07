@@ -19,8 +19,8 @@ export class CameraComponent {
       this.camera.updateProjectionMatrix();
    }
 
-   setQuaternion(quaternion: Quaternion) {
-      this.camera.quaternion.copy(quaternion);
+   setQuaternion(quaternion: Quaternion, t: number) {
+      this.camera.quaternion.slerp(quaternion, t);
    }
 
    setPosition(position: Vector3) {

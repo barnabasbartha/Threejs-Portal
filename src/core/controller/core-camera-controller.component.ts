@@ -24,6 +24,10 @@ export class CoreCameraControllerComponent {
       return this.direction.set(0, 0, -1).applyQuaternion(this.object.quaternion);
    }
 
+   getQuaternion(): Quaternion {
+      return this.object.quaternion;
+   }
+
    private move(deltaX: number, deltaY: number) {
       this.object.rotation.y -= deltaX * CoreCameraControllerComponent.SENSITIVITY;
       this.object.rotation.x -= deltaY * CoreCameraControllerComponent.SENSITIVITY;

@@ -8,7 +8,7 @@ export class SkyWorld extends World {
    private readonly box: Mesh;
 
    constructor() {
-      super("SkyWorld");
+      super("SkyWorld", Infinity);
       this.initLight();
       this.initSky();
       this.addPortal(this.portal = new PortalWorldObject("SkyWorld.portal", "RoomWorld", "RoomWorld.portal"));

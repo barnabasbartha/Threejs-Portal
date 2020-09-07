@@ -6,6 +6,8 @@ import {map} from "rxjs/operators";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {PhysicsComponent} from "../physics/physics.component";
 import {Teleport} from "../scene/teleport/teleport.model";
+import {SceneComponent} from "../scene/scene.component";
+import {MathUtil} from "../../util/math-util";
 
 @Singleton
 export class MovementComponent {
@@ -17,7 +19,8 @@ export class MovementComponent {
    private readonly position = new Vector3(0, 1, 2);
 
    constructor(@Inject private readonly movementController: CoreMovementControllerComponent,
-               @Inject private readonly physics: PhysicsComponent) {
+               @Inject private readonly physics: PhysicsComponent,
+               @Inject private readonly scene: SceneComponent) {
       this.position$ = movementController.movement$.pipe(
          map(movement => {
             const collision = physics.checkPortalCollision(this.position, movement);
@@ -31,7 +34,9 @@ export class MovementComponent {
                   movement.multiplyScalar(collision.ratio);
                }
             }
-            return this.position.add(movement);
+            this.position.add(movement);
+            this.limitWorldSize();
+            return this.position;
          }),
       );
    }
@@ -39,5 +44,11 @@ export class MovementComponent {
    setPosition(position: Vector3) {
       this.position.x = position.x;
       this.position.z = position.z;
+   }
+
+   private limitWorldSize() {
+      const size = this.scene.getCurrentWorld().getSize();
+      this.position.x = MathUtil.minMax(this.position.x, -size, size);
+      this.position.z = MathUtil.minMax(this.position.z, -size, size);
    }
 }

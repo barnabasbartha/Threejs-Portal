@@ -8,8 +8,17 @@ export abstract class World extends AbstractObject<Scene> {
    private readonly objects = new Set<WorldObject>();
    private portals = new Map<string, PortalWorldObject>();
 
-   protected constructor(private name: string) {
+   protected constructor(private name: string,
+                         private size: number) {
       super();
+   }
+
+   getName(): string {
+      return this.name;
+   }
+
+   getSize(): number {
+      return this.size;
    }
 
    step(delta: number) {
@@ -30,10 +39,6 @@ export abstract class World extends AbstractObject<Scene> {
          this.objects.delete(object);
          this.group.remove(object.getGroup());
       }
-   }
-
-   getName(): string {
-      return this.name;
    }
 
    addPortal(portal: PortalWorldObject) {

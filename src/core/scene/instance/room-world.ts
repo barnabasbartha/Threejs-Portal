@@ -4,6 +4,7 @@ import {
    AmbientLight,
    BackSide,
    BoxBufferGeometry,
+   DoubleSide,
    Mesh,
    MeshNormalMaterial,
    MeshStandardMaterial,
@@ -17,12 +18,12 @@ export class RoomWorld extends World {
    private readonly outsideBox: Mesh;
 
    constructor() {
-      super("RoomWorld");
+      super("RoomWorld", 4.9);
       this.initLight();
       this.addPortal(this.portal = new PortalWorldObject("RoomWorld.portal", "SkyWorld", "SkyWorld.portal"));
       this.portal.getPosition().set(0, 1, 0);
 
-      this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial()));
+      this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial({side: DoubleSide})));
       this.box.position.set(0, 1.5, 3.5);
 
       this.add(this.outsideBox = new Mesh(

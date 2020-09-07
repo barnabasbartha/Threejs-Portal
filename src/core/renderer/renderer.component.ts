@@ -1,5 +1,5 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, LinearEncoding, Matrix4, NoToneMapping, Scene, WebGLRenderer} from "three";
+import {Camera, LinearEncoding, Matrix4, NoToneMapping, PerspectiveCamera, Scene, WebGLRenderer} from "three";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {World} from "../scene/instance/world";
@@ -38,9 +38,8 @@ export class RendererComponent {
    }
 
    private readonly cameraMatrixWorld = new Matrix4();
-   private readonly cameraProjectionMatrix = new Matrix4();
 
-   render(worlds: Map<string, World>, world: World, camera: Camera) {
+   render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
       if (!this.renderer) {
          return;
       }
@@ -51,7 +50,6 @@ export class RendererComponent {
       // save camera matrices because they will be modified when rending a view through a portal
       camera.updateMatrixWorld();
       this.cameraMatrixWorld.copy(camera.matrixWorld);
-      this.cameraProjectionMatrix.copy(camera.projectionMatrix);
 
       // full clear (color, depth and stencil)
       this.renderer.clear(true, true, true);
@@ -88,18 +86,25 @@ export class RendererComponent {
 
          // compute the view through the portal
          camera.matrixAutoUpdate = false;
+         camera.matrixWorldNeedsUpdate = false;
          camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
          camera.matrixWorldInverse.getInverse(camera.matrixWorld);
 
          // render the view through the portal
          const destinationScene = worlds.get(portal.getDestinationSceneName()).getGroup();
+         const tmpNear = camera.near;
+         camera.near = Math.max(tmpNear, camera.position.distanceTo(portal.getPosition()) - 2);
+         camera.updateProjectionMatrix();
          this.renderer.render(destinationScene, camera);
+         camera.near = tmpNear;
+         camera.updateProjectionMatrix();
 
          // clear the stencil buffer for the next portal
          this.renderer.clear(false, false, true);
 
          // restore original camera matrices for the next portal
          camera.matrixAutoUpdate = true;
+         camera.matrixWorldNeedsUpdate = true;
          camera.matrixWorld.copy(this.cameraMatrixWorld);
       });
 
@@ -125,6 +130,7 @@ export class RendererComponent {
       this.renderer.render(scene, camera);
    }
 
+   private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
    private readonly dstInverse = new Matrix4();
    private readonly srcToCam = new Matrix4();
    private readonly srcToDst = new Matrix4();
@@ -134,7 +140,7 @@ export class RendererComponent {
       const destinationPortal = sourcePortal.getDestination();
       this.srcToCam.multiplyMatrices(camera.matrixWorldInverse, sourcePortal.getMatrix());
       this.dstInverse.getInverse(destinationPortal.getMatrix());
-      this.srcToDst.identity().multiply(this.srcToCam).multiply(this.dstInverse);
+      this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.result.getInverse(this.srcToDst);
       return this.result;
    }

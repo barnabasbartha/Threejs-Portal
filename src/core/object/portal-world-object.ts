@@ -10,13 +10,15 @@ export class PortalWorldObject extends WorldObject {
                private destinationSceneName: string,
                private destinationPortalName: string) {
       super();
+
       this.addPhysicalObject(this.mesh = new Mesh(
          new CircleBufferGeometry(1, 100),
          new MeshBasicMaterial({
             side: DoubleSide,
             transparent: true,
             opacity: 0
-         }))
+         }),
+         )
       );
 
       // this.startAnimation();

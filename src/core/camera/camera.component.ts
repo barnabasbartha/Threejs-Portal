@@ -1,16 +1,16 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, PerspectiveCamera, Quaternion, Vector3} from "three";
+import {PerspectiveCamera, Quaternion, Vector3} from "three";
 
 @Singleton
 export class CameraComponent {
    private readonly camera: PerspectiveCamera;
 
    constructor() {
-      this.camera = new PerspectiveCamera(70, 1, 0.01, 5000);
+      this.camera = new PerspectiveCamera(70, 1, 0.0001, 5000);
       this.camera.matrixAutoUpdate = false;
    }
 
-   getCamera(): Camera {
+   getCamera(): PerspectiveCamera {
       return this.camera;
    }
 

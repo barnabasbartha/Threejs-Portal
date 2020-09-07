@@ -9,6 +9,7 @@ import {
    MeshStandardMaterial,
    PointLight
 } from "three";
+import {Sky} from "three/examples/jsm/objects/Sky";
 
 export class RoomWorld extends World {
    private readonly portal: PortalWorldObject;
@@ -20,10 +21,9 @@ export class RoomWorld extends World {
       this.initLight();
       this.addPortal(this.portal = new PortalWorldObject("RoomWorld.portal", "SkyWorld", "SkyWorld.portal"));
       this.portal.getPosition().set(0, 1, 0);
-      this.portal.getGroup().rotation.y = Math.PI;
 
       this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial()));
-      this.box.position.set(0, 1.5, -3);
+      this.box.position.set(0, 1.5, 3.5);
 
       this.add(this.outsideBox = new Mesh(
          new BoxBufferGeometry(10, 6, 10),
@@ -32,6 +32,11 @@ export class RoomWorld extends World {
             color: 0x888888
          })));
       this.outsideBox.position.set(0, 3, 0);
+
+
+      const sky = new Sky();
+      sky.scale.setScalar(10000);
+      this.add(sky);
    }
 
    private initLight() {

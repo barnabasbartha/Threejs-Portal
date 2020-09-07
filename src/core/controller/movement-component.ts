@@ -14,7 +14,7 @@ export class MovementComponent {
    private readonly teleportSubject = new ReplaySubject<Teleport>();
    public readonly teleport$ = this.teleportSubject.pipe();
 
-   private readonly position = new Vector3(0, 1, 3);
+   private readonly position = new Vector3(0, 1, 2);
 
    constructor(@Inject private readonly movementController: CoreMovementControllerComponent,
                @Inject private readonly physics: PhysicsComponent) {

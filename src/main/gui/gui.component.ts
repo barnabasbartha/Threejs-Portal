@@ -14,7 +14,6 @@ export class GuiComponent {
 
     <h1>Click to start</h1>
     <p>Use WASD and Cursor to move.</p>
-    <p>Use Audio for greater experience.</p>
 
 </div>`;
 

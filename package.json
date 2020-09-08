@@ -21,7 +21,7 @@
       "babel-plugin-loop-optimizer": "^1.4.1",
       "chai": "^4.2.0",
       "clean-webpack-plugin": "^3.0.0",
-      "copy-webpack-plugin": "^6.0.3",
+      "copy-webpack-plugin": "5.1.1",
       "css-loader": "^4.2.1",
       "file-loader": "^6.0.0",
       "gltf-webpack-loader": "^1.0.6",

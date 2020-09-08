@@ -1,0 +1,40 @@
+html, body {
+   margin: 0;
+   padding: 0;
+   overflow: hidden;
+}
+
+canvas {
+   width: 100vw;
+   height: 100vh;
+}
+
+.gui-layer {
+   position: fixed;
+   width: 100vw;
+   height: 100vh;
+   background: rgba(0, 0, 0, .2);
+   transition: 2s ease-in-out;
+   transition-delay: .2s;
+
+   .container {
+      position: relative;
+      text-align: center;
+      color: white;
+      font-family: Arial, sans-serif;
+      top: 40%;
+      transform: translateY(-50%);
+      display: none;
+   }
+
+   .container.visible {
+      display: block;
+   }
+
+}
+
+.gui-layer.visible {
+   background: rgba(0, 0, 0, 1);
+   transition: 200ms ease-in-out;
+   cursor: pointer;
+}

@@ -1,0 +1,13 @@
+﻿/.idea
+*/.*
+**/$*
+**/bin/*
+**/build/*
+**/logs/*
+**/.idea
+*.log
+*.info
+**/node_modules/
+**/dist
+package-lock\.json
+.eslintcache

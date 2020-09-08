@@ -1,0 +1,16 @@
+image: node:12.16.3-alpine
+stages:
+   - build
+
+pages:
+   stage: build
+   only:
+      - master
+   script:
+      - npm install
+      - npm test
+      - npm run build
+      - mv dist public
+   artifacts:
+      paths:
+         - public

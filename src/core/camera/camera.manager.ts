@@ -7,7 +7,7 @@ import {TimerComponent} from "../timer/timer.component";
 
 @Singleton
 export class CameraManager {
-   private static CAMERA_INTENSITY = .25;
+   private static CAMERA_INTENSITY = .2;
 
    constructor(@Inject private readonly component: CameraComponent,
                @Inject private readonly controller: CoreControllerComponent,

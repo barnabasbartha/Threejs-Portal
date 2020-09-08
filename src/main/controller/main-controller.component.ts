@@ -26,20 +26,20 @@ export class MainControllerComponent extends CommonControllerComponent {
       });
    }
 
-   init(target: HTMLElement) {
-      MainControllerComponent.addEventListener<MouseEvent>(target, 'mousemove', event => {
+   init(canvas: HTMLElement, guiLayer: HTMLDivElement) {
+      MainControllerComponent.addEventListener<MouseEvent>(canvas, 'mousemove', event => {
          this.mouseMoveObject.x = event.movementX;
          this.mouseMoveObject.y = event.movementY;
          this.mouseMoveSubject.next(this.mouseMoveObject);
       });
       MainControllerComponent.addEventListener(document, 'pointerlockchange', () => {
-         const locked = (document.pointerLockElement === target ||
+         const locked = (document.pointerLockElement === canvas ||
             // @ts-ignore
-            document.mozPointerLockElement === target);
+            document.mozPointerLockElement === canvas);
          this.pointerLockSubject.next(locked ? EventStatus.ON : EventStatus.OFF);
       });
-      MainControllerComponent.addEventListener<MouseEvent>(target, 'mousedown', event => {
-         target.requestPointerLock();
+      MainControllerComponent.addEventListener<MouseEvent>(guiLayer, 'mousedown', event => {
+         canvas.requestPointerLock();
       });
    }
 

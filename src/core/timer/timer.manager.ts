@@ -7,10 +7,8 @@ export class TimerManager {
    constructor(@Inject protected readonly component: TimerComponent,
                @Inject protected readonly controller: CoreControllerComponent) {
       controller.pointerLock$.subscribe(status => {
-         if (status)
-            component.enable();
-         else
-            component.disable();
+         if (status) component.enable();
+         else component.disable();
       })
    }
 }

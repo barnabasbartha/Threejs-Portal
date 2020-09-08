@@ -1,6 +1,6 @@
 import {WorldObject} from "./world-object";
 import {CircleBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial} from "three";
-import TWEEN from '@tweenjs/tween.js';
+// import TWEEN from '@tweenjs/tween.js';
 
 export class PortalWorldObject extends WorldObject {
    private readonly mesh: Mesh;
@@ -45,6 +45,7 @@ export class PortalWorldObject extends WorldObject {
       return this.name;
    }
 
+   /*
    private startAnimation() {
       const tweenA = new TWEEN.Tween(this.mesh.position)
          .to({
@@ -64,4 +65,5 @@ export class PortalWorldObject extends WorldObject {
       tweenA.chain(tweenB);
       tweenB.chain(tweenA);
    }
+    */
 }

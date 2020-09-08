@@ -1,16 +1,5 @@
 import {Singleton} from "typescript-ioc";
-import {
-   Camera,
-   LinearEncoding,
-   Matrix4,
-   NoToneMapping,
-   PerspectiveCamera,
-   Plane,
-   Scene,
-   Vector3,
-   Vector4,
-   WebGLRenderer
-} from "three";
+import {Camera, LinearEncoding, Matrix4, NoToneMapping, PerspectiveCamera, Scene, Vector3, WebGLRenderer} from "three";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {World} from "../scene/instance/world";
@@ -49,7 +38,7 @@ export class RendererComponent {
    }
 
    private readonly cameraMatrixWorld = new Matrix4();
-   private readonly cameraProjectionMatrix = new Matrix4();
+   //private readonly cameraProjectionMatrix = new Matrix4();
    private readonly cameraTmpPosition = new Vector3();
 
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
@@ -63,7 +52,7 @@ export class RendererComponent {
       // save camera matrices because they will be modified when rending a view through a portal
       camera.updateMatrixWorld();
       this.cameraMatrixWorld.copy(camera.matrixWorld);
-      this.cameraProjectionMatrix.copy(camera.projectionMatrix);
+      // this.cameraProjectionMatrix.copy(camera.projectionMatrix);
 
       // full clear (color, depth and stencil)
       this.renderer.clear(true, true, true);
@@ -75,7 +64,7 @@ export class RendererComponent {
       // TODO: Draw portals recursively
 
       portalsInScene
-         .sort((a, b) => Math.sign(a.getAbsolutePosition().distanceTo(camera.position) - b.getAbsolutePosition().distanceTo(camera.position)))
+         //.sort((a, b) => Math.sign(a.getAbsolutePosition().distanceTo(camera.position) - b.getAbsolutePosition().distanceTo(camera.position)))
          .forEach(portal => {
             // disable color + depth
             // only the stencil buffer will be drawn into
@@ -154,7 +143,7 @@ export class RendererComponent {
       this.renderer.render(scene, camera);
    }
 
-   private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
+   // private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
    private readonly dstInverse = new Matrix4();
    private readonly srcToCam = new Matrix4();
    private readonly srcToDst = new Matrix4();
@@ -170,6 +159,7 @@ export class RendererComponent {
       return this.result;
    }
 
+   /*
    private readonly dstRotationMatrix = new Matrix4();
    private readonly normal = new Vector3();
    private readonly clipPlane = new Plane();
@@ -205,4 +195,5 @@ export class RendererComponent {
 
       return this.projectionMatrix;
    }
+   */
 }

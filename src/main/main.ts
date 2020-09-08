@@ -45,6 +45,7 @@ class Main {
       this.controller.init(this.canvas);
       this.controller.mouseMove$.subscribe(event => this.coreThread?.mouseMove(event.x, event.y));
       this.controller.resize$.subscribe(() => this.coreThread?.setSize(window.innerWidth, window.innerHeight));
+      this.controller.pointerLock$.subscribe(status => this.coreThread?.setPointerLock(status));
       this.keyboardController.key$.subscribe(keyEvent => this.coreThread?.keyEvent(keyEvent));
    }
 }

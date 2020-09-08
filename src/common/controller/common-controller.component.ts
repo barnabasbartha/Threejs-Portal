@@ -1,4 +1,4 @@
-import {IVector2} from "../event.model";
+import {EventStatus, IVector2} from "../event.model";
 import {Subject} from "rxjs";
 import {KeyEvent} from "./controller.model";
 
@@ -13,4 +13,7 @@ export abstract class CommonControllerComponent {
 
    protected readonly keySubject = new Subject<KeyEvent>();
    public readonly key$ = this.keySubject.pipe();
+
+   protected readonly pointerLockSubject = new Subject<EventStatus>();
+   public readonly pointerLock$ = this.pointerLockSubject.pipe();
 }

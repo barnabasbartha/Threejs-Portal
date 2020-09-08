@@ -32,6 +32,12 @@ export class MainControllerComponent extends CommonControllerComponent {
          this.mouseMoveObject.y = event.movementY;
          this.mouseMoveSubject.next(this.mouseMoveObject);
       });
+      MainControllerComponent.addEventListener(document, 'pointerlockchange', () => {
+         const locked = (document.pointerLockElement === target ||
+            // @ts-ignore
+            document.mozPointerLockElement === target);
+         this.pointerLockSubject.next(locked ? EventStatus.ON : EventStatus.OFF);
+      });
       MainControllerComponent.addEventListener<MouseEvent>(target, 'mousedown', event => {
          target.requestPointerLock();
       });

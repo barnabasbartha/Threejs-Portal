@@ -7,6 +7,8 @@ import {CoreControllerComponent} from "./controller/core-controller.component";
 import {CameraManager} from "./camera/camera.manager";
 import {KeyEvent} from "../common/controller/controller.model";
 import {TeleportComponent} from "./scene/teleport/teleport.component";
+import {TimerManager} from "./timer/timer.manager";
+import {EventStatus} from "../common/event.model";
 
 @Singleton
 export class CoreThread {
@@ -15,7 +17,8 @@ export class CoreThread {
                @Inject private readonly sceneManager: SceneManager,
                @Inject private readonly cameraManager: CameraManager,
                @Inject private readonly controller: CoreControllerComponent,
-               @Inject private readonly teleport: TeleportComponent) {
+               @Inject private readonly teleport: TeleportComponent,
+               @Inject private readonly timer: TimerManager) {
       this.waitForCanvas();
    }
 
@@ -34,6 +37,10 @@ export class CoreThread {
       this.controller.resize(width, height);
    }
 
+   setPointerLock(status: EventStatus) {
+      this.controller.setPointerLock(status);
+   }
+
    mouseMove(x: number, y: number) {
       this.controller.move(x, y);
    }
@@ -49,6 +56,7 @@ const coreThread = Container.get(CoreThread);
 
 expose({
    setSize: coreThread.setSize.bind(coreThread),
+   setPointerLock: coreThread.setPointerLock.bind(coreThread),
    mouseMove: coreThread.mouseMove.bind(coreThread),
-   keyEvent: coreThread.keyEvent.bind(coreThread)
+   keyEvent: coreThread.keyEvent.bind(coreThread),
 });

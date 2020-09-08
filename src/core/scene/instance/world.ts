@@ -9,7 +9,7 @@ export abstract class World extends AbstractObject<Scene> {
    private portals = new Map<string, PortalWorldObject>();
 
    protected constructor(private name: string,
-                         private size: number) {
+                         private size: number = Infinity) {
       super();
    }
 
@@ -43,7 +43,6 @@ export abstract class World extends AbstractObject<Scene> {
 
    addPortal(portal: PortalWorldObject) {
       this.portals.set(portal.getName(), portal);
-      this.addObject(portal);
    }
 
    getPortals(): PortalWorldObject[] {

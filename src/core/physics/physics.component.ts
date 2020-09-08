@@ -31,7 +31,8 @@ export class PhysicsComponent {
          const intersection = intersections[0];
          return {
             ratio: intersection.distance / this.raycaster.far,
-            object: objectToWorldObject.get(intersection.object)
+            object: objectToWorldObject.get(intersection.object),
+            position: intersection.point
          }
       }
       return null;

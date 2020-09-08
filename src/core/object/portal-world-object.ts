@@ -8,11 +8,12 @@ export class PortalWorldObject extends WorldObject {
 
    constructor(private name: string,
                private destinationSceneName: string,
-               private destinationPortalName: string) {
+               private destinationPortalName: string,
+               private size: number = 1) {
       super();
 
       this.addPhysicalObject(this.mesh = new Mesh(
-         new CircleBufferGeometry(1, 100),
+         new CircleBufferGeometry(size, 100),
          new MeshBasicMaterial({
             side: DoubleSide,
             transparent: true,

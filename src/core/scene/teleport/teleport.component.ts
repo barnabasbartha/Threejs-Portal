@@ -2,9 +2,12 @@ import {Inject, Singleton} from "typescript-ioc";
 import {MovementComponent} from "../../controller/movement-component";
 import {CoreCameraControllerComponent} from "../../controller/core-camera-controller.component";
 import {SceneComponent} from "../scene.component";
+import {Vector3} from "three";
 
 @Singleton
 export class TeleportComponent {
+   private readonly tmpVector = new Vector3();
+
    constructor(@Inject protected readonly movement: MovementComponent,
                @Inject protected readonly camera: CoreCameraControllerComponent,
                @Inject protected readonly scene: SceneComponent) {
@@ -19,6 +22,8 @@ export class TeleportComponent {
          scene.setCurrentWorld(targetWorld);
 
          // TODO: Set new position (MovementComponent) and camera orientation (CoreCameraControllerComponent)
+         this.tmpVector.copy(teleport.collision.position).sub(sourcePortal.getAbsolutePosition());
+         movement.setPosition(this.tmpVector.add(targetPortal.getAbsolutePosition()));
       });
    }
 }

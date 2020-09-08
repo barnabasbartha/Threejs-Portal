@@ -4,13 +4,15 @@ import {AbstractObject} from "./abstract-object";
 export abstract class WorldObject extends AbstractObject<Group> {
    protected readonly group = new Group();
    private readonly physicalObjects: Object3D[] = [];
+   private readonly tmpVector = new Vector3();
 
    getMatrix(): Matrix4 {
       return this.group.matrix;
    }
 
-   getPosition(): Vector3 {
-      return this.group.position;
+   getAbsolutePosition(): Vector3 {
+      this.group.getWorldPosition(this.tmpVector);
+      return this.tmpVector;
    }
 
    protected addPhysicalObject(object: Object3D) {

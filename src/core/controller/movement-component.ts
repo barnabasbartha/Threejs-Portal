@@ -42,8 +42,7 @@ export class MovementComponent {
    }
 
    setPosition(position: Vector3) {
-      this.position.x = position.x;
-      this.position.z = position.z;
+      this.position.copy(position);
    }
 
    private limitWorldSize() {

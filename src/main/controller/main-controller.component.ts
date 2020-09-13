@@ -1,50 +1,62 @@
 import {Singleton} from "typescript-ioc";
-import {CommonControllerComponent} from "../../common/controller/common-controller.component";
 import {KeyEvent} from "../../common/controller/controller.model";
-import {EventStatus} from "../../common/event.model";
+import {EventStatus, IVector2} from "../../common/event.model";
+import {fromEvent, merge, Observable, Subject} from "rxjs";
+import {distinctUntilChanged, map, tap} from "rxjs/operators";
 
 @Singleton
-export class MainControllerComponent extends CommonControllerComponent {
+export class MainControllerComponent {
+   private readonly resizeObject: IVector2 = {x: 0, y: 0};
+   public readonly resize$: Observable<IVector2>;
+   public readonly key$: Observable<KeyEvent>;
+
+   private readonly mouseMoveObject: IVector2 = {x: 0, y: 0};
+   private readonly mouseMoveSubject = new Subject<IVector2>();
+   public readonly mouseMove$ = this.mouseMoveSubject.pipe();
+
+   private readonly pointerLockSubject = new Subject<EventStatus>();
+   public readonly pointerLock$ = this.pointerLockSubject.pipe();
+
    constructor() {
-      super();
-      MainControllerComponent.addEventListener(window, 'resize', () => {
-         this.resizeObject.x = window.innerWidth;
-         this.resizeObject.y = window.innerHeight;
-         this.resizeSubject.next(this.resizeObject);
-      });
-      MainControllerComponent.addEventListener(window, 'keydown', (event: KeyboardEvent) => {
-         this.keySubject.next({
+      this.resize$ = fromEvent(window, 'resize').pipe(
+         tap(() => {
+            this.resizeObject.x = window.innerWidth;
+            this.resizeObject.y = window.innerHeight;
+         }),
+         map(() => this.resizeObject)
+      );
+
+      this.key$ = merge(
+         (fromEvent(window, 'keydown') as Observable<KeyboardEvent>).pipe(map(event => ({
             status: EventStatus.ON,
             key: event.code
-         } as KeyEvent);
-      });
-      MainControllerComponent.addEventListener(window, 'keyup', (event: KeyboardEvent) => {
-         this.keySubject.next({
+         }))),
+         (fromEvent(window, 'keyup') as Observable<KeyboardEvent>).pipe(map(event => ({
             status: EventStatus.OFF,
             key: event.code
-         } as KeyEvent);
-      });
+         })))
+      ).pipe(
+         distinctUntilChanged((prev, curr) => {
+            return prev.key === curr.key && prev.status === curr.status;
+         })
+      );
    }
 
    init(canvas: HTMLElement, guiLayer: HTMLDivElement) {
-      MainControllerComponent.addEventListener<MouseEvent>(canvas, 'mousemove', event => {
-         this.mouseMoveObject.x = event.movementX;
-         this.mouseMoveObject.y = event.movementY;
-         this.mouseMoveSubject.next(this.mouseMoveObject);
-      });
-      MainControllerComponent.addEventListener(document, 'pointerlockchange', () => {
-         const locked = (document.pointerLockElement === canvas ||
-            // @ts-ignore
-            document.mozPointerLockElement === canvas);
-         this.pointerLockSubject.next(locked ? EventStatus.ON : EventStatus.OFF);
-      });
-      MainControllerComponent.addEventListener<MouseEvent>(guiLayer, 'mousedown', event => {
-         canvas.requestPointerLock();
-      });
-   }
+      (fromEvent(canvas, 'mousemove') as Observable<MouseEvent>).pipe(
+         tap(event => {
+            this.mouseMoveObject.x = event.movementX;
+            this.mouseMoveObject.y = event.movementY;
+         }),
+         map(() => this.mouseMoveObject)
+      ).subscribe(object => this.mouseMoveSubject.next(object));
 
-   private static addEventListener<T>(target: GlobalEventHandlers, type: string, listener: (event: T) => void) {
-      // @ts-ignore
-      target.addEventListener(type, listener, {passive: true});
+      fromEvent(document, 'pointerlockchange').pipe(
+         // @ts-ignore
+         map(() => document.pointerLockElement === canvas || document.mozPointerLockElement === canvas),
+         map(locked => locked ? EventStatus.ON : EventStatus.OFF)
+      ).subscribe(status => this.pointerLockSubject.next(status));
+
+      fromEvent(guiLayer, 'mousedown').subscribe(() => canvas.requestPointerLock());
    }
 }

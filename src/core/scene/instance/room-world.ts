@@ -11,7 +11,6 @@ import {
    PointLight
 } from "three";
 import {Sky} from "three/examples/jsm/objects/Sky";
-import {PortalHolderWorldObject} from "../../object/portal-holder-world-object";
 
 export class RoomWorld extends World {
    private readonly portal: PortalWorldObject;

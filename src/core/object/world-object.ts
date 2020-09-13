@@ -6,10 +6,6 @@ export abstract class WorldObject extends AbstractObject<Group> {
    private readonly physicalObjects: Object3D[] = [];
    private readonly tmpVector = new Vector3();
 
-   getMatrix(): Matrix4 {
-      return this.group.matrix;
-   }
-
    getAbsolutePosition(): Vector3 {
       this.group.getWorldPosition(this.tmpVector);
       return this.tmpVector;

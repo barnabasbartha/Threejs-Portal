@@ -1,6 +1,5 @@
 import {WorldObject} from "./world-object";
 import {CircleBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial} from "three";
-// import TWEEN from '@tweenjs/tween.js';
 
 export class PortalWorldObject extends WorldObject {
    private readonly mesh: Mesh;
@@ -21,8 +20,6 @@ export class PortalWorldObject extends WorldObject {
          }),
          )
       );
-
-      // this.startAnimation();
    }
 
    getDestinationSceneName(): string {
@@ -44,26 +41,4 @@ export class PortalWorldObject extends WorldObject {
    getName(): string {
       return this.name;
    }
-
-   /*
-   private startAnimation() {
-      const tweenA = new TWEEN.Tween(this.mesh.position)
-         .to({
-            x: 0,
-            y: .4,
-            z: 0
-         }, 3000)
-         .easing(TWEEN.Easing.Sinusoidal.InOut)
-         .start();
-      const tweenB = new TWEEN.Tween(this.mesh.position)
-         .to({
-            x: 0,
-            y: 0,
-            z: 0
-         }, 3000)
-         .easing(TWEEN.Easing.Sinusoidal.InOut);
-      tweenA.chain(tweenB);
-      tweenB.chain(tweenA);
-   }
-    */
 }

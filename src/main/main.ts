@@ -4,7 +4,6 @@ import "./main.scss";
 import {Container, Inject, Singleton} from "typescript-ioc";
 import {WorkerImplementation} from "threads/dist/types/master";
 import {MainControllerComponent} from "./controller/main-controller.component";
-import {MainKeyboardControllerComponent} from "./controller/main-keyboard-controller.component";
 import {GuiManager} from "./gui/gui.manager";
 import {GuiComponent} from "./gui/gui.component";
 
@@ -14,7 +13,6 @@ class Main {
    private coreThread?: CoreThread;
 
    constructor(@Inject private readonly controller: MainControllerComponent,
-               @Inject private readonly keyboardController: MainKeyboardControllerComponent,
                @Inject private readonly guiManager: GuiManager,
                @Inject private readonly guiComponent: GuiComponent) {
       this.initCanvas();
@@ -50,7 +48,7 @@ class Main {
       this.controller.mouseMove$.subscribe(event => this.coreThread?.mouseMove(event.x, event.y));
       this.controller.resize$.subscribe(() => this.coreThread?.setSize(window.innerWidth, window.innerHeight));
       this.controller.pointerLock$.subscribe(status => this.coreThread?.setPointerLock(status));
-      this.keyboardController.key$.subscribe(keyEvent => this.coreThread?.keyEvent(keyEvent));
+      this.controller.key$.subscribe(keyEvent => this.coreThread?.keyEvent(keyEvent));
    }
 }
 

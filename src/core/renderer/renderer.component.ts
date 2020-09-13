@@ -18,7 +18,7 @@ export class RendererComponent {
       canvas['style'] = {width: canvas.width, height: canvas.height};
       this.renderer = new WebGLRenderer({
          canvas,
-         context: canvas.getContext('webgl2') as WebGLRenderingContext,
+         context: canvas.getContext('webgl2', {stencil: true}) as WebGLRenderingContext,
          powerPreference: 'high-performance',
          stencil: true,
          depth: true
@@ -64,8 +64,8 @@ export class RendererComponent {
       // TODO: Draw portals recursively
 
       portalsInScene
-         //.sort((a, b) => Math.sign(a.getAbsolutePosition().distanceTo(camera.position) - b.getAbsolutePosition().distanceTo(camera.position)))
-         .forEach(portal => {
+         // .sort((a, b) => Math.sign(a.getAbsolutePosition().distanceTo(camera.position) - b.getAbsolutePosition().distanceTo(camera.position)))
+         .forEach((portal, i) => {
             // disable color + depth
             // only the stencil buffer will be drawn into
             gl.colorMask(false, false, false, false);
@@ -87,7 +87,7 @@ export class RendererComponent {
             gl.depthMask(true);
 
             // fragments with a stencil value of 1 will be rendered
-            gl.stencilFunc(gl.EQUAL, 1, 0xff);
+            gl.stencilFunc(gl.EQUAL, 1, 0xFF);
             // stencil buffer is not changed
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
 
@@ -99,9 +99,14 @@ export class RendererComponent {
             const tmpNear = camera.near;
             camera.near = Math.max(tmpNear, camera.position.distanceTo(portal.getAbsolutePosition()) - 2);
             camera.updateProjectionMatrix();
-            camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
+
+            // Solution A) Rotation will be fine
+            // camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
+
+            // Solution B) Position will be fine
             camera.position.copy(portal.getDestination().getAbsolutePosition()).sub(portal.getAbsolutePosition()).add(this.cameraTmpPosition);
             camera.updateMatrix();
+
             camera.matrixWorldInverse.getInverse(camera.matrixWorld);
             // camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal.getDestination(), camera));
 
@@ -128,7 +133,10 @@ export class RendererComponent {
       this.renderer.clear(false, true, false);
 
       // all the current scene portals will be drawn this time
-      this.stencilScene.children = portalsInScene.map(portal => portal.getGroup());
+      this.stencilScene.children = portalsInScene
+         //.sort((a, b) => Math.sign(b.getAbsolutePosition().distanceTo(camera.position) - a.getAbsolutePosition().distanceTo(camera.position)))
+         //.sort((a, b) => Math.sign(a.getAbsolutePosition().distanceTo(camera.position) - b.getAbsolutePosition().distanceTo(camera.position)))
+         .map(portal => portal.getGroup());
 
       // disable color
       gl.colorMask(false, false, false, false);
@@ -143,7 +151,7 @@ export class RendererComponent {
       this.renderer.render(scene, camera);
    }
 
-   // private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
+   private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
    private readonly dstInverse = new Matrix4();
    private readonly srcToCam = new Matrix4();
    private readonly srcToDst = new Matrix4();
@@ -153,8 +161,7 @@ export class RendererComponent {
       const destinationPortal = sourcePortal.getDestination();
       this.srcToCam.multiplyMatrices(camera.matrixWorldInverse, sourcePortal.getMatrix());
       this.dstInverse.getInverse(destinationPortal.getMatrix());
-      this.srcToDst.identity().multiply(this.srcToCam).multiply(this.dstInverse);
-      // this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
+      this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.result.getInverse(this.srcToDst);
       return this.result;
    }

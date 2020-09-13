@@ -3,6 +3,10 @@ import {SkyWorld} from "./instance/sky-world";
 import {World} from "./instance/world";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {RoomWorld} from "./instance/room-world";
+import {BoxWorld1} from "./instance/box-world-1";
+import {BoxWorld2} from "./instance/box-world-2";
+import {BoxWorld3} from "./instance/box-world-3";
+import {BoxWorld4} from "./instance/box-world-4";
 
 // import TWEEN from '@tweenjs/tween.js';
 
@@ -14,10 +18,10 @@ export class SceneComponent {
    constructor() {
       this.add(this.currentWorld = new RoomWorld());
       this.add(new SkyWorld());
-      //this.add(new BoxWorld1());
-      //this.add(new BoxWorld2());
-      //this.add(new BoxWorld3());
-      //this.add(new BoxWorld4());
+      this.add(new BoxWorld1());
+      this.add(new BoxWorld2());
+      this.add(new BoxWorld3());
+      this.add(new BoxWorld4());
    }
 
    getCurrentWorld(): World {
@@ -55,12 +59,10 @@ export class SceneComponent {
    private updatePortals() {
       const portals = this.getPortals();
       Array.from(portals.values()).forEach((portal: PortalWorldObject) => {
-         if (!portal.getDestination()) {
-            if (portals.has(portal.getDestinationPortalName())) {
-               const otherPortal = portals.get(portal.getDestinationPortalName());
-               portal.setDestination(otherPortal);
-               otherPortal.setDestination(portal);
-            }
+         if (!portal.getDestination() && portals.has(portal.getDestinationPortalName())) {
+            const otherPortal = portals.get(portal.getDestinationPortalName());
+            portal.setDestination(otherPortal);
+            otherPortal.setDestination(portal);
          }
       })
    }

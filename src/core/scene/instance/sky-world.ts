@@ -63,5 +63,6 @@ export class SkyWorld extends World {
    step(delta: number) {
       this.box.rotation.y -= 0.015;
       this.box.rotation.x += 0.015;
+      // this.portal.getGroup().rotation.y += .01;
    }
 }

@@ -21,9 +21,9 @@ export class AbstractBoxWorld extends World {
       this.initLight();
       this.addPortal(this.portal = new PortalWorldObject(`BoxWorld${number}.portal`, "RoomWorld", `RoomWorld.boxPortal${number}`, .5));
       this.addObject(this.portal);
-      this.portal.getGroup().position.set(0, 0, -.49);
+      this.portal.getGroup().position.set(0, 0, 0);
 
-      this.add(this.mesh = new Mesh(new BoxBufferGeometry(.4, .4, .4), new MeshNormalMaterial()));
+      this.add(this.mesh = new Mesh(new BoxBufferGeometry(.2, .2, .2), new MeshNormalMaterial()));
 
       this.add(this.outsideBox = new Mesh(
          new BoxBufferGeometry(1, 1, 1),

@@ -1,5 +1,6 @@
 import {WorldObject} from "./world-object";
 import {CircleBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial} from "three";
+
 // import TWEEN from '@tweenjs/tween.js';
 
 export class PortalWorldObject extends WorldObject {

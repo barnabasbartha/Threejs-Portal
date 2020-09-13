@@ -1,7 +1,6 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, LinearEncoding, Matrix4, NoToneMapping, PerspectiveCamera, Scene, Vector3, WebGLRenderer} from "three";
+import {LinearEncoding, Matrix4, NoToneMapping, PerspectiveCamera, Scene, Vector3, WebGLRenderer} from "three";
 import {Subject} from "rxjs";
-import {PortalWorldObject} from "../object/portal-world-object";
 import {World} from "../scene/instance/world";
 
 @Singleton
@@ -20,13 +19,12 @@ export class RendererComponent {
          canvas,
          context: canvas.getContext('webgl2') as WebGLRenderingContext,
          powerPreference: 'high-performance',
-         stencil: true,
          depth: true
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(.8);
       this.renderer.shadowMap.enabled = false;
-      this.renderer.outputEncoding = LinearEncoding; //sRGBEncoding;
+      this.renderer.outputEncoding = LinearEncoding;
       this.renderer.toneMapping = NoToneMapping;
       this.renderer.toneMappingExposure = 1;
       this.context = this.renderer.getContext();
@@ -38,7 +36,6 @@ export class RendererComponent {
    }
 
    private readonly cameraMatrixWorld = new Matrix4();
-   //private readonly cameraProjectionMatrix = new Matrix4();
    private readonly cameraTmpPosition = new Vector3();
 
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
@@ -52,7 +49,6 @@ export class RendererComponent {
       // save camera matrices because they will be modified when rending a view through a portal
       camera.updateMatrixWorld();
       this.cameraMatrixWorld.copy(camera.matrixWorld);
-      // this.cameraProjectionMatrix.copy(camera.projectionMatrix);
 
       // full clear (color, depth and stencil)
       this.renderer.clear(true, true, true);
@@ -61,10 +57,8 @@ export class RendererComponent {
       // disable stencil mask
       gl.stencilMask(0xFF);
 
-      // TODO: Draw portals recursively
 
       portalsInScene
-         //.sort((a, b) => Math.sign(a.getAbsolutePosition().distanceTo(camera.position) - b.getAbsolutePosition().distanceTo(camera.position)))
          .forEach(portal => {
             // disable color + depth
             // only the stencil buffer will be drawn into
@@ -99,11 +93,9 @@ export class RendererComponent {
             const tmpNear = camera.near;
             camera.near = Math.max(tmpNear, camera.position.distanceTo(portal.getAbsolutePosition()) - 2);
             camera.updateProjectionMatrix();
-            camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
             camera.position.copy(portal.getDestination().getAbsolutePosition()).sub(portal.getAbsolutePosition()).add(this.cameraTmpPosition);
             camera.updateMatrix();
             camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-            // camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal.getDestination(), camera));
 
             // render the view through the portal
             this.renderer.render(destinationScene, camera);
@@ -118,7 +110,6 @@ export class RendererComponent {
             camera.matrixWorld.copy(this.cameraMatrixWorld);
             camera.near = tmpNear;
             camera.updateProjectionMatrix();
-            //camera.projectionMatrix.copy(this.cameraProjectionMatrix);
          });
 
       // after all portals have been drawn, we can disable the stencil test
@@ -142,58 +133,4 @@ export class RendererComponent {
       // finally, render the current scene
       this.renderer.render(scene, camera);
    }
-
-   // private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
-   private readonly dstInverse = new Matrix4();
-   private readonly srcToCam = new Matrix4();
-   private readonly srcToDst = new Matrix4();
-   private readonly result = new Matrix4();
-
-   private computePortalViewMatrix(sourcePortal: PortalWorldObject, camera: Camera): Matrix4 {
-      const destinationPortal = sourcePortal.getDestination();
-      this.srcToCam.multiplyMatrices(camera.matrixWorldInverse, sourcePortal.getMatrix());
-      this.dstInverse.getInverse(destinationPortal.getMatrix());
-      this.srcToDst.identity().multiply(this.srcToCam).multiply(this.dstInverse);
-      // this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
-      this.result.getInverse(this.srcToDst);
-      return this.result;
-   }
-
-   /*
-   private readonly dstRotationMatrix = new Matrix4();
-   private readonly normal = new Vector3();
-   private readonly clipPlane = new Plane();
-   private readonly clipVector = new Vector4();
-   private readonly q = new Vector4();
-   private readonly projectionMatrix = new Matrix4();
-
-   private computePortalProjectionMatrix(destinationPortal: PortalWorldObject, camera: Camera): Matrix4 {
-      // http://www.terathon.com/code/oblique.html
-      this.dstRotationMatrix.identity();
-      this.dstRotationMatrix.extractRotation(destinationPortal.getMatrix());
-
-      this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
-
-      this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());
-      this.clipPlane.applyMatrix4(camera.matrixWorldInverse);
-
-      this.clipVector.set(this.clipPlane.normal.x, this.clipPlane.normal.y, this.clipPlane.normal.z, this.clipPlane.constant);
-
-      this.projectionMatrix.copy(camera.projectionMatrix);
-
-      this.q.x = (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) / this.projectionMatrix.elements[0];
-      this.q.y = (Math.sign(this.clipVector.y) + this.projectionMatrix.elements[9]) / this.projectionMatrix.elements[5];
-      this.q.z = -1.0;
-      this.q.w = (1.0 + this.projectionMatrix.elements[10]) / camera.projectionMatrix.elements[14];
-
-      this.clipVector.multiplyScalar(2 / this.clipVector.dot(this.q));
-
-      this.projectionMatrix.elements[2] = this.clipVector.x;
-      this.projectionMatrix.elements[6] = this.clipVector.y;
-      this.projectionMatrix.elements[10] = this.clipVector.z + 1.0;
-      this.projectionMatrix.elements[14] = this.clipVector.w;
-
-      return this.projectionMatrix;
-   }
-   */
 }

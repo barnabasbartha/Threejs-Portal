@@ -7,7 +7,6 @@ export class CameraComponent {
 
    constructor() {
       this.camera = new PerspectiveCamera(70, 1, 0.0001, 5000);
-      this.camera.matrixAutoUpdate = false;
    }
 
    getCamera(): PerspectiveCamera {

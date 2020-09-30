@@ -8,7 +8,8 @@ export abstract class WorldObject extends AbstractObject<Group> {
    private readonly tmpQuaternion = new Quaternion();
 
    getMatrix(): Matrix4 {
-      return this.group.matrix;
+      this.group.updateMatrixWorld(true);
+      return this.group.matrixWorld;
    }
 
    getAbsolutePosition(): Vector3 {

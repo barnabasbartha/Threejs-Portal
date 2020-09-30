@@ -18,7 +18,7 @@ export class PortalWorldObject extends WorldObject {
          new MeshBasicMaterial({
             side: DoubleSide,
             transparent: true,
-            opacity: .5
+            opacity: 0
          }),
          )
       );

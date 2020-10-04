@@ -1,5 +1,16 @@
 import {Singleton} from "typescript-ioc";
-import {Camera, LinearEncoding, Matrix4, NoToneMapping, PerspectiveCamera, Scene, WebGLRenderer} from "three";
+import {
+   Camera,
+   LinearEncoding,
+   Matrix4,
+   NoToneMapping,
+   PerspectiveCamera,
+   Plane,
+   Scene,
+   Vector3,
+   Vector4,
+   WebGLRenderer
+} from "three";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {World} from "../scene/instance/world";
@@ -45,6 +56,7 @@ export class RendererComponent {
    }
 
    private readonly cameraMatrixWorld = new Matrix4();
+   private readonly cameraProjectionMatrix = new Matrix4();
 
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
       if (!this.renderer) {
@@ -57,6 +69,7 @@ export class RendererComponent {
       // save camera matrices because they will be modified when rending a view through a portal
       camera.updateMatrixWorld();
       this.cameraMatrixWorld.copy(camera.matrixWorld);
+      this.cameraProjectionMatrix.copy(camera.projectionMatrix);
 
       // full clear (color, depth and stencil)
       this.renderer.clear();
@@ -69,6 +82,12 @@ export class RendererComponent {
       //gl.clearDepth(-1);
       //gl.depthMask(true);
       // TODO: Draw portals recursively
+
+
+      //gl.colorMask(false, false, false, false);
+      //this.stencilScene.children = portalsInScene.map(portal => portal.getGroup());
+      //this.renderer.render(this.stencilScene, camera);
+      //gl.colorMask(true, true, true, true);
 
       portalsInScene
          .forEach((portal) => {
@@ -102,12 +121,13 @@ export class RendererComponent {
             camera.matrixAutoUpdate = false;
             camera.matrixWorldNeedsUpdate = false;
             const destinationScene = worlds.get(portal.getDestinationSceneName()).getGroup();
-            const tmpNear = camera.near;
-            camera.near = Math.max(tmpNear, camera.position.distanceTo(portal.getAbsolutePosition()) - 2);
-            camera.updateProjectionMatrix();
+            // const tmpNear = camera.near;
+            // camera.near = Math.max(tmpNear, camera.position.distanceTo(portal.getAbsolutePosition()) - 2);
             camera.matrixWorldInverse.getInverse(camera.matrixWorld);
             camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
             camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+            camera.updateProjectionMatrix();
+            camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal, portal.getDestination(), camera));
 
             // render the view through the portal
             //gl.depthMask(false);
@@ -116,14 +136,15 @@ export class RendererComponent {
 
             // clear the depth buffer to remove the portal views' depth from the current scene
             // clear the stencil buffer for the next portal
-            this.renderer.clear(false, true, true);
+            this.renderer.clear(false, false, true);
 
             // restore original camera matrices for the next portal
             camera.matrixAutoUpdate = true;
             camera.matrixWorldNeedsUpdate = true;
             camera.matrixWorld.copy(this.cameraMatrixWorld);
-            camera.near = tmpNear;
-            camera.updateProjectionMatrix();
+            // camera.near = tmpNear;
+            // camera.updateProjectionMatrix();
+            camera.projectionMatrix.copy(this.cameraProjectionMatrix);
          });
 
       // after all portals have been drawn, we can disable the stencil test
@@ -161,5 +182,43 @@ export class RendererComponent {
       this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.result.getInverse(this.srcToDst);
       return this.result;
+   }
+
+   private readonly dstRotationMatrix = new Matrix4();
+   private readonly normal = new Vector3();
+   private readonly clipPlane = new Plane();
+   private readonly clipVector = new Vector4();
+   private readonly q = new Vector4();
+   private readonly projectionMatrix = new Matrix4();
+
+   // Use custom projection matrix to align portal camera's near clip plane with the surface of the portal
+   // See http://www.terathon.com/code/oblique.html
+   // See www.terathon.com/lengyel/Lengyel-Oblique.pdf
+   private computePortalProjectionMatrix(sourcePortal: PortalWorldObject, destinationPortal: PortalWorldObject, camera: Camera): Matrix4 {
+      this.dstRotationMatrix.identity();
+      this.dstRotationMatrix.extractRotation(destinationPortal.getMatrix());
+
+      this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
+
+      this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());
+      this.clipPlane.applyMatrix4(camera.matrixWorldInverse);
+
+      this.clipVector.set(this.clipPlane.normal.x, this.clipPlane.normal.y, this.clipPlane.normal.z, this.clipPlane.constant);
+
+      this.projectionMatrix.copy(camera.projectionMatrix);
+
+      this.q.x = (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) / this.projectionMatrix.elements[0];
+      this.q.y = (Math.sign(this.clipVector.y) + this.projectionMatrix.elements[9]) / this.projectionMatrix.elements[5];
+      this.q.z = -1.0;
+      this.q.w = (1.0 + this.projectionMatrix.elements[10]) / camera.projectionMatrix.elements[14];
+
+      this.clipVector.multiplyScalar(2 / this.clipVector.dot(this.q));
+
+      this.projectionMatrix.elements[2] = this.clipVector.x;
+      this.projectionMatrix.elements[6] = this.clipVector.y;
+      this.projectionMatrix.elements[10] = this.clipVector.z + 1.0;
+      this.projectionMatrix.elements[14] = this.clipVector.w;
+
+      return this.projectionMatrix;
    }
 }

@@ -20,6 +20,7 @@ export class AbstractBoxWorld extends World {
       super(`BoxWorld${number}`);
       this.initLight();
       this.addPortal(this.portal = new PortalWorldObject(`BoxWorld${number}.portal`, "RoomWorld", `RoomWorld.boxPortal${number}`, .5));
+      this.portal.getGroup().rotation.y = Math.PI;
       this.addObject(this.portal);
       this.portal.getGroup().position.set(0, 0, .499);
 
@@ -32,10 +33,6 @@ export class AbstractBoxWorld extends World {
             color,
             shadowSide: BackSide
          })));
-
-      //const sky = new Sky();
-      //sky.scale.setScalar(10000);
-      //this.add(sky);
    }
 
    private initLight() {

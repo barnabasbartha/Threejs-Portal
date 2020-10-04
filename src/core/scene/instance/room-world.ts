@@ -10,7 +10,6 @@ import {
    MeshStandardMaterial,
    PointLight
 } from "three";
-import {Sky} from "three/examples/jsm/objects/Sky";
 import {PortalHolderWorldObject} from "../../object/portal-holder-world-object";
 
 export class RoomWorld extends World {
@@ -37,10 +36,6 @@ export class RoomWorld extends World {
       this.outsideBox.position.set(0, 3, 0);
 
 
-      const sky = new Sky();
-      sky.scale.setScalar(10000);
-      this.add(sky);
-
       const portal1 = new PortalWorldObject("RoomWorld.boxPortal1", "BoxWorld1", "BoxWorld1.portal", .5);
       const portal2 = new PortalWorldObject("RoomWorld.boxPortal2", "BoxWorld2", "BoxWorld2.portal", .5);
       const portal3 = new PortalWorldObject("RoomWorld.boxPortal3", "BoxWorld3", "BoxWorld3.portal", .5);
@@ -52,6 +47,7 @@ export class RoomWorld extends World {
       const portalHolder = new PortalHolderWorldObject(portal1, portal2, portal3, portal4);
       this.addObject(portalHolder);
       portalHolder.getGroup().position.set(2.5, 1, 0);
+      portalHolder.getGroup().updateMatrixWorld();
 
 
       const mirrorPortal = new PortalWorldObject("RoomWorld.mirror", "RoomWorld", "RoomWorld.mirror");

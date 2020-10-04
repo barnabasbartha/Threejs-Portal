@@ -14,7 +14,7 @@ export class PortalWorldObject extends WorldObject {
       super();
 
       this.addPhysicalObject(this.mesh = new Mesh(
-         new CircleBufferGeometry(size, 100),
+         new CircleBufferGeometry(size, 32),
          new MeshBasicMaterial({
             side: DoubleSide,
             transparent: true,

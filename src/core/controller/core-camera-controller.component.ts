@@ -21,7 +21,7 @@ export class CoreCameraControllerComponent {
    }
 
    getDirection(): Vector3 {
-      return this.direction.set(0, 0, -1).applyQuaternion(this.object.quaternion);
+      return this.direction.set(0, 0, 1).applyQuaternion(this.object.quaternion);
    }
 
    getQuaternion(): Quaternion {

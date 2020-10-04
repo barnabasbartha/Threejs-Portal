@@ -9,6 +9,7 @@ import {TimerComponent} from "../timer/timer.component";
 export class CoreMovementControllerComponent {
    private static readonly PLANE_NORMAL = new Vector3(0, 1, 0);
    private static readonly DEG_45 = Math.PI / 4;
+   private static readonly DEG_180 = Math.PI;
    private static readonly KEY_FORWARD = "KeyW";
    private static readonly KEY_LEFT = "KeyA";
    private static readonly KEY_BACKWARDS = "KeyS";
@@ -56,7 +57,7 @@ export class CoreMovementControllerComponent {
          this.movement.copy(this.lookingDirection)
             .projectOnPlane(CoreMovementControllerComponent.PLANE_NORMAL)
             .normalize();
-         const additionalAngle = this.keyDirection * CoreMovementControllerComponent.DEG_45;
+         const additionalAngle = this.keyDirection * CoreMovementControllerComponent.DEG_45 + CoreMovementControllerComponent.DEG_180;
          let moveVectorDeg = Math.atan2(this.movement.x, this.movement.z);
          moveVectorDeg -= additionalAngle;
          this.movement.x = Math.sin(moveVectorDeg);

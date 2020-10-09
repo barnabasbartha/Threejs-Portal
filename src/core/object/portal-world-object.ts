@@ -20,7 +20,8 @@ export class PortalWorldObject extends WorldObject {
             transparent: true,
             opacity: 0,
             //color: new Color(Math.random(), Math.random(), Math.random())
-            polygonOffsetFactor: -10,
+            polygonOffsetFactor: -1,
+            polygonOffsetUnits: -4,
             polygonOffset: true
          }),
          )

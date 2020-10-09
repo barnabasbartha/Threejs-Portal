@@ -69,11 +69,11 @@ export class RoomWorld extends World {
 
    private initLight() {
       const directionalLight = new PointLight();
-      directionalLight.intensity = 1;
+      directionalLight.intensity = .7;
       directionalLight.position.set(4, 4, 4);
       this.add(directionalLight);
 
-      const ambientLight = new AmbientLight();
+      const ambientLight = new AmbientLight(0xffffff);
       this.add(ambientLight);
    }
 

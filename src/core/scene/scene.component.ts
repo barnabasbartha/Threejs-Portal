@@ -1,5 +1,4 @@
 import {Singleton} from "typescript-ioc";
-import {SkyWorld} from "./instance/sky-world";
 import {World} from "./instance/world";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {RoomWorld} from "./instance/room-world";
@@ -17,7 +16,7 @@ export class SceneComponent {
 
    constructor() {
       this.add(this.currentWorld = new RoomWorld());
-      this.add(new SkyWorld());
+      //this.add(new SkyWorld());
       this.add(new BoxWorld1());
       this.add(new BoxWorld2());
       this.add(new BoxWorld3());

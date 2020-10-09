@@ -2,12 +2,10 @@ import {Inject, Singleton} from "typescript-ioc";
 import {MovementComponent} from "../../controller/movement-component";
 import {CoreCameraControllerComponent} from "../../controller/core-camera-controller.component";
 import {SceneComponent} from "../scene.component";
-import {Matrix4, Quaternion, Vector3} from "three";
+import {Euler} from "three";
 
 @Singleton
 export class TeleportComponent {
-   private readonly tmpVector = new Vector3();
-
    constructor(@Inject protected readonly movement: MovementComponent,
                @Inject protected readonly camera: CoreCameraControllerComponent,
                @Inject protected readonly scene: SceneComponent) {
@@ -19,14 +17,29 @@ export class TeleportComponent {
          // Switch scene
          scene.setCurrentWorld(targetWorld);
 
-         this.tmpVector.copy(teleport.collision.position).sub(sourcePortal.getAbsolutePosition());
-         movement.setPosition(this.tmpVector.add(targetPortal.getAbsolutePosition()));
+         const collisionSourcePortalDeltaPosition = teleport.collision.position.clone().sub(sourcePortal.getAbsolutePosition());
+         const cameraRotation = camera.getRotation();
+         const targetPortalRotation = targetPortal.getAbsoluteRotation();
+         const sourcePortalRotation = sourcePortal.getAbsoluteRotation();
+         const deltaRotation = new Euler(
+            targetPortalRotation.x - sourcePortalRotation.x,
+            targetPortalRotation.y - sourcePortalRotation.y + Math.PI,
+            targetPortalRotation.z - sourcePortalRotation.z
+         );
+         cameraRotation.x += deltaRotation.x;
+         cameraRotation.y += deltaRotation.y;
+         cameraRotation.z += deltaRotation.z;
+         collisionSourcePortalDeltaPosition.applyEuler(deltaRotation);
 
-         // const deltaQuaternion = targetPortal.getAbsoluteQuaternion().inverse().multiply(sourcePortal.getAbsoluteQuaternion());
-         // const deltaQuaternion = targetPortal.getAbsoluteQuaternion().inverse().multiply(sourcePortal.getAbsoluteQuaternion());
-         // camera.setQuaternion(deltaQuaternion);
+         const remainingMovementAfterCollision = teleport.collision.movement.clone().multiplyScalar(1 - teleport.collision.ratioToPosition);
+         remainingMovementAfterCollision.applyEuler(deltaRotation);
 
-         // TODO: Add the rest of the movement vector to the new direction (maybe two times)
+         camera.setRotation(cameraRotation);
+         movement.setPosition(
+            collisionSourcePortalDeltaPosition
+               .add(remainingMovementAfterCollision)
+               .add(targetPortal.getAbsolutePosition())
+         );
       });
    }
 }

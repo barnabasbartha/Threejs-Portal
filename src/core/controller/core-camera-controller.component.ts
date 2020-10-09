@@ -1,6 +1,6 @@
 import {Inject, Singleton} from "typescript-ioc";
 import {CoreControllerComponent} from "./core-controller.component";
-import {Object3D, Quaternion, Vector3} from "three";
+import {Euler, Object3D, Quaternion, Vector3} from "three";
 import {MathUtil} from "../../util/math-util";
 import {Subject} from "rxjs";
 
@@ -29,7 +29,17 @@ export class CoreCameraControllerComponent {
    }
 
    setQuaternion(quaternion: Quaternion) {
-      this.object.quaternion.multiply(quaternion);
+      this.object.setRotationFromQuaternion(quaternion);
+      this.update();
+   }
+
+   getRotation(): Euler {
+      return this.object.rotation;
+   }
+
+   setRotation(rotation: Euler) {
+      this.object.rotation.copy(rotation);
+      this.object.updateMatrix();
       this.update();
    }
 

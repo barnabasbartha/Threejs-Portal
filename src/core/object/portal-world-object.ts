@@ -1,5 +1,5 @@
 import {WorldObject} from "./world-object";
-import {CircleBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial} from "three";
+import {DoubleSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
 
 // import TWEEN from '@tweenjs/tween.js';
 
@@ -14,11 +14,14 @@ export class PortalWorldObject extends WorldObject {
       super();
 
       this.addPhysicalObject(this.mesh = new Mesh(
-         new CircleBufferGeometry(size, 32),
+         new PlaneBufferGeometry(size, size),
          new MeshBasicMaterial({
             side: DoubleSide,
             transparent: true,
-            opacity: 0
+            opacity: 0,
+            //color: new Color(Math.random(), Math.random(), Math.random())
+            polygonOffsetFactor: -10,
+            polygonOffset: true
          }),
          )
       );

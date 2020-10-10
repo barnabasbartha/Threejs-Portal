@@ -38,8 +38,7 @@ export class CoreCameraControllerComponent {
    }
 
    setRotation(rotation: Euler) {
-      this.object.rotation.copy(rotation);
-      this.object.updateMatrix();
+      this.object.setRotationFromEuler(rotation);
       this.update();
    }
 

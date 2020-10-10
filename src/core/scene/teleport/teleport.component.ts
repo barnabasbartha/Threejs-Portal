@@ -22,9 +22,9 @@ export class TeleportComponent {
          const targetPortalRotation = targetPortal.getAbsoluteRotation();
          const sourcePortalRotation = sourcePortal.getAbsoluteRotation();
          const deltaRotation = new Euler(
-            targetPortalRotation.x - sourcePortalRotation.x,
-            targetPortalRotation.y - sourcePortalRotation.y + Math.PI,
-            targetPortalRotation.z - sourcePortalRotation.z
+            0, //targetPortalRotation.x - sourcePortalRotation.x,
+            targetPortalRotation.y - sourcePortalRotation.y,
+            0, //targetPortalRotation.z - sourcePortalRotation.z
          );
          cameraRotation.x += deltaRotation.x;
          cameraRotation.y += deltaRotation.y;

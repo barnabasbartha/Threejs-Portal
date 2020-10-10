@@ -1,35 +1,30 @@
-import {Singleton} from "typescript-ioc";
 import {
-   BoxBufferGeometry,
    Camera,
-   CircleBufferGeometry,
-   DoubleSide,
    Group,
    LinearEncoding,
    Matrix4,
-   Mesh,
-   MeshBasicMaterial,
    NoToneMapping,
    PerspectiveCamera,
    Plane,
    Scene,
    Vector3,
    Vector4,
-   WebGLRenderer
+   WebGLRenderer,
 } from "three";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {World} from "../scene/instance/world";
 import {Config} from "../../config/config";
+import {Singleton} from "typescript-ioc";
 
 @Singleton
 export class RendererComponent {
    private readonly initSubject = new Subject<void>();
    public readonly init$ = this.initSubject.pipe();
 
-   private renderer: WebGLRenderer;
+   private renderer?: WebGLRenderer;
    private stencilScene = new Scene();
-   private context: WebGLRenderingContext;
+   private gl?: WebGLRenderingContext;
 
    init(canvas: HTMLCanvasElement) {
       // @ts-ignore
@@ -53,7 +48,7 @@ export class RendererComponent {
       this.renderer.outputEncoding = LinearEncoding; //sRGBEncoding;
       this.renderer.toneMapping = NoToneMapping;
       this.renderer.toneMappingExposure = 1;
-      this.context = this.renderer.getContext();
+      this.gl = this.renderer.getContext();
       this.initSubject.next();
    }
 
@@ -61,225 +56,83 @@ export class RendererComponent {
       this.renderer?.setSize(width, height);
    }
 
-   private readonly cameraMatrixWorld = new Matrix4();
-   private readonly cameraProjectionMatrix = new Matrix4();
-
-
-   //
-   private readonly frontCircle = new Mesh(
-      new CircleBufferGeometry(1, 32),
-      new MeshBasicMaterial({
-         side: DoubleSide,
-         transparent: true,
-         opacity: 0,
-         //color: new Color(Math.random(),Math.random(),Math.random())
-      }),
-   );
-   private readonly backCircle = new Mesh(
-      new CircleBufferGeometry(1, 32),
-      new MeshBasicMaterial({
-         side: DoubleSide,
-         transparent: true,
-         opacity: 0,
-         //color: new Color(Math.random(),Math.random(),Math.random())
-      }),
-   );
-
-   private readonly frontBox = new Mesh(new BoxBufferGeometry(), new MeshBasicMaterial({color: 0x00ff00}));
-   private readonly backBox = new Mesh(new BoxBufferGeometry(), new MeshBasicMaterial({color: 0xff0000}));
-
-   //
-
-   private readonly portalsGroup = new Group();
-
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
       if (!this.renderer) {
          return;
       }
-      const scene = world.getGroup();
-      const portalsInScene = world.getPortals();
-      const gl = this.context;
 
-      // save camera matrices because they will be modified when rending a view through a portal
-      camera.updateMatrixWorld();
-      this.cameraMatrixWorld.copy(camera.matrixWorld);
-      this.cameraProjectionMatrix.copy(camera.projectionMatrix);
-
-      // full clear (color, depth and stencil)
       this.renderer.clear();
 
+      this.gl.enable(this.gl.STENCIL_TEST);
+      this.gl.enable(this.gl.DEPTH_TEST);
 
-      ///
-      /*
-      gl.enable(gl.STENCIL_TEST);
-      gl.enable(gl.DEPTH_TEST);
-      this.frontCircle.position.set(.5, 1, -1);
-      this.backCircle.position.set(-.5, 1, -1.5);
-      this.frontBox.position.set(.5, 1, -5);
-      this.backBox.position.set(-.5, 1, -6);
-      this.frontBox.rotation.x += 0.01;
-      this.frontBox.rotation.z += 0.01;
-      this.backBox.rotation.x -= 0.01;
-      this.backBox.rotation.z -= 0.01;
+      const drawPortalGroups = this.renderWorldPortals(worlds, world, camera, 0);
 
-      // TODO: Stencil front circle
-      //this.frontCircle.material.opacity = 1;
-      //this.backCircle.material.opacity = 1;
-      gl.colorMask(false, false, false, false);
-      //this.stencilScene.children = [this.frontCircle, this.backCircle];
-      //this.renderer.render(this.stencilScene, camera);
-      //gl.depthMask(false);
-      gl.stencilFunc(gl.NEVER, 1, 0xFF);
-      gl.stencilOp(gl.REPLACE, gl.KEEP, gl.KEEP);
-      this.stencilScene.children = [this.frontCircle];
-      this.renderer.render(this.stencilScene, camera);
-      gl.colorMask(true, true, true, true);
-      //gl.depthMask(true);
-
-      // TODO: Draw front box
-      //this.frontCircle.material.opacity = 0;
-      //this.backCircle.material.opacity = 0
-      gl.stencilFunc(gl.EQUAL, 1, 0xFF);
-      gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-      this.stencilScene.children = [this.frontCircle, this.backCircle, this.frontBox];
-      this.renderer.render(this.stencilScene, camera);
-      this.renderer.clear(false, false, true);
-
-      // TODO: Stencil back circle
-      //this.frontCircle.material.opacity = 1;
-      //this.backCircle.material.opacity = 1;
-      gl.colorMask(false, false, false, false);
-      //this.stencilScene.children = [this.frontCircle, this.backCircle];
-      //this.renderer.render(this.stencilScene, camera);
-      //gl.depthMask(false);
-      gl.stencilFunc(gl.NEVER, 1, 0xFF);
-      gl.stencilOp(gl.REPLACE, gl.KEEP, gl.KEEP);
-      this.stencilScene.children = [this.backCircle];
-      this.renderer.render(this.stencilScene, camera);
-      gl.colorMask(true, true, true, true);
-      //gl.depthMask(true);
-
-      // TODO: Draw back box
-      //this.frontCircle.material.opacity = 0;
-      //this.backCircle.material.opacity = 0
-      gl.stencilFunc(gl.EQUAL, 1, 0xFF);
-      gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-      this.stencilScene.children = [this.frontCircle, this.backCircle, this.backBox];
-      this.renderer.render(this.stencilScene, camera);
-      this.renderer.clear(false, false, true);
-
-
-
-      gl.disable(gl.STENCIL_TEST);
+      this.gl.disable(this.gl.STENCIL_TEST);
       this.renderer.clear(false, true, false);
-      gl.colorMask(false, false, false, false);
-      this.stencilScene.children = [this.frontCircle, this.backCircle];
+
+      this.gl.colorMask(false, false, false, false);
+      this.stencilScene.children = drawPortalGroups;
       this.renderer.render(this.stencilScene, camera);
-      gl.colorMask(true, true, true, true);
+      this.gl.colorMask(true, true, true, true);
+
+      const scene = world.getGroup();
       this.renderer.render(scene, camera);
-      return;
-      */
+   }
 
-
-      gl.enable(gl.STENCIL_TEST);
-      gl.enable(gl.DEPTH_TEST);
-      // enable stencil test
-      // disable stencil mask
-      //gl.depthFunc(gl.GREATER);
-      //gl.clearDepth(1);
-      //gl.depthMask(true);
-      // portalsInScene.forEach(portal => portal.disableTransparency());
-
+   private renderWorldPortals(worlds: Map<string, World>, world: World, camera: PerspectiveCamera, recursiveLevel: number): Group[] {
+      const portalsInScene = world.getPortals();
       const portalGroups = portalsInScene.map(portal => portal.getGroup());
-      this.portalsGroup.children = portalGroups;
+      const drawPortalGroups = [...portalGroups];
+
+      const cameraMatrixWorld = camera.matrixWorld.clone();
+      //const cameraProjectionMatrix = camera.projectionMatrix.clone();
       portalsInScene
          .forEach((portal) => {
-            // disable color + depth
-            // only the stencil buffer will be drawn into
-            gl.colorMask(false, false, false, false);
-            //gl.depthMask(false);
-
-            // the stencil test will always fail (this is cheaper to compute)
-            gl.stencilFunc(gl.NEVER, 1, 0xFF);
-            // fragments where the portal is drawn will have a stencil value of 1
-            // other fragments will retain a stencil value of 0
-            gl.stencilOp(gl.REPLACE, gl.KEEP, gl.KEEP);
-            //  gl.depthFunc(gl.LESS);
-
-            // render the portal shape using the settings above
-            // set the portal as the only child of the stencil scene
-            this.stencilScene.children = [portal.getGroup()];
-            this.renderer.render(this.stencilScene, camera);
-
-            // enable color + depth
-            gl.colorMask(true, true, true, true);
-            //gl.depthMask(true);
-
-            // fragments with a stencil value of 1 will be rendered
-            gl.stencilFunc(gl.EQUAL, 1, 0xFF);
-            // stencil buffer is not changed
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+            const destinationWorld = worlds.get(portal.getDestinationSceneName());
+            const destinationScene = destinationWorld.getGroup();
 
 
-            //this.stencilScene.children = portalGroups;
-            //this.renderer.render(this.stencilScene, camera);
-
-            // compute the view through the portal
-            camera.matrixAutoUpdate = false;
-            const destinationScene = worlds.get(portal.getDestinationSceneName()).getGroup();
-            //destinationScene.matrixWorld.identity().multiply(portal.getMatrix()).multiply(portal.getDestination().getGroup().matrixWorld);
-            // destinationScene.updateWorldMatrix(true, true);
-            camera.matrixWorldInverse.getInverse(camera.matrixWorld); // TODO: Could be cached
-            camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
-            camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-            camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal, portal.getDestination(), camera));
-
-            // render the view through the portal
-            //gl.depthMask(false);
-            // this.stencilScene.children = [ ...destinationScene.children];
-            this.portalsGroup.matrixAutoUpdate = false;
-            //this.portalsGroup.matrixWorld.identity().multiply(camera.matrixWorld).multiply(new Matrix4().getInverse(this.cameraMatrixWorld));
-            // this.portalsGroup.matrixWorld.identity().multiply(this.cameraMatrixWorld).multiply(new Matrix4().getInverse(camera.matrixWorld));
-            this.stencilScene.children = [this.portalsGroup, ...destinationScene.children];
-            this.renderer.render(this.stencilScene, camera);
-            //this.renderer.render(destinationScene, camera);
-            //gl.depthMask(true);
-
-            // clear the depth buffer to remove the portal views' depth from the current scene
-            // clear the stencil buffer for the next portal
+            if (recursiveLevel > 0) {
+               camera.matrixAutoUpdate = false;
+               camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
+               const childPortalGroups = this.renderWorldPortals(worlds, destinationWorld, camera, recursiveLevel - 1);
+               drawPortalGroups.push(...childPortalGroups);
+               camera.matrixAutoUpdate = true;
+               camera.matrixWorld.copy(cameraMatrixWorld);
+               //camera.projectionMatrix.copy(cameraProjectionMatrix);
+            }
             this.renderer.clear(false, false, true);
 
-            // restore original camera matrices for the next portal
+            this.gl.colorMask(false, false, false, false);
+            this.gl.stencilFunc(this.gl.NEVER, 1, 0xFF);
+            this.gl.stencilOp(this.gl.REPLACE, this.gl.KEEP, this.gl.KEEP);
+            this.stencilScene.children = [portal.getGroup()];
+            this.renderer.render(this.stencilScene, camera);
+            this.gl.colorMask(true, true, true, true);
+
+            this.gl.stencilFunc(this.gl.EQUAL, 1, 0xFF);
+            this.gl.stencilOp(this.gl.KEEP, this.gl.KEEP, this.gl.KEEP);
+            camera.matrixAutoUpdate = false;
+            //camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+            camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
+            //camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+            //camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal, portal.getDestination(), camera));
+
+
+
+            //this.stencilScene.children = [...portalGroups, ...destinationScene.children];
+            //this.stencilScene.children = [...children, ...destinationScene.children];
+            this.stencilScene.children = destinationScene.children;
+            this.renderer.render(this.stencilScene, camera);
+            this.renderer.clear(false, false, true);
+
             camera.matrixAutoUpdate = true;
-            camera.matrixWorld.copy(this.cameraMatrixWorld);
-            camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-            camera.projectionMatrix.copy(this.cameraProjectionMatrix);
-            //destinationScene.updateMatrixWorld(true);
-            //destinationScene.updateWorldMatrix(true, true);
+            camera.matrixWorld.copy(cameraMatrixWorld);
+            //camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+            //camera.projectionMatrix.copy(cameraProjectionMatrix);
          });
-
-      // after all portals have been drawn, we can disable the stencil test
-      gl.disable(gl.STENCIL_TEST);
-
-      // clear the depth buffer to remove the portal views' depth from the current scene
-      this.renderer.clear(false, true, false);
-
-      // disable color
-      gl.colorMask(false, false, false, false);
-      // draw the portal shapes into the depth buffer
-      // this will make the portals appear as flat shapes
-      // this.stencilScene.children = [portalsInScene[0].getGroup()];
-      this.stencilScene.children = portalGroups;
-      this.renderer.render(this.stencilScene, camera);
-
-      // enable color
-      gl.colorMask(true, true, true, true);
-
-      // finally, render the current scene
-      //gl.depthFunc(gl.LESS);
-      //gl.clearDepth(Infinity);
-      // portalsInScene.forEach(portal => portal.enableTransparency());
-      this.renderer.render(scene, camera);
+      return drawPortalGroups;
    }
 
    private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);

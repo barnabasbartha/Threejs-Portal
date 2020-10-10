@@ -36,10 +36,10 @@ export class RoomWorld extends World {
       this.outsideBox.position.set(0, 3, 0);
 
 
-      const portal1 = new PortalWorldObject("RoomWorld.boxPortal1", "BoxWorld1", "BoxWorld1.portal", .5);
-      const portal2 = new PortalWorldObject("RoomWorld.boxPortal2", "BoxWorld2", "BoxWorld2.portal", .5);
-      const portal3 = new PortalWorldObject("RoomWorld.boxPortal3", "BoxWorld3", "BoxWorld3.portal", .5);
-      const portal4 = new PortalWorldObject("RoomWorld.boxPortal4", "BoxWorld4", "BoxWorld4.portal", .5);
+      const portal1 = new PortalWorldObject("RoomWorld.boxPortal1", "BoxWorld1", "BoxWorld1.portal", 1);
+      const portal2 = new PortalWorldObject("RoomWorld.boxPortal2", "BoxWorld2", "BoxWorld2.portal", 1);
+      const portal3 = new PortalWorldObject("RoomWorld.boxPortal3", "BoxWorld3", "BoxWorld3.portal", 1);
+      const portal4 = new PortalWorldObject("RoomWorld.boxPortal4", "BoxWorld4", "BoxWorld4.portal", 1);
       this.addPortal(portal1);
       this.addPortal(portal2)
       this.addPortal(portal3);
@@ -57,8 +57,8 @@ export class RoomWorld extends World {
 
 
       const portalToRoom1 = new PortalWorldObject("RoomWorld.portalToRoom1", "RoomWorld", "RoomWorld.portalToRoom2", 2);
-      portalToRoom1.getGroup().position.set(-5.0, 1, -2);
-      portalToRoom1.getGroup().rotation.y = Math.PI / 2;
+      portalToRoom1.getGroup().position.set(-2, 1, 5);
+      portalToRoom1.getGroup().rotation.y = Math.PI;
       this.addPortal(portalToRoom1);
       this.addObject(portalToRoom1);
       const portalToRoom2 = new PortalWorldObject("RoomWorld.portalToRoom2", "RoomWorld", "RoomWorld.portalToRoom1", 2);

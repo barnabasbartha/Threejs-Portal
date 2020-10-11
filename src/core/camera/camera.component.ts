@@ -7,7 +7,6 @@ export class CameraComponent {
 
    constructor() {
       this.camera = new PerspectiveCamera(70, 1, 0.0001, 5000);
-      this.camera.matrixAutoUpdate = false;
    }
 
    getCamera(): PerspectiveCamera {
@@ -19,8 +18,8 @@ export class CameraComponent {
       this.camera.updateProjectionMatrix();
    }
 
-   setQuaternion(quaternion: Quaternion, t: number) {
-      this.camera.quaternion.slerp(quaternion, t);
+   setQuaternion(quaternion: Quaternion) {
+      this.camera.quaternion.copy(quaternion);
    }
 
    setPosition(position: Vector3) {

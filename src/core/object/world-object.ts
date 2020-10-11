@@ -10,7 +10,7 @@ export abstract class WorldObject extends AbstractObject<Group> {
 
    getMatrix(): Matrix4 {
       this.group.updateMatrix();
-      return this.group.matrixWorld; 
+      return this.group.matrixWorld;
    }
 
    getAbsolutePosition(): Vector3 {

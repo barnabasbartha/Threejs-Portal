@@ -39,12 +39,12 @@ export class RoomWorld extends World {
 
 
       const portalToRoom1 = new PortalWorldObject("RoomWorld.portalToRoom1", "RoomWorld", "RoomWorld.portalToRoom2", true, 2);
-      portalToRoom1.getGroup().position.set(5, 1, 0);
+      portalToRoom1.getGroup().position.set(4.99, 1, 0);
       portalToRoom1.getGroup().rotation.y = -Math.PI / 2;
       this.addPortal(portalToRoom1);
       this.addObject(portalToRoom1);
       const portalToRoom2 = new PortalWorldObject("RoomWorld.portalToRoom2", "RoomWorld", "RoomWorld.portalToRoom1", true, 2);
-      portalToRoom2.getGroup().position.set(2, 1, -5.0);
+      portalToRoom2.getGroup().position.set(2, 1, -4.99);
       this.addPortal(portalToRoom2);
       this.addObject(portalToRoom2);
 

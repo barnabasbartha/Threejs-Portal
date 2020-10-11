@@ -17,7 +17,6 @@ class Main {
                @Inject private readonly guiComponent: GuiComponent) {
       this.initCanvas();
       this.initCoreThread();
-      this.initComponents();
       console.log("Main thread OK");
    }
 
@@ -39,6 +38,7 @@ class Main {
          .then(([coreThread, coreWorker]) => {
             this.coreThread = coreThread;
             console.log("Core thread created");
+            this.initComponents();
             coreWorker.postMessage({canvas: offscreenCanvas}, [offscreenCanvas]);
          });
    }

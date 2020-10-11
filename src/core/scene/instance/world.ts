@@ -6,11 +6,16 @@ import {PortalWorldObject} from "../../object/portal-world-object";
 export abstract class World extends AbstractObject<Scene> {
    protected readonly group = new Scene();
    private readonly objects = new Set<WorldObject>();
+   protected readonly groupWithoutPortals = new Scene();
    private portals = new Map<string, PortalWorldObject>();
 
    protected constructor(private name: string,
                          private size: number = Infinity) {
       super();
+   }
+
+   getGroupWithoutPortals(): Scene {
+      return this.groupWithoutPortals;
    }
 
    getName(): string {
@@ -30,6 +35,9 @@ export abstract class World extends AbstractObject<Scene> {
    addObject(object: WorldObject) {
       if (!this.objects.has(object)) {
          this.objects.add(object);
+         if (!(object instanceof PortalWorldObject)) {
+            this.groupWithoutPortals.add(object.getGroup());
+         }
          this.add(object.getGroup());
       }
    }
@@ -38,6 +46,9 @@ export abstract class World extends AbstractObject<Scene> {
       if (this.objects.has(object)) {
          this.objects.delete(object);
          this.group.remove(object.getGroup());
+         if (!(object instanceof PortalWorldObject)) {
+            this.groupWithoutPortals.add(object.getGroup());
+         }
       }
    }
 

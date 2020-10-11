@@ -1,9 +1,8 @@
 import {
-   Camera,
-   Group,
    LinearEncoding,
    Matrix4,
    NoToneMapping,
+   Object3D,
    PerspectiveCamera,
    Plane,
    Scene,
@@ -23,7 +22,7 @@ export class RendererComponent {
    public readonly init$ = this.initSubject.pipe();
 
    private renderer?: WebGLRenderer;
-   private stencilScene = new Scene();
+   private tmpScene = new Scene();
    private gl?: WebGLRenderingContext;
 
    init(canvas: HTMLCanvasElement) {
@@ -57,94 +56,106 @@ export class RendererComponent {
    }
 
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
-      if (!this.renderer) {
-         return;
+      if (this.renderer) {
+         this.renderer.clear();
+         camera.updateMatrix();
+         camera.updateMatrixWorld(true);
+         this.renderWorldPortals(worlds, world, null, camera, camera.matrixWorld.clone(), camera.projectionMatrix.clone());
       }
-
-      this.renderer.clear();
-
-      this.gl.enable(this.gl.STENCIL_TEST);
-      this.gl.enable(this.gl.DEPTH_TEST);
-
-      const drawPortalGroups = this.renderWorldPortals(worlds, world, camera, 0);
-
-      this.gl.disable(this.gl.STENCIL_TEST);
-      this.renderer.clear(false, true, false);
-
-      this.gl.colorMask(false, false, false, false);
-      this.stencilScene.children = drawPortalGroups;
-      this.renderer.render(this.stencilScene, camera);
-      this.gl.colorMask(true, true, true, true);
-
-      const scene = world.getGroup();
-      this.renderer.render(scene, camera);
    }
 
-   private renderWorldPortals(worlds: Map<string, World>, world: World, camera: PerspectiveCamera, recursiveLevel: number): Group[] {
+   private renderWorldPortals(worlds: Map<string, World>, world: World, excludePortal: PortalWorldObject | null, camera: PerspectiveCamera, viewMat: Matrix4, projMat: Matrix4, recursionLevel: number = 0) {
+      const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInScene = world.getPortals();
-      const portalGroups = portalsInScene.map(portal => portal.getGroup());
-      const drawPortalGroups = [...portalGroups];
-
-      const cameraMatrixWorld = camera.matrixWorld.clone();
-      //const cameraProjectionMatrix = camera.projectionMatrix.clone();
       portalsInScene
-         .forEach((portal) => {
+         .filter(portal => portal !== excludePortal)
+         .forEach(portal => {
             const destinationWorld = worlds.get(portal.getDestinationSceneName());
-            const destinationScene = destinationWorld.getGroup();
-
-
-            if (recursiveLevel > 0) {
-               camera.matrixAutoUpdate = false;
-               camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
-               const childPortalGroups = this.renderWorldPortals(worlds, destinationWorld, camera, recursiveLevel - 1);
-               drawPortalGroups.push(...childPortalGroups);
-               camera.matrixAutoUpdate = true;
-               camera.matrixWorld.copy(cameraMatrixWorld);
-               //camera.projectionMatrix.copy(cameraProjectionMatrix);
-            }
-            this.renderer.clear(false, false, true);
 
             this.gl.colorMask(false, false, false, false);
-            this.gl.stencilFunc(this.gl.NEVER, 1, 0xFF);
-            this.gl.stencilOp(this.gl.REPLACE, this.gl.KEEP, this.gl.KEEP);
-            this.stencilScene.children = [portal.getGroup()];
-            this.renderer.render(this.stencilScene, camera);
-            this.gl.colorMask(true, true, true, true);
+            this.gl.depthMask(false);
+            this.gl.disable(this.gl.DEPTH_TEST);
+            this.gl.enable(this.gl.STENCIL_TEST);
+            this.gl.stencilFunc(this.gl.NOTEQUAL, recursionLevel, 0xFF);
+            this.gl.stencilOp(this.gl.INCR, this.gl.KEEP, this.gl.KEEP);
+            this.gl.stencilMask(0xFF);
+            this.renderScene(camera, [portal.getGroup()], viewMat, projMat);
 
-            this.gl.stencilFunc(this.gl.EQUAL, 1, 0xFF);
-            this.gl.stencilOp(this.gl.KEEP, this.gl.KEEP, this.gl.KEEP);
-            camera.matrixAutoUpdate = false;
-            //camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-            camera.matrixWorld.copy(this.computePortalViewMatrix(portal, camera));
-            //camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-            //camera.projectionMatrix.copy(this.computePortalProjectionMatrix(portal, portal.getDestination(), camera));
+            const destViewMat = this.computePortalViewMatrix(portal, viewMat).clone();
+            const destProjMat = this.computePortalProjectionMatrix(portal, destViewMat, projMat).clone();
 
+            if (recursionLevelLeft > 0) {
+               this.renderWorldPortals(worlds, destinationWorld, portal.getDestination(), camera, destViewMat, destProjMat, recursionLevel + 1);
+            } else {
+               this.gl.colorMask(true, true, true, true);
+               this.gl.depthMask(true);
+               this.renderer.clear(false, true, false);
+               this.gl.enable(this.gl.DEPTH_TEST);
+               this.gl.enable(this.gl.STENCIL_TEST);
+               this.gl.stencilMask(0x00);
+               this.gl.stencilFunc(this.gl.EQUAL, recursionLevel + 1, 0xFF);
 
+               this.renderScene(camera, destinationWorld.getGroup().children, destViewMat, destProjMat);
+            }
 
-            //this.stencilScene.children = [...portalGroups, ...destinationScene.children];
-            //this.stencilScene.children = [...children, ...destinationScene.children];
-            this.stencilScene.children = destinationScene.children;
-            this.renderer.render(this.stencilScene, camera);
-            this.renderer.clear(false, false, true);
+            this.gl.colorMask(false, false, false, false);
+            this.gl.depthMask(false);
+            this.gl.enable(this.gl.STENCIL_TEST);
+            this.gl.stencilMask(0xFF);
+            this.gl.stencilFunc(this.gl.NOTEQUAL, recursionLevel + 1, 0xFF);
+            this.gl.stencilOp(this.gl.DECR, this.gl.KEEP, this.gl.KEEP);
 
-            camera.matrixAutoUpdate = true;
-            camera.matrixWorld.copy(cameraMatrixWorld);
-            //camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-            //camera.projectionMatrix.copy(cameraProjectionMatrix);
+            this.renderScene(camera, [portal.getGroup()], viewMat, projMat);
          });
-      return drawPortalGroups;
+
+      this.gl.disable(this.gl.STENCIL_TEST);
+      this.gl.stencilMask(0x00);
+      this.gl.colorMask(false, false, false, false);
+      this.gl.enable(this.gl.DEPTH_TEST);
+      this.gl.depthMask(true);
+      this.gl.depthFunc(this.gl.ALWAYS);
+      this.renderer.clear(false, true, false);
+
+      this.renderScene(camera, portalsInScene.map(portal => portal.getGroup()), viewMat, projMat);
+
+      this.gl.depthFunc(this.gl.LESS);
+      this.gl.enable(this.gl.STENCIL_TEST);
+      this.gl.stencilMask(0x00);
+      this.gl.stencilFunc(this.gl.LEQUAL, recursionLevel, 0xFF);
+      this.gl.colorMask(true, true, true, true);
+      this.gl.depthMask(true);
+
+      this.renderScene(camera, world.getGroup().children, viewMat, projMat);
+   }
+
+   private originalCameraMatrixWorld = new Matrix4();
+   private originalCameraProjectionMatrix = new Matrix4();
+
+   private renderScene(camera: PerspectiveCamera, children: Object3D[], viewMat: Matrix4, projMat: Matrix4) {
+      this.tmpScene.children = children;
+      this.originalCameraMatrixWorld.copy(camera.matrixWorld);
+      this.originalCameraProjectionMatrix.copy(camera.projectionMatrix);
+      camera.matrixAutoUpdate = false;
+      camera.matrixWorld.copy(viewMat);
+      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      camera.projectionMatrix.copy(projMat);
+      this.renderer.render(this.tmpScene, camera);
+      camera.matrixAutoUpdate = true;
+      camera.matrixWorld.copy(this.originalCameraMatrixWorld);
+      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      camera.projectionMatrix.copy(this.originalCameraProjectionMatrix);
    }
 
    private readonly rotationYMatrix = new Matrix4().makeRotationY(Math.PI);
+   private readonly inverse = new Matrix4();
    private readonly dstInverse = new Matrix4();
    private readonly srcToCam = new Matrix4();
    private readonly srcToDst = new Matrix4();
    private readonly result = new Matrix4();
 
-   private computePortalViewMatrix(sourcePortal: PortalWorldObject, camera: Camera): Matrix4 {
-      const destinationPortal = sourcePortal.getDestination();
-      this.srcToCam.multiplyMatrices(camera.matrixWorldInverse, sourcePortal.getMatrix());
-      this.dstInverse.getInverse(destinationPortal.getMatrix());
+   private computePortalViewMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4): Matrix4 {
+      this.srcToCam.multiplyMatrices(this.inverse.getInverse(viewMat), sourcePortal.getMatrix());
+      this.dstInverse.getInverse(sourcePortal.getDestination().getMatrix());
       this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.result.getInverse(this.srcToDst);
       return this.result;
@@ -156,27 +167,29 @@ export class RendererComponent {
    private readonly clipVector = new Vector4();
    private readonly q = new Vector4();
    private readonly projectionMatrix = new Matrix4();
+   private readonly cameraInverseViewMat = new Matrix4();
 
    // Use custom projection matrix to align portal camera's near clip plane with the surface of the portal
    // See http://www.terathon.com/code/oblique.html
    // See www.terathon.com/lengyel/Lengyel-Oblique.pdf
-   private computePortalProjectionMatrix(sourcePortal: PortalWorldObject, destinationPortal: PortalWorldObject, camera: Camera): Matrix4 {
-      this.dstRotationMatrix.identity();
-      this.dstRotationMatrix.extractRotation(destinationPortal.getMatrix());
+   private computePortalProjectionMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4, projMat: Matrix4): Matrix4 {
+      const destinationPortal = sourcePortal.getDestination();
+      this.cameraInverseViewMat.getInverse(viewMat);
+      this.dstRotationMatrix.identity().extractRotation(destinationPortal.getMatrix());
 
       // TODO: Use -1 if dot product is negative (?)
       this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
 
       this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());
-      this.clipPlane.applyMatrix4(camera.matrixWorldInverse);
+      this.clipPlane.applyMatrix4(this.cameraInverseViewMat);
 
       this.clipVector.set(this.clipPlane.normal.x, this.clipPlane.normal.y, this.clipPlane.normal.z, this.clipPlane.constant);
-      this.projectionMatrix.copy(camera.projectionMatrix);
+      this.projectionMatrix.copy(projMat);
 
       this.q.x = (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) / this.projectionMatrix.elements[0];
       this.q.y = (Math.sign(this.clipVector.y) + this.projectionMatrix.elements[9]) / this.projectionMatrix.elements[5];
       this.q.z = -1.0;
-      this.q.w = (1.0 + this.projectionMatrix.elements[10]) / camera.projectionMatrix.elements[14];
+      this.q.w = (1.0 + this.projectionMatrix.elements[10]) / projMat.elements[14];
 
       this.clipVector.multiplyScalar(2 / this.clipVector.dot(this.q));
 

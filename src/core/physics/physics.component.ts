@@ -11,7 +11,7 @@ export class PhysicsComponent {
    constructor(@Inject private readonly scene: SceneComponent) {
    }
 
-   // In case of collision, it returns the ratio of "movement" vector to the hit point
+   // In case of collision, it returns the ratioToPosition of "movement" vector to the hit point
    // If the collision is at the third of the "movement" vector, then it will return 0.33
    // If there is no collision, it will return null
    checkCollision(position: Vector3, movement: Vector3, objects: WorldObject[]): Collision | null {
@@ -30,9 +30,10 @@ export class PhysicsComponent {
       if (intersections.length) {
          const intersection = intersections[0];
          return {
-            ratio: intersection.distance / this.raycaster.far,
+            ratioToPosition: intersection.distance / this.raycaster.far,
             object: objectToWorldObject.get(intersection.object),
-            position: intersection.point
+            position: intersection.point,
+            movement
          }
       }
       return null;

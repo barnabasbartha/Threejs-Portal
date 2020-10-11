@@ -2,7 +2,8 @@ import {WorldObject} from "../object/world-object";
 import {Vector3} from "three";
 
 export interface Collision {
-   ratio: number;
+   ratioToPosition: number;
    object: WorldObject;
    position: Vector3;
+   movement: Vector3;
 }

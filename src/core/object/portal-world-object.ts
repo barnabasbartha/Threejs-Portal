@@ -1,5 +1,7 @@
 import {WorldObject} from "./world-object";
-import {CircleBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial} from "three";
+import {FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
+
+// import TWEEN from '@tweenjs/tween.js';
 
 export class PortalWorldObject extends WorldObject {
    private readonly mesh: Mesh;
@@ -8,18 +10,24 @@ export class PortalWorldObject extends WorldObject {
    constructor(private name: string,
                private destinationSceneName: string,
                private destinationPortalName: string,
+               private teleportEnabled: boolean,
                private size: number = 1) {
       super();
 
       this.addPhysicalObject(this.mesh = new Mesh(
-         new CircleBufferGeometry(size, 100),
+         new PlaneBufferGeometry(size, size),
          new MeshBasicMaterial({
-            side: DoubleSide,
+            side: FrontSide,
             transparent: true,
-            opacity: 0
+            opacity: 0,
+            polygonOffsetFactor: -1,
+            polygonOffsetUnits: -4,
+            polygonOffset: true,
          }),
          )
       );
+
+      // this.startAnimation();
    }
 
    getDestinationSceneName(): string {
@@ -41,4 +49,30 @@ export class PortalWorldObject extends WorldObject {
    getName(): string {
       return this.name;
    }
+
+   isTeleportEnabled(): boolean {
+      return this.teleportEnabled;
+   }
+
+   /*
+   private startAnimation() {
+      const tweenA = new TWEEN.Tween(this.mesh.position)
+         .to({
+            x: 0,
+            y: .4,
+            z: 0
+         }, 3000)
+         .easing(TWEEN.Easing.Sinusoidal.InOut)
+         .start();
+      const tweenB = new TWEEN.Tween(this.mesh.position)
+         .to({
+            x: 0,
+            y: 0,
+            z: 0
+         }, 3000)
+         .easing(TWEEN.Easing.Sinusoidal.InOut);
+      tweenA.chain(tweenB);
+      tweenB.chain(tweenA);
+   }
+    */
 }

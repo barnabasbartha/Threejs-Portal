@@ -15,7 +15,8 @@ export class CameraManager {
                @Inject private readonly timer: TimerComponent,
                @Inject private readonly movement: MovementComponent) {
       controller.resize$.subscribe(size => component.setAspectRatio(size.x / size.y));
-      timer.step$.subscribe(delta => component.setQuaternion(cameraController.getQuaternion(), delta * CameraManager.CAMERA_INTENSITY));
+      // timer.step$.subscribe(delta => component.setQuaternion(cameraController.getQuaternion()));
+      cameraController.quaternion$.subscribe(quaternion => component.setQuaternion(quaternion));
       movement.position$.subscribe(position => component.setPosition(position));
    }
 }

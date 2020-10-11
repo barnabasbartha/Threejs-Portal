@@ -17,7 +17,7 @@ export class RoomWorld extends World {
    private readonly outsideBox: Mesh;
 
    constructor() {
-      super("RoomWorld", 5.5);
+      super("RoomWorld", 4.99);
       this.initLight();
 
       this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial({side: DoubleSide})));
@@ -39,8 +39,8 @@ export class RoomWorld extends World {
 
 
       const portalToRoom1 = new PortalWorldObject("RoomWorld.portalToRoom1", "RoomWorld", "RoomWorld.portalToRoom2", true, 2);
-      portalToRoom1.getGroup().position.set(-2, 1, 5);
-      portalToRoom1.getGroup().rotation.y = Math.PI;
+      portalToRoom1.getGroup().position.set(5, 1, 0);
+      portalToRoom1.getGroup().rotation.y = -Math.PI / 2;
       this.addPortal(portalToRoom1);
       this.addObject(portalToRoom1);
       const portalToRoom2 = new PortalWorldObject("RoomWorld.portalToRoom2", "RoomWorld", "RoomWorld.portalToRoom1", true, 2);

@@ -13,16 +13,12 @@ import {
 import {PortalHolderWorldObject} from "../../object/portal-holder-world-object";
 
 export class RoomWorld extends World {
-   private readonly portal: PortalWorldObject;
    private readonly box: Mesh;
    private readonly outsideBox: Mesh;
 
    constructor() {
       super("RoomWorld", 5.5);
       this.initLight();
-      //this.addPortal(this.portal = new PortalWorldObject("RoomWorld.portal", "SkyWorld", "SkyWorld.portal"));
-      //this.addObject(this.portal);
-      //this.portal.getGroup().position.set(0, 1, 0);
 
       this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial({side: DoubleSide})));
       this.box.position.set(0, 1.5, 3.5);
@@ -42,20 +38,20 @@ export class RoomWorld extends World {
       //this.addObject(mirrorPortal);
 
 
-      const portalToRoom1 = new PortalWorldObject("RoomWorld.portalToRoom1", "RoomWorld", "RoomWorld.portalToRoom2", 2);
+      const portalToRoom1 = new PortalWorldObject("RoomWorld.portalToRoom1", "RoomWorld", "RoomWorld.portalToRoom2", true,2);
       portalToRoom1.getGroup().position.set(-2, 1, 5);
       portalToRoom1.getGroup().rotation.y = Math.PI;
       this.addPortal(portalToRoom1);
       this.addObject(portalToRoom1);
-      const portalToRoom2 = new PortalWorldObject("RoomWorld.portalToRoom2", "RoomWorld", "RoomWorld.portalToRoom1", 2);
+      const portalToRoom2 = new PortalWorldObject("RoomWorld.portalToRoom2", "RoomWorld", "RoomWorld.portalToRoom1", true,2);
       portalToRoom2.getGroup().position.set(2, 1, -5.0);
       this.addPortal(portalToRoom2);
       this.addObject(portalToRoom2);
 
-      const portal1 = new PortalWorldObject("RoomWorld.boxPortal1", "BoxWorld1", "BoxWorld1.portal", 1);
-      const portal2 = new PortalWorldObject("RoomWorld.boxPortal2", "BoxWorld2", "BoxWorld2.portal", 1);
-      const portal3 = new PortalWorldObject("RoomWorld.boxPortal3", "BoxWorld3", "BoxWorld3.portal", 1);
-      const portal4 = new PortalWorldObject("RoomWorld.boxPortal4", "BoxWorld4", "BoxWorld4.portal", 1);
+      const portal1 = new PortalWorldObject("RoomWorld.boxPortal1", "BoxWorld1", "BoxWorld1.portal", false,1);
+      const portal2 = new PortalWorldObject("RoomWorld.boxPortal2", "BoxWorld2", "BoxWorld2.portal", false,1);
+      const portal3 = new PortalWorldObject("RoomWorld.boxPortal3", "BoxWorld3", "BoxWorld3.portal", false,1);
+      const portal4 = new PortalWorldObject("RoomWorld.boxPortal4", "BoxWorld4", "BoxWorld4.portal", false,1);
       this.addPortal(portal1);
       this.addPortal(portal2)
       this.addPortal(portal3);

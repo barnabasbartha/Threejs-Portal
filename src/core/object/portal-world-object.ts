@@ -10,6 +10,7 @@ export class PortalWorldObject extends WorldObject {
    constructor(private name: string,
                private destinationSceneName: string,
                private destinationPortalName: string,
+               private teleportEnabled: boolean,
                private size: number = 1) {
       super();
 
@@ -47,6 +48,10 @@ export class PortalWorldObject extends WorldObject {
 
    getName(): string {
       return this.name;
+   }
+
+   isTeleportEnabled(): boolean {
+      return this.teleportEnabled;
    }
 
    /*

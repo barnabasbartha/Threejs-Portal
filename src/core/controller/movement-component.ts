@@ -27,10 +27,12 @@ export class MovementComponent {
             const collision = physics.checkPortalCollision(this.position, movement);
             if (collision) {
                if (collision.object instanceof PortalWorldObject) {
-                  this.teleportSubject.next({
-                     sourcePortal: collision.object,
-                     collision
-                  } as Teleport);
+                  if (collision.object.isTeleportEnabled()) {
+                     this.teleportSubject.next({
+                        sourcePortal: collision.object,
+                        collision
+                     } as Teleport);
+                  }
                   return null;
                } else {
                   movement.multiplyScalar(collision.ratioToPosition);

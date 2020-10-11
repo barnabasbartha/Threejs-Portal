@@ -16,7 +16,6 @@ export class SceneComponent {
 
    constructor() {
       this.add(this.currentWorld = new RoomWorld());
-      //this.add(new SkyWorld());
       this.add(new BoxWorld1());
       this.add(new BoxWorld2());
       this.add(new BoxWorld3());

@@ -4,7 +4,6 @@ import {FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
 // import TWEEN from '@tweenjs/tween.js';
 
 export class PortalWorldObject extends WorldObject {
-   private readonly mesh: Mesh;
    private destination?: PortalWorldObject;
 
    constructor(private name: string,
@@ -14,18 +13,12 @@ export class PortalWorldObject extends WorldObject {
                private size: number = 1) {
       super();
 
-      this.addPhysicalObject(this.mesh = new Mesh(
+      this.addPhysicalObject(new Mesh(
          new PlaneBufferGeometry(size, size),
          new MeshBasicMaterial({
-            side: FrontSide,
-            transparent: true,
-            opacity: 0,
-            polygonOffsetFactor: -1,
-            polygonOffsetUnits: -4,
-            polygonOffset: true,
-         }),
-         )
-      );
+            side: FrontSide
+         })
+      ));
 
       // this.startAnimation();
    }

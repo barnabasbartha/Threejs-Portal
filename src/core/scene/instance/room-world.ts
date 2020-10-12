@@ -1,35 +1,34 @@
 import {World} from "./world";
 import {PortalWorldObject} from "../../object/portal-world-object";
-import {
-   AmbientLight,
-   BackSide,
-   BoxBufferGeometry,
-   DoubleSide,
-   Mesh,
-   MeshNormalMaterial,
-   MeshStandardMaterial,
-   PointLight
-} from "three";
+import {AmbientLight, BackSide, BoxBufferGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, Mesh} from "three";
 import {PortalHolderWorldObject} from "../../object/portal-holder-world-object";
 
 export class RoomWorld extends World {
-   private readonly box: Mesh;
-   private readonly outsideBox: Mesh;
-
    constructor() {
       super("RoomWorld", 4.99);
       this.initLight();
 
-      this.add(this.box = new Mesh(new BoxBufferGeometry(1, 2, 1), new MeshNormalMaterial({side: DoubleSide})));
-      this.box.position.set(0, 1.5, 3.5);
-
-      this.add(this.outsideBox = new Mesh(
-         new BoxBufferGeometry(10, 6, 10),
-         new MeshStandardMaterial({
+      const outsideBox = new Mesh(
+         new BoxBufferGeometry(10, 3, 10),
+         new LineBasicMaterial({
             side: BackSide,
-            color: 0x888888
-         })));
-      this.outsideBox.position.set(0, 3, 0);
+            color: 0xffffff,
+            polygonOffset: true,
+            polygonOffsetUnits: 1,
+            polygonOffsetFactor: 1
+         }));
+      this.add(outsideBox);
+      outsideBox.position.set(0, 1.5, 0);
+
+      const outsideBoxEdges = new LineSegments(new EdgesGeometry(new BoxBufferGeometry(10, 3, 10)), new LineBasicMaterial({
+         color: 0x000000,
+         linewidth: 3,
+         polygonOffset: true,
+         polygonOffsetUnits: -1,
+         polygonOffsetFactor: -1
+      }));
+      this.add(outsideBoxEdges);
+      outsideBoxEdges.position.set(0, 1.5, 0);
 
 
       //const mirrorPortal = new PortalWorldObject("RoomWorld.mirror", "RoomWorld", "RoomWorld.mirror");
@@ -62,15 +61,14 @@ export class RoomWorld extends World {
    }
 
    private initLight() {
-      const directionalLight = new PointLight(0xffffff, .7);
-      directionalLight.position.set(0, 2.5, 0);
-      this.add(directionalLight);
+      //const directionalLight = new PointLight(0xffffff, .7);
+      //directionalLight.position.set(0, 2.5, 0);
+      //this.add(directionalLight);
 
       const ambientLight = new AmbientLight(0xffffff);
       this.add(ambientLight);
    }
 
    step(delta: number) {
-      this.box.rotation.y += 0.01;
    }
 }

@@ -7,7 +7,6 @@ import {PortalWorldObject} from "../object/portal-world-object";
 import {PhysicsComponent} from "../physics/physics.component";
 import {Teleport} from "../scene/teleport/teleport.model";
 import {SceneComponent} from "../scene/scene.component";
-import {MathUtil} from "../../util/math-util";
 
 @Singleton
 export class MovementComponent {
@@ -38,23 +37,16 @@ export class MovementComponent {
                   movement.multiplyScalar(collision.ratioToPosition);
                }
             }
-            this.position.add(movement);
-            this.limitWorldSize();
-            return this.position;
+            return movement;
          }),
-         filter(position => !!position),
+         filter(movement => !!movement),
+         map(movement => this.position.add(movement))
       ));
    }
 
    setPosition(position: Vector3) {
       this.position.copy(position);
       this.update();
-   }
-
-   private limitWorldSize() {
-      const size = this.scene.getCurrentWorld().getSize();
-      this.position.x = MathUtil.minMax(this.position.x, -size, size);
-      this.position.z = MathUtil.minMax(this.position.z, -size, size);
    }
 
    private update() {

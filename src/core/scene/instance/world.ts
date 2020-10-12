@@ -9,8 +9,7 @@ export abstract class World extends AbstractObject<Scene> {
    protected readonly groupWithoutPortals = new Scene();
    private portals = new Map<string, PortalWorldObject>();
 
-   protected constructor(private name: string,
-                         private size: number = Infinity) {
+   protected constructor(private name: string) {
       super();
    }
 
@@ -20,10 +19,6 @@ export abstract class World extends AbstractObject<Scene> {
 
    getName(): string {
       return this.name;
-   }
-
-   getSize(): number {
-      return this.size;
    }
 
    step(delta: number) {

@@ -5,7 +5,7 @@ import {PortalHolderWorldObject} from "../../object/portal-holder-world-object";
 
 export class RoomWorld extends World {
    constructor() {
-      super("RoomWorld", 4.99);
+      super("RoomWorld");
       this.initLight();
 
       const outsideBox = new Mesh(

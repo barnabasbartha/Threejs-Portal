@@ -34,12 +34,12 @@ export class RendererComponent {
             stencil: true,
             depth: true,
             powerPreference: 'high-performance' as WebGLPowerPreference,
-            antialias: false
+            antialias: true
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
          stencil: true,
          depth: true,
-         antialias: false
+         antialias: true
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);
@@ -58,7 +58,6 @@ export class RendererComponent {
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
       if (this.renderer) {
          this.renderer.clear();
-         camera.updateMatrix();
          camera.updateMatrixWorld(true);
          this.renderWorldPortals(worlds, world, null, camera, camera.matrixWorld.clone(), camera.projectionMatrix.clone());
       }
@@ -95,7 +94,8 @@ export class RendererComponent {
                this.gl.stencilMask(0x00);
                this.gl.stencilFunc(this.gl.EQUAL, recursionLevel + 1, 0xFF);
 
-               this.renderScene(camera, destinationWorld.getGroup().children, destViewMat, destProjMat);
+               this.renderScene(camera, destinationWorld.getGroup().children
+                  .filter(object => object !== excludePortal?.getGroup()), destViewMat, destProjMat);
             }
 
             this.gl.colorMask(false, false, false, false);
@@ -116,7 +116,9 @@ export class RendererComponent {
       this.gl.depthFunc(this.gl.ALWAYS);
       this.renderer.clear(false, true, false);
 
-      this.renderScene(camera, portalsInScene.map(portal => portal.getGroup()), viewMat, projMat);
+      this.renderScene(camera, portalsInScene
+         .filter(portal => portal !== excludePortal)
+         .map(portal => portal.getGroup()), viewMat, projMat);
 
       this.gl.depthFunc(this.gl.LESS);
       this.gl.enable(this.gl.STENCIL_TEST);
@@ -125,7 +127,8 @@ export class RendererComponent {
       this.gl.colorMask(true, true, true, true);
       this.gl.depthMask(true);
 
-      this.renderScene(camera, world.getGroup().children, viewMat, projMat);
+      this.renderScene(camera, world.getGroup().children
+         .filter(object => object !== excludePortal?.getGroup()), viewMat, projMat);
    }
 
    private originalCameraMatrixWorld = new Matrix4();
@@ -154,8 +157,8 @@ export class RendererComponent {
    private readonly result = new Matrix4();
 
    private computePortalViewMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4): Matrix4 {
-      this.srcToCam.multiplyMatrices(this.inverse.getInverse(viewMat), sourcePortal.getMatrix());
-      this.dstInverse.getInverse(sourcePortal.getDestination().getMatrix());
+      this.srcToCam.multiplyMatrices(this.inverse.getInverse(viewMat), sourcePortal.getMatrix().clone());
+      this.dstInverse.getInverse(sourcePortal.getDestination().getMatrix().clone());
       this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.result.getInverse(this.srcToDst);
       return this.result;

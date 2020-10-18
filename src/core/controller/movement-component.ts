@@ -34,6 +34,7 @@ export class MovementComponent {
                   }
                   return null;
                } else {
+                  // TODO: Multiply ratio - CONTACT_DISTANCE and continue checking on surface until a certain level
                   movement.multiplyScalar(collision.ratioToPosition);
                }
             }

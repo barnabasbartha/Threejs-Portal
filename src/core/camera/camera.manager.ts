@@ -7,15 +7,12 @@ import {TimerComponent} from "../timer/timer.component";
 
 @Singleton
 export class CameraManager {
-   private static CAMERA_INTENSITY = .2;
-
    constructor(@Inject private readonly component: CameraComponent,
                @Inject private readonly controller: CoreControllerComponent,
                @Inject private readonly cameraController: CoreCameraControllerComponent,
                @Inject private readonly timer: TimerComponent,
                @Inject private readonly movement: MovementComponent) {
       controller.resize$.subscribe(size => component.setAspectRatio(size.x / size.y));
-      // timer.step$.subscribe(delta => component.setQuaternion(cameraController.getQuaternion()));
       cameraController.quaternion$.subscribe(quaternion => component.setQuaternion(quaternion));
       movement.position$.subscribe(position => component.setPosition(position));
    }

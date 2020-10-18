@@ -1,25 +1,18 @@
 import {WorldObject} from "./world-object";
-import {FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
+import {Object3D} from "three";
 
 // import TWEEN from '@tweenjs/tween.js';
 
 export class PortalWorldObject extends WorldObject {
    private destination?: PortalWorldObject;
 
-   constructor(private name: string,
+   constructor(object: Object3D | null,
+               private name: string,
                private destinationSceneName: string,
                private destinationPortalName: string,
-               private teleportEnabled: boolean,
-               private size: number = 1) {
+               private teleportEnabled: boolean) {
       super();
-
-      this.addPhysicalObject(new Mesh(
-         new PlaneBufferGeometry(size, size),
-         new MeshBasicMaterial({
-            side: FrontSide
-         })
-      ));
-
+      this.addPhysicalObject(object);
       // this.startAnimation();
    }
 

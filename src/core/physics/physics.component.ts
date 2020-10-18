@@ -7,9 +7,24 @@ import {SceneComponent} from "../scene/scene.component";
 @Singleton
 export class PhysicsComponent {
    private readonly raycaster = new Raycaster();
+   private readonly physicalObjectToWorldObject = new Map<Object3D, WorldObject>();
+   private physicalObjects: Object3D[] = [];
 
    constructor(@Inject private readonly scene: SceneComponent) {
    }
+
+   setWorld(world: WorldObject) {
+      this.clear();
+      world.getPhysicalObjects()
+   }
+
+   private clear() {
+      this.physicalObjectToWorldObject.clear();
+      this.physicalObjects = [];
+   }
+
+
+   ///
 
    // In case of collision, it returns the ratioToPosition of "movement" vector to the hit point
    // If the collision is at the third of the "movement" vector, then it will return 0.33
@@ -40,6 +55,9 @@ export class PhysicsComponent {
    }
 
    checkPortalCollision(position: Vector3, movement: Vector3): Collision | null {
+      if (!this.scene.getCurrentWorld()) {
+         return null;
+      }
       return this.checkCollision(position, movement, this.scene.getCurrentWorld().getPortals());
    }
 }

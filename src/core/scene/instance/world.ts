@@ -3,13 +3,13 @@ import {Scene} from "three";
 import {AbstractObject} from "../../object/abstract-object";
 import {PortalWorldObject} from "../../object/portal-world-object";
 
-export abstract class World extends AbstractObject<Scene> {
+export class World extends AbstractObject<Scene> {
    protected readonly group = new Scene();
    private readonly objects = new Set<WorldObject>();
    protected readonly groupWithoutPortals = new Scene();
    private portals = new Map<string, PortalWorldObject>();
 
-   protected constructor(private name: string) {
+   constructor(private name: string) {
       super();
    }
 

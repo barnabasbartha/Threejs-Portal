@@ -9,6 +9,7 @@ import {KeyEvent} from "../common/controller/controller.model";
 import {TeleportComponent} from "./scene/teleport/teleport.component";
 import {TimerManager} from "./timer/timer.manager";
 import {EventStatus} from "../common/event.model";
+import {MapComponent} from "./map/map.component";
 
 @Singleton
 export class CoreThread {
@@ -18,7 +19,8 @@ export class CoreThread {
                @Inject private readonly cameraManager: CameraManager,
                @Inject private readonly controller: CoreControllerComponent,
                @Inject private readonly teleport: TeleportComponent,
-               @Inject private readonly timer: TimerManager) {
+               @Inject private readonly timer: TimerManager,
+               @Inject private readonly mapComponent: MapComponent) {
       this.waitForCanvas();
    }
 
@@ -26,9 +28,7 @@ export class CoreThread {
       onmessage = (event) => {
          const canvas: HTMLCanvasElement = event?.data?.canvas;
          if (canvas) {
-            this.renderer.init(canvas);
-            this.setSize(canvas.width, canvas.height);
-            console.log("Core thread OK");
+            this.init(canvas);
          }
       };
    }
@@ -47,6 +47,13 @@ export class CoreThread {
 
    keyEvent(keyEvent: KeyEvent) {
       this.controller.keyEvent(keyEvent);
+   }
+
+   private init(canvas: HTMLCanvasElement) {
+      this.renderer.init(canvas);
+      this.setSize(canvas.width, canvas.height);
+      console.log("Core thread OK");
+      this.mapComponent.load();
    }
 }
 

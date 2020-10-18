@@ -1,26 +1,13 @@
 import {Singleton} from "typescript-ioc";
 import {World} from "./instance/world";
 import {PortalWorldObject} from "../object/portal-world-object";
-import {RoomWorld} from "./instance/room-world";
-import {BoxWorld1} from "./instance/box-world-1";
-import {BoxWorld2} from "./instance/box-world-2";
-import {BoxWorld3} from "./instance/box-world-3";
-import {BoxWorld4} from "./instance/box-world-4";
 
 // import TWEEN from '@tweenjs/tween.js';
 
 @Singleton
 export class SceneComponent {
    private worlds = new Map<string, World>();
-   private currentWorld: World;
-
-   constructor() {
-      this.add(this.currentWorld = new RoomWorld());
-      this.add(new BoxWorld1());
-      this.add(new BoxWorld2());
-      this.add(new BoxWorld3());
-      this.add(new BoxWorld4());
-   }
+   private currentWorld?: World;
 
    getCurrentWorld(): World {
       return this.currentWorld;
@@ -49,7 +36,7 @@ export class SceneComponent {
       return portals;
    }
 
-   private add(world: World) {
+   add(world: World) {
       this.worlds.set(world.getName(), world);
       this.updatePortals();
    }

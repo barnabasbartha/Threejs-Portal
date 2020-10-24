@@ -6,7 +6,7 @@ import {filter, map} from "rxjs/operators";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {PhysicsComponent} from "../physics/physics.component";
 import {TeleportContext} from "../teleport/teleport.model";
-import {SceneComponent} from "../scene/scene.component";
+import {WorldComponent} from "../world/world.component";
 
 @Singleton
 export class MovementComponent {
@@ -20,7 +20,7 @@ export class MovementComponent {
 
    constructor(@Inject private readonly movementController: CoreMovementControllerComponent,
                @Inject private readonly physics: PhysicsComponent,
-               @Inject private readonly scene: SceneComponent) {
+               @Inject private readonly world: WorldComponent) {
       this.position$ = merge(this.positionSubject, movementController.movement$.pipe(
          map(movement => {
             const collision = physics.checkPortalCollision(this.position, movement);

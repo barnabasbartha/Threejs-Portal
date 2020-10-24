@@ -1,7 +1,7 @@
 import {Inject, Singleton} from "typescript-ioc";
 import {GLTF, GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {SceneComponent} from "../scene/scene.component";
-import {World} from "../scene/instance/world";
+import {WorldComponent} from "../world/world.component";
+import {World} from "../world/world";
 import {
    DoubleSide,
    EdgesGeometry,
@@ -32,7 +32,7 @@ export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    public readonly mapLoaded$ = this.mapLoadedSubject.pipe();
 
-   constructor(@Inject private readonly scene: SceneComponent) {
+   constructor(@Inject private readonly world: WorldComponent) {
    }
 
    load() {
@@ -59,9 +59,9 @@ export class MapComponent {
                         this.addMesh(world, meshObject);
                      });
 
-                  this.scene.add(world);
+                  this.world.add(world);
                   if (parameters.world === 'main') {
-                     this.scene.setCurrentWorld(world);
+                     this.world.setCurrentWorld(world);
                   }
                });
 

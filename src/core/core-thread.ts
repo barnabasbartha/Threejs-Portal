@@ -2,7 +2,7 @@ import {expose} from "threads/worker";
 import {Container, Inject, Singleton} from "typescript-ioc";
 import {RendererComponent} from "./renderer/renderer.component";
 import {RendererManager} from "./renderer/renderer.manager";
-import {SceneManager} from "./scene/scene.manager";
+import {WorldManager} from "./world/world.manager";
 import {CoreControllerComponent} from "./controller/core-controller.component";
 import {CameraManager} from "./camera/camera.manager";
 import {KeyEvent} from "../common/controller/controller.model";
@@ -13,14 +13,14 @@ import {TeleportManager} from "./teleport/teleport.manager";
 
 @Singleton
 export class CoreThread {
-   constructor(@Inject private readonly rendererManager: RendererManager,
-               @Inject private readonly renderer: RendererComponent,
-               @Inject private readonly sceneManager: SceneManager,
-               @Inject private readonly cameraManager: CameraManager,
+   constructor(@Inject private readonly renderer: RendererManager,
+               @Inject private readonly rendererComponent: RendererComponent,
+               @Inject private readonly world: WorldManager,
+               @Inject private readonly camera: CameraManager,
                @Inject private readonly controller: CoreControllerComponent,
                @Inject private readonly teleport: TeleportManager,
                @Inject private readonly timer: TimerManager,
-               @Inject private readonly mapComponent: MapComponent) {
+               @Inject private readonly map: MapComponent) {
       this.waitForCanvas();
    }
 
@@ -50,10 +50,10 @@ export class CoreThread {
    }
 
    private init(canvas: HTMLCanvasElement) {
-      this.renderer.init(canvas);
+      this.rendererComponent.init(canvas);
       this.setSize(canvas.width, canvas.height);
       console.log("Core thread OK");
-      this.mapComponent.load();
+      this.map.load();
    }
 }
 

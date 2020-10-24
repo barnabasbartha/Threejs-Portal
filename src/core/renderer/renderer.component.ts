@@ -12,7 +12,7 @@ import {
 } from "three";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
-import {World} from "../scene/instance/world";
+import {World} from "../world/world";
 import {Config} from "../../config/config";
 import {Singleton} from "typescript-ioc";
 
@@ -65,11 +65,11 @@ export class RendererComponent {
 
    private renderWorldPortals(worlds: Map<string, World>, world: World, excludePortal: PortalWorldObject | null, camera: PerspectiveCamera, viewMat: Matrix4, projMat: Matrix4, recursionLevel: number = 0) {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
-      const portalsInScene = world.getPortals();
-      portalsInScene
+      const portalsInWorld = world.getPortals();
+      portalsInWorld
          .filter(portal => portal !== excludePortal)
          .forEach(portal => {
-            const destinationWorld = worlds.get(portal.getDestinationSceneName());
+            const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
             this.gl.colorMask(false, false, false, false);
             this.gl.depthMask(false);
@@ -116,7 +116,7 @@ export class RendererComponent {
       this.gl.depthFunc(this.gl.ALWAYS);
       this.renderer.clear(false, true, false);
 
-      this.renderScene(camera, portalsInScene
+      this.renderScene(camera, portalsInWorld
          .filter(portal => portal !== excludePortal)
          .map(portal => portal.getGroup()), viewMat, projMat);
 

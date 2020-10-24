@@ -1,11 +1,9 @@
 import {Singleton} from "typescript-ioc";
-import {World} from "./instance/world";
+import {World} from "./world";
 import {PortalWorldObject} from "../object/portal-world-object";
 
-// import TWEEN from '@tweenjs/tween.js';
-
 @Singleton
-export class SceneComponent {
+export class WorldComponent {
    private worlds = new Map<string, World>();
    private currentWorld?: World;
 
@@ -26,13 +24,12 @@ export class SceneComponent {
    }
 
    step(delta: number) {
-      Array.from(this.worlds.values()).forEach(scene => scene.step(delta));
-      // TWEEN.update();
+      Array.from(this.worlds.values()).forEach(world => world.step(delta));
    }
 
    getPortals(): Map<string, PortalWorldObject> {
       const portals = new Map<string, PortalWorldObject>();
-      Array.from(this.worlds.values()).forEach(scene => scene.getPortals().forEach(portal => portals.set(portal.getName(), portal)));
+      Array.from(this.worlds.values()).forEach(world => world.getPortals().forEach(portal => portals.set(portal.getName(), portal)));
       return portals;
    }
 

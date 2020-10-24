@@ -1,7 +1,7 @@
 import {Inject, Singleton} from "typescript-ioc";
 import {MovementComponent} from "../controller/movement-component";
 import {CoreCameraControllerComponent} from "../controller/core-camera-controller.component";
-import {SceneComponent} from "../scene/scene.component";
+import {WorldComponent} from "../world/world.component";
 import {Euler} from "three";
 import {TeleportContext} from "./teleport.model";
 
@@ -11,16 +11,16 @@ export class TeleportComponent {
 
    constructor(@Inject protected readonly movement: MovementComponent,
                @Inject protected readonly camera: CoreCameraControllerComponent,
-               @Inject protected readonly scene: SceneComponent) {
+               @Inject protected readonly world: WorldComponent) {
    }
 
    teleport(teleport: TeleportContext) {
       const sourcePortal = teleport.sourcePortal;
-      const targetWorld = this.scene.getWorld(sourcePortal.getDestinationSceneName());
+      const targetWorld = this.world.getWorld(sourcePortal.getDestinationWorldName());
       const targetPortal = targetWorld.getPortal(sourcePortal.getDestinationPortalName());
 
-      // Switch scene
-      this.scene.setCurrentWorld(targetWorld);
+      // Switch world
+      this.world.setCurrentWorld(targetWorld);
 
       const collisionSourcePortalDeltaPosition = teleport.collision.position.clone().sub(sourcePortal.getAbsolutePosition());
       const cameraRotation = this.camera.getRotation();

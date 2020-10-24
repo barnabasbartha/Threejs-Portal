@@ -2,7 +2,7 @@ import {Inject, Singleton} from "typescript-ioc";
 import {Object3D, Raycaster, Vector3} from "three";
 import {WorldObject} from "../object/world-object";
 import {Collision} from "./physics.model";
-import {SceneComponent} from "../scene/scene.component";
+import {WorldComponent} from "../world/world.component";
 
 @Singleton
 export class PhysicsComponent {
@@ -10,7 +10,7 @@ export class PhysicsComponent {
    private readonly physicalObjectToWorldObject = new Map<Object3D, WorldObject>();
    private physicalObjects: Object3D[] = [];
 
-   constructor(@Inject private readonly scene: SceneComponent) {
+   constructor(@Inject private readonly world: WorldComponent) {
    }
 
    setWorld(world: WorldObject) {
@@ -55,9 +55,9 @@ export class PhysicsComponent {
    }
 
    checkPortalCollision(position: Vector3, movement: Vector3): Collision | null {
-      if (!this.scene.getCurrentWorld()) {
+      if (!this.world.getCurrentWorld()) {
          return null;
       }
-      return this.checkCollision(position, movement, this.scene.getCurrentWorld().getPortals());
+      return this.checkCollision(position, movement, this.world.getCurrentWorld().getPortals());
    }
 }

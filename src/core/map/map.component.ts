@@ -5,6 +5,7 @@ import {World} from "../world/world";
 import {
    DoubleSide,
    EdgesGeometry,
+   Group,
    LineBasicMaterial,
    LineSegments,
    Mesh,
@@ -16,8 +17,10 @@ import {WorldObject} from "../object/world-object";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
 
+type ObjectType = 'world' | 'mesh' | 'portal';
+
 interface ObjectParameters {
-   type: string;
+   type: ObjectType;
    world: string;
    name: string;
 }
@@ -31,8 +34,22 @@ interface PortalObjectParameters extends ObjectParameters {
 export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    public readonly mapLoaded$ = this.mapLoadedSubject.pipe();
+   private static MESH_MATERIAL = new MeshBasicMaterial({
+      color: 0xffffff,
+      side: DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1
+   });
+   private static MESH_LINE_MATERIAL = new LineBasicMaterial({
+      color: 0x000000,
+      linewidth: 3,
+      polygonOffset: true,
+      polygonOffsetUnits: -1,
+      polygonOffsetFactor: -1
+   });
 
-   constructor(@Inject private readonly world: WorldComponent) {
+   constructor(@Inject private readonly worldComponent: WorldComponent) {
    }
 
    load() {
@@ -41,30 +58,9 @@ export class MapComponent {
          (gltf: GLTF) => {
             console.log(url, gltf.scene.clone());
 
-            this.getObjects(gltf.scene.children)
-               .filter(([_, parameters]) => parameters.type === 'world')
-               .forEach(([mapObject, parameters]) => {
-                  const world = new World(parameters.world);
-                  this.addMesh(world, mapObject);
-
-                  this.getObjects([...mapObject.children])
-                     .filter(([_, parameters]) => parameters.type === 'portal')
-                     .forEach(([portalObject, parameters]) => {
-                        this.addPortal(world, mapObject, portalObject, parameters);
-                     });
-
-                  this.getObjects([...mapObject.children])
-                     .filter(([_, parameters]) => parameters.type === 'mesh')
-                     .forEach(([meshObject]) => {
-                        this.addMesh(world, meshObject);
-                     });
-
-                  this.world.add(world);
-                  if (parameters.world === 'main') {
-                     this.world.setCurrentWorld(world);
-                  }
-               });
-
+            const [worlds, mainWorld] = this.parseMap(gltf.scene);
+            worlds.forEach(world => this.worldComponent.add(world));
+            this.worldComponent.setCurrentWorld(mainWorld);
 
             this.mapLoadedSubject.next();
          },
@@ -76,11 +72,45 @@ export class MapComponent {
       );
    }
 
-   private getObjects(objects: Object3D[]): [Object3D, ObjectParameters][] {
-      return [...objects].map(object => {
+   private parseMap(scene: Group): [World[], World] {
+      const worlds: World[] = [];
+      let mainWorld: World = null;
+      this.getObjects(scene, 'world')
+         .forEach(([mapObject, parameters]) => {
+            const world = new World(parameters.world);
+            world.addObject(this.createWorldObject(mapObject as Mesh));
+
+            this.getObjects(mapObject, 'portal')
+               .forEach(([portalObject, parameters]) => {
+                  this.addPortal(world, mapObject, portalObject, parameters as PortalObjectParameters);
+               });
+
+            this.getObjects(mapObject, 'mesh')
+               .forEach(([meshObject]) => {
+                  world.addObject(this.createWorldObject(meshObject as Mesh));
+               });
+
+            worlds.push(world);
+            if (parameters.world === 'main') {
+               mainWorld = world;
+            }
+         });
+      if (!mainWorld) {
+         throw new Error('Map does not have main world.');
+      }
+      return [worlds, mainWorld];
+   }
+
+   private getObjects(parent: Object3D, type: ObjectType): [Object3D, ObjectParameters][] {
+      return this.getObjectsParameters(parent.children)
+         .filter(([_, parameters]) => parameters.type === type);
+   }
+
+   private getObjectsParameters(objects: Object3D[]): [Object3D, ObjectParameters][] {
+      return objects.map(object => {
          const parametersString = object.name.split('_');
          const parameters: ObjectParameters = {
-            type: parametersString[0],
+            type: parametersString[0] as ObjectType,
             world: parametersString[1],
             name: parametersString[2],
          };
@@ -90,38 +120,30 @@ export class MapComponent {
       });
    }
 
-   private addMesh(world: World, mapObject: Object3D) {
+   private createWorldObject(mesh: Mesh): WorldObject {
       const worldObject = new WorldObject();
-      worldObject.add(mapObject);
-      const mapObjectMesh = mapObject as Mesh;
-      mapObjectMesh.material = new MeshBasicMaterial({
-         color: 0xffffff,
-         side: DoubleSide,
-         polygonOffset: true,
-         polygonOffsetFactor: 1,
-         polygonOffsetUnits: 1
-      });
-      world.addObject(worldObject);
-
-      const edges = new LineSegments(new EdgesGeometry(mapObjectMesh.geometry), new LineBasicMaterial({
-         color: 0x000000,
-         linewidth: 3,
-         polygonOffset: true,
-         polygonOffsetUnits: -1,
-         polygonOffsetFactor: -1
-      }));
-      worldObject.add(edges);
+      this.handleMeshMaterial(mesh);
+      worldObject.add(mesh);
+      worldObject.add(this.createMeshOutline(mesh));
+      return worldObject;
    }
 
-   private addPortal(world: World, mapObject: Object3D, portalObject: Object3D, parameters: ObjectParameters) {
+   private handleMeshMaterial(mesh: Mesh) {
+      mesh.material = MapComponent.MESH_MATERIAL;
+   }
+
+   private createMeshOutline(mesh: Mesh): Object3D {
+      return new LineSegments(new EdgesGeometry(mesh.geometry), MapComponent.MESH_LINE_MATERIAL);
+   }
+
+   private addPortal(world: World, mapObject: Object3D, portalObject: Object3D, parameters: PortalObjectParameters) {
       mapObject.remove(portalObject);
-      const portalParameters = parameters as PortalObjectParameters;
 
       const portal = new PortalWorldObject(
          new Mesh(new PlaneBufferGeometry(2, 2)),
          parameters.name,
-         portalParameters.targetWorld,
-         portalParameters.target,
+         parameters.targetWorld,
+         parameters.target,
          true,
       );
       portal.getGroup().position.copy(portalObject.position);

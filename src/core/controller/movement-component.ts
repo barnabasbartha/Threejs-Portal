@@ -5,14 +5,14 @@ import {Vector3} from "three";
 import {filter, map} from "rxjs/operators";
 import {PortalWorldObject} from "../object/portal-world-object";
 import {PhysicsComponent} from "../physics/physics.component";
-import {Teleport} from "../scene/teleport/teleport.model";
+import {TeleportContext} from "../teleport/teleport.model";
 import {SceneComponent} from "../scene/scene.component";
 
 @Singleton
 export class MovementComponent {
    public readonly position$: Observable<Vector3>;
 
-   private readonly teleportSubject = new ReplaySubject<Teleport>();
+   private readonly teleportSubject = new ReplaySubject<TeleportContext>();
    public readonly teleport$ = this.teleportSubject.pipe();
 
    private readonly positionSubject = new ReplaySubject<Vector3>();
@@ -30,7 +30,7 @@ export class MovementComponent {
                      this.teleportSubject.next({
                         sourcePortal: collision.object,
                         collision
-                     } as Teleport);
+                     } as TeleportContext);
                   }
                   return null;
                } else {

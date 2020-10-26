@@ -4,10 +4,10 @@ import {CoreCameraControllerComponent} from "../controller/core-camera-controlle
 import {WorldComponent} from "../world/world.component";
 import {Euler} from "three";
 import {TeleportContext} from "./teleport.model";
+import {TeleportUtils} from "./teleport-utils";
 
 @Singleton
 export class TeleportComponent {
-   private static readonly EPS = 0.000001;
 
    constructor(@Inject protected readonly movement: MovementComponent,
                @Inject protected readonly camera: CoreCameraControllerComponent,
@@ -28,10 +28,7 @@ export class TeleportComponent {
       const sourcePortalRotation = sourcePortal.getAbsoluteRotation();
 
       // For some reason, if the source/target portal's rotation is less than EPS, it will rotate 180 deg
-      const extraRotation = (Math.abs(sourcePortalRotation.y) < TeleportComponent.EPS &&
-         sourcePortalRotation.y !== 0) ||
-      (Math.abs(targetPortalRotation.y) < TeleportComponent.EPS &&
-         targetPortalRotation.y !== 0) ? 0 : Math.PI;
+      const extraRotation = TeleportUtils.getBuggyRotationConstant(sourcePortalRotation.y, targetPortalRotation.y);
 
       const deltaRotation = new Euler(
          0, //targetPortalRotation.x - sourcePortalRotation.x,

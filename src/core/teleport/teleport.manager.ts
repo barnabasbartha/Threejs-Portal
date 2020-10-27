@@ -4,8 +4,8 @@ import {MovementComponent} from "../controller/movement-component";
 
 @Singleton
 export class TeleportManager {
-   constructor(@Inject protected readonly component: TeleportComponent,
-               @Inject protected readonly movement: MovementComponent,) {
+   constructor(@Inject private readonly component: TeleportComponent,
+               @Inject private readonly movement: MovementComponent,) {
       movement.teleport$.subscribe(teleport => component.teleport(teleport));
    }
 }

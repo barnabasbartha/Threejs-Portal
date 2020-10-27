@@ -123,7 +123,7 @@ export class MapComponent {
    private createWorldObject(mesh: Mesh): WorldObject {
       const worldObject = new WorldObject();
       this.handleMeshMaterial(mesh);
-      worldObject.add(mesh);
+      worldObject.addPhysicalObject(mesh);
       worldObject.add(this.createMeshOutline(mesh));
       return worldObject;
    }

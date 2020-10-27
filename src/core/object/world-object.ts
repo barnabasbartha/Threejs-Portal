@@ -27,7 +27,7 @@ export class WorldObject extends AbstractObject<Group> {
       return this.tmpQuaternion;
    }
 
-   protected addPhysicalObject(object: Object3D) {
+   addPhysicalObject(object: Object3D) {
       this.add(object);
       this.physicalObjects.push(object);
    }

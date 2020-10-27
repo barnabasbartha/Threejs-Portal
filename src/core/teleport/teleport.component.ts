@@ -9,9 +9,9 @@ import {TeleportUtils} from "./teleport-utils";
 @Singleton
 export class TeleportComponent {
 
-   constructor(@Inject protected readonly movement: MovementComponent,
-               @Inject protected readonly camera: CoreCameraControllerComponent,
-               @Inject protected readonly world: WorldComponent) {
+   constructor(@Inject private readonly movement: MovementComponent,
+               @Inject private readonly camera: CoreCameraControllerComponent,
+               @Inject private readonly world: WorldComponent) {
    }
 
    teleport(teleport: TeleportContext) {
@@ -22,7 +22,7 @@ export class TeleportComponent {
       // Switch world
       this.world.setCurrentWorld(targetWorld);
 
-      const collisionSourcePortalDeltaPosition = teleport.collision.position.clone().sub(sourcePortal.getAbsolutePosition());
+      const collisionSourcePortalDeltaPosition = teleport.collision.intersection.point.clone().sub(sourcePortal.getAbsolutePosition());
       const cameraRotation = this.camera.getRotation();
       const targetPortalRotation = targetPortal.getAbsoluteRotation();
       const sourcePortalRotation = sourcePortal.getAbsoluteRotation();
@@ -40,7 +40,7 @@ export class TeleportComponent {
       // cameraRotation.z += deltaRotation.z;
       collisionSourcePortalDeltaPosition.applyEuler(deltaRotation);
 
-      const remainingMovementAfterCollision = teleport.collision.movement.clone().multiplyScalar(1 - teleport.collision.ratioToPosition);
+      const remainingMovementAfterCollision = teleport.collision.movement.clone().multiplyScalar(teleport.collision.ratioAfterPosition);
       remainingMovementAfterCollision.applyEuler(deltaRotation);
 
       this.camera.setRotation(cameraRotation);

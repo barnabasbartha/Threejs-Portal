@@ -1,9 +1,13 @@
 import {Singleton} from "typescript-ioc";
 import {World} from "./world";
 import {PortalWorldObject} from "../object/portal-world-object";
+import {Subject} from "rxjs";
 
 @Singleton
 export class WorldComponent {
+   private readonly worldChangedSubject = new Subject<World>();
+   public readonly worldChanged$ = this.worldChangedSubject.pipe();
+
    private worlds = new Map<string, World>();
    private currentWorld?: World;
 
@@ -13,6 +17,7 @@ export class WorldComponent {
 
    setCurrentWorld(world: World) {
       this.currentWorld = world;
+      this.worldChangedSubject.next(world);
    }
 
    getWorld(name: string): World {

@@ -47,8 +47,13 @@ export class World extends AbstractObject<Scene> {
       }
    }
 
+   getObjects(): WorldObject[] {
+      return Array.from(this.objects.values());
+   }
+
    addPortal(portal: PortalWorldObject) {
       this.portals.set(portal.getName(), portal);
+      this.addObject(portal);
    }
 
    getPortals(): PortalWorldObject[] {

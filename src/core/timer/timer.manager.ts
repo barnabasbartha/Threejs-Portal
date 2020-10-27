@@ -8,9 +8,9 @@ export class TimerManager {
    private mapLoaded = false;
    private pointerLocked = false;
 
-   constructor(@Inject protected readonly component: TimerComponent,
-               @Inject protected readonly controller: CoreControllerComponent,
-               @Inject protected readonly map: MapComponent) {
+   constructor(@Inject private readonly component: TimerComponent,
+               @Inject private readonly controller: CoreControllerComponent,
+               @Inject private readonly map: MapComponent) {
       map.mapLoaded$.subscribe(() => {
          this.mapLoaded = true;
          this.checkStart();

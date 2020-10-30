@@ -22,6 +22,7 @@ module.exports = (env, argv) => {
    const distDir = "dist";
    const distAssetDir = "asset";
    const baseUrl = ".";
+   const baseUrlProd = "/portal/";
 
    /*
     * Plugins
@@ -79,7 +80,7 @@ module.exports = (env, argv) => {
          filename: "index.html",
          title: title,
          meta: {
-            base: baseUrl,
+            base: isProduction() ? baseUrlProd : baseUrl,
             viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
          }
       }),

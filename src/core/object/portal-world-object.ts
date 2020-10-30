@@ -1,37 +1,20 @@
 import {WorldObject} from "./world-object";
-import {FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry} from "three";
-
-// import TWEEN from '@tweenjs/tween.js';
+import {Object3D} from "three";
 
 export class PortalWorldObject extends WorldObject {
-   private readonly mesh: Mesh;
    private destination?: PortalWorldObject;
 
-   constructor(private name: string,
-               private destinationSceneName: string,
+   constructor(object: Object3D | null,
+               private name: string,
+               private destinationWorldName: string,
                private destinationPortalName: string,
-               private teleportEnabled: boolean,
-               private size: number = 1) {
+               private teleportEnabled: boolean) {
       super();
-
-      this.addPhysicalObject(this.mesh = new Mesh(
-         new PlaneBufferGeometry(size, size),
-         new MeshBasicMaterial({
-            side: FrontSide,
-            transparent: true,
-            opacity: 0,
-            polygonOffsetFactor: -1,
-            polygonOffsetUnits: -4,
-            polygonOffset: true,
-         }),
-         )
-      );
-
-      // this.startAnimation();
+      this.addPhysicalObject(object);
    }
 
-   getDestinationSceneName(): string {
-      return this.destinationSceneName;
+   getDestinationWorldName(): string {
+      return this.destinationWorldName;
    }
 
    getDestinationPortalName(): string {
@@ -53,26 +36,4 @@ export class PortalWorldObject extends WorldObject {
    isTeleportEnabled(): boolean {
       return this.teleportEnabled;
    }
-
-   /*
-   private startAnimation() {
-      const tweenA = new TWEEN.Tween(this.mesh.position)
-         .to({
-            x: 0,
-            y: .4,
-            z: 0
-         }, 3000)
-         .easing(TWEEN.Easing.Sinusoidal.InOut)
-         .start();
-      const tweenB = new TWEEN.Tween(this.mesh.position)
-         .to({
-            x: 0,
-            y: 0,
-            z: 0
-         }, 3000)
-         .easing(TWEEN.Easing.Sinusoidal.InOut);
-      tweenA.chain(tweenB);
-      tweenB.chain(tweenA);
-   }
-    */
 }

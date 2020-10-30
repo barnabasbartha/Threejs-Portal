@@ -1,16 +1,15 @@
-import {WorldObject} from "../../object/world-object";
+import {WorldObject} from "../object/world-object";
 import {Scene} from "three";
-import {AbstractObject} from "../../object/abstract-object";
-import {PortalWorldObject} from "../../object/portal-world-object";
+import {AbstractObject} from "../object/abstract-object";
+import {PortalWorldObject} from "../object/portal-world-object";
 
-export abstract class World extends AbstractObject<Scene> {
+export class World extends AbstractObject<Scene> {
    protected readonly group = new Scene();
    private readonly objects = new Set<WorldObject>();
    protected readonly groupWithoutPortals = new Scene();
    private portals = new Map<string, PortalWorldObject>();
 
-   protected constructor(private name: string,
-                         private size: number = Infinity) {
+   constructor(private name: string) {
       super();
    }
 
@@ -20,10 +19,6 @@ export abstract class World extends AbstractObject<Scene> {
 
    getName(): string {
       return this.name;
-   }
-
-   getSize(): number {
-      return this.size;
    }
 
    step(delta: number) {
@@ -52,8 +47,13 @@ export abstract class World extends AbstractObject<Scene> {
       }
    }
 
+   getObjects(): WorldObject[] {
+      return Array.from(this.objects.values());
+   }
+
    addPortal(portal: PortalWorldObject) {
       this.portals.set(portal.getName(), portal);
+      this.addObject(portal);
    }
 
    getPortals(): PortalWorldObject[] {

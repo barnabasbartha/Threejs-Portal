@@ -1,9 +1,12 @@
 import {WorldObject} from "../object/world-object";
-import {Vector3} from "three";
+import {Intersection, Vector3} from "three";
 
 export interface Collision {
    ratioToPosition: number;
+   ratioAfterPosition: number;
    object: WorldObject;
-   position: Vector3;
+   normal: Vector3;
+   intersection: Intersection;
    movement: Vector3;
+   isPortal: boolean;
 }

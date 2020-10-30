@@ -1,7 +1,7 @@
 import {Euler, Group, Matrix4, Object3D, Quaternion, Vector3} from "three";
 import {AbstractObject} from "./abstract-object";
 
-export abstract class WorldObject extends AbstractObject<Group> {
+export class WorldObject extends AbstractObject<Group> {
    protected readonly group = new Group();
    private readonly physicalObjects: Object3D[] = [];
    private readonly tmpVector = new Vector3();
@@ -9,7 +9,7 @@ export abstract class WorldObject extends AbstractObject<Group> {
    private readonly tmpQuaternion = new Quaternion();
 
    getMatrix(): Matrix4 {
-      this.group.updateMatrix();
+      this.group.updateMatrixWorld(true)
       return this.group.matrixWorld;
    }
 
@@ -27,7 +27,7 @@ export abstract class WorldObject extends AbstractObject<Group> {
       return this.tmpQuaternion;
    }
 
-   protected addPhysicalObject(object: Object3D) {
+   addPhysicalObject(object: Object3D) {
       this.add(object);
       this.physicalObjects.push(object);
    }

@@ -4,6 +4,7 @@ import {ReplaySubject} from "rxjs";
 import {CoreKeyboardControllerComponent} from "./core-keyboard-controller.component";
 import {CoreCameraControllerComponent} from "./core-camera-controller.component";
 import {TimerComponent} from "../timer/timer.component";
+import {Config} from "../../config/config";
 
 @Singleton
 export class CoreMovementControllerComponent {
@@ -18,7 +19,7 @@ export class CoreMovementControllerComponent {
    private readonly movementSubject = new ReplaySubject<Vector3>();
    public readonly movement$ = this.movementSubject.pipe();
 
-   private static readonly SENSITIVITY = .05;
+   private static readonly SENSITIVITY = .05 * Config.PLAYER_SPEED;
    private readonly lookingDirection = new Vector3();
    private readonly movement = new Vector3();
    private keyDirection = KeyDirection.IDLE;
@@ -55,13 +56,14 @@ export class CoreMovementControllerComponent {
    private step(delta: number) {
       if (this.keyDirection !== KeyDirection.IDLE) {
          this.movement.copy(this.lookingDirection)
-            .projectOnPlane(CoreMovementControllerComponent.PLANE_NORMAL)
+            //.projectOnPlane(CoreMovementControllerComponent.PLANE_NORMAL)
             .normalize();
          const additionalAngle = this.keyDirection * CoreMovementControllerComponent.DEG_45 + CoreMovementControllerComponent.DEG_180;
          let moveVectorDeg = Math.atan2(this.movement.x, this.movement.z);
          moveVectorDeg -= additionalAngle;
          this.movement.x = Math.sin(moveVectorDeg);
          this.movement.z = Math.cos(moveVectorDeg);
+         this.movement.y *= -1;
          this.movement
             .multiplyScalar(CoreMovementControllerComponent.SENSITIVITY)
             .multiplyScalar(delta);

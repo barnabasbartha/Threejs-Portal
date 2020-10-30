@@ -1,26 +1,15 @@
 import {Singleton} from "typescript-ioc";
-import {World} from "./instance/world";
+import {World} from "./world";
 import {PortalWorldObject} from "../object/portal-world-object";
-import {RoomWorld} from "./instance/room-world";
-import {BoxWorld1} from "./instance/box-world-1";
-import {BoxWorld2} from "./instance/box-world-2";
-import {BoxWorld3} from "./instance/box-world-3";
-import {BoxWorld4} from "./instance/box-world-4";
-
-// import TWEEN from '@tweenjs/tween.js';
+import {Subject} from "rxjs";
 
 @Singleton
-export class SceneComponent {
-   private worlds = new Map<string, World>();
-   private currentWorld: World;
+export class WorldComponent {
+   private readonly worldChangedSubject = new Subject<World>();
+   public readonly worldChanged$ = this.worldChangedSubject.pipe();
 
-   constructor() {
-      this.add(this.currentWorld = new RoomWorld());
-      this.add(new BoxWorld1());
-      this.add(new BoxWorld2());
-      this.add(new BoxWorld3());
-      this.add(new BoxWorld4());
-   }
+   private worlds = new Map<string, World>();
+   private currentWorld?: World;
 
    getCurrentWorld(): World {
       return this.currentWorld;
@@ -28,6 +17,7 @@ export class SceneComponent {
 
    setCurrentWorld(world: World) {
       this.currentWorld = world;
+      this.worldChangedSubject.next(world);
    }
 
    getWorld(name: string): World {
@@ -39,17 +29,16 @@ export class SceneComponent {
    }
 
    step(delta: number) {
-      Array.from(this.worlds.values()).forEach(scene => scene.step(delta));
-      // TWEEN.update();
+      Array.from(this.worlds.values()).forEach(world => world.step(delta));
    }
 
    getPortals(): Map<string, PortalWorldObject> {
       const portals = new Map<string, PortalWorldObject>();
-      Array.from(this.worlds.values()).forEach(scene => scene.getPortals().forEach(portal => portals.set(portal.getName(), portal)));
+      Array.from(this.worlds.values()).forEach(world => world.getPortals().forEach(portal => portals.set(portal.getName(), portal)));
       return portals;
    }
 
-   private add(world: World) {
+   add(world: World) {
       this.worlds.set(world.getName(), world);
       this.updatePortals();
    }

@@ -16,6 +16,7 @@ import {
 import {WorldObject} from "../object/world-object";
 import {Subject} from "rxjs";
 import {PortalWorldObject} from "../object/portal-world-object";
+import {Config} from "../../config/config";
 
 type ObjectType = 'world' | 'mesh' | 'portal';
 
@@ -53,7 +54,7 @@ export class MapComponent {
    }
 
    load() {
-      const url = "../asset/map04.glb";
+      const url = Config.ASSET_DIR + "map04.glb";
       new GLTFLoader().load(url,
          (gltf: GLTF) => {
             console.log(url, gltf.scene.clone());

@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
    margin: 0;
    padding: 0;
    overflow: hidden;
@@ -13,9 +14,9 @@ canvas {
    position: fixed;
    width: 100vw;
    height: 100vh;
-   background: rgba(0, 0, 0, .2);
+   background: rgba(0, 0, 0, 0.2);
    transition: 2s ease-in-out;
-   transition-delay: .2s;
+   transition-delay: 0.2s;
 
    .container {
       position: relative;
@@ -30,7 +31,6 @@ canvas {
    .container.visible {
       display: block;
    }
-
 }
 
 .gui-layer.visible {

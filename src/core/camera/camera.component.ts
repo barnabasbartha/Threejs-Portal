@@ -13,16 +13,16 @@ export class CameraComponent {
       return this.camera;
    }
 
-   setAspectRatio(ratio: number) {
+   setAspectRatio(ratio: number): void {
       this.camera.aspect = ratio;
       this.camera.updateProjectionMatrix();
    }
 
-   setQuaternion(quaternion: Quaternion) {
+   setQuaternion(quaternion: Quaternion): void {
       this.camera.quaternion.copy(quaternion);
    }
 
-   setPosition(position: Vector3) {
+   setPosition(position: Vector3): void {
       this.camera.position.copy(position);
    }
 }

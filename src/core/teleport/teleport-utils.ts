@@ -4,7 +4,7 @@ export class TeleportUtils {
    static getBuggyRotationConstant(sourceY: number, targetY: number): number {
       const sBuggy = this.isRotationBuggy(sourceY);
       const tBuggy = this.isRotationBuggy(targetY);
-      const isBuggy = (sBuggy || tBuggy) && (!(sBuggy && tBuggy));
+      const isBuggy = (sBuggy || tBuggy) && !(sBuggy && tBuggy);
       return !isBuggy ? Math.PI : 0;
    }
 

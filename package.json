@@ -1,11 +1,15 @@
 {
-   "name": "portal",
+   "name": "Threejs-Portal",
    "description": "",
    "license": "",
    "scripts": {
       "start": "./node_modules/.bin/webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
       "build": "./node_modules/.bin/webpack --mode production",
-      "test": "./node_modules/.bin/mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts"
+      "test": "./node_modules/.bin/mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
+      "prettier": "prettier -l \"src/**/*.{ts,scss,html}\"",
+      "prettier:fix": "npm run prettier -- --write",
+      "lint": "eslint . --ext .ts",
+      "sass-lint": "sass-lint \"src/**/*.scss\" -v -q"
    },
    "devDependencies": {
       "@babel/core": "^7.11.1",
@@ -46,7 +50,12 @@
       "typescript-ioc": "3.2.2",
       "webpack": "^4.44.1",
       "webpack-cli": "^3.3.12",
-      "webpack-dev-server": "^3.11.0"
+      "webpack-dev-server": "^3.11.0",
+      "prettier": "^2.1.2",
+      "@typescript-eslint/eslint-plugin": "^4.6.1",
+      "@typescript-eslint/parser": "^4.6.1",
+      "eslint": "^7.12.1",
+      "sass-lint": "^1.13.1"
    },
    "dependencies": {
       "threads": "1.6.3",

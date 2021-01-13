@@ -14,19 +14,21 @@ import {PhysicsManager} from "./physics/physics.manager";
 
 @Singleton
 export class CoreThread {
-   constructor(@Inject private readonly renderer: RendererManager,
-               @Inject private readonly rendererComponent: RendererComponent,
-               @Inject private readonly world: WorldManager,
-               @Inject private readonly camera: CameraManager,
-               @Inject private readonly controller: CoreControllerComponent,
-               @Inject private readonly teleport: TeleportManager,
-               @Inject private readonly timer: TimerManager,
-               @Inject private readonly physics: PhysicsManager,
-               @Inject private readonly map: MapComponent) {
+   constructor(
+      @Inject private readonly renderer: RendererManager,
+      @Inject private readonly rendererComponent: RendererComponent,
+      @Inject private readonly world: WorldManager,
+      @Inject private readonly camera: CameraManager,
+      @Inject private readonly controller: CoreControllerComponent,
+      @Inject private readonly teleport: TeleportManager,
+      @Inject private readonly timer: TimerManager,
+      @Inject private readonly physics: PhysicsManager,
+      @Inject private readonly map: MapComponent
+   ) {
       this.waitForCanvas();
    }
 
-   private waitForCanvas() {
+   private waitForCanvas(): void {
       onmessage = (event) => {
          const canvas: HTMLCanvasElement = event?.data?.canvas;
          if (canvas) {
@@ -35,23 +37,23 @@ export class CoreThread {
       };
    }
 
-   setSize(width: number, height: number) {
+   setSize(width: number, height: number): void {
       this.controller.resize(width, height);
    }
 
-   setPointerLock(status: EventStatus) {
+   setPointerLock(status: EventStatus): void {
       this.controller.setPointerLock(status);
    }
 
-   mouseMove(x: number, y: number) {
+   mouseMove(x: number, y: number): void {
       this.controller.move(x, y);
    }
 
-   keyEvent(keyEvent: KeyEvent) {
+   keyEvent(keyEvent: KeyEvent): void {
       this.controller.keyEvent(keyEvent);
    }
 
-   private init(canvas: HTMLCanvasElement) {
+   private init(canvas: HTMLCanvasElement): void {
       this.rendererComponent.init(canvas);
       this.setSize(canvas.width, canvas.height);
       console.log("Core thread OK");

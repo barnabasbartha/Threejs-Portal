@@ -6,12 +6,14 @@ import {RendererComponent} from "../renderer/renderer.component";
 
 @Singleton
 export class WorldManager {
-   constructor(@Inject private readonly component: WorldComponent,
-               @Inject private readonly timer: TimerComponent,
-               @Inject private readonly controller: CoreControllerComponent,
-               @Inject private readonly renderer: RendererComponent) {
+   constructor(
+      @Inject private readonly component: WorldComponent,
+      @Inject private readonly timer: TimerComponent,
+      @Inject private readonly controller: CoreControllerComponent,
+      @Inject private readonly renderer: RendererComponent
+   ) {
       renderer.init$.subscribe(() => {
-         timer.step$.subscribe(delta => component.step(delta));
+         timer.step$.subscribe((delta) => component.step(delta));
       });
    }
 }

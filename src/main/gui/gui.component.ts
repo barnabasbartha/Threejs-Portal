@@ -18,15 +18,17 @@ export class GuiComponent {
 </div>`;
 
       document.getElementsByTagName("body")[0].appendChild(this.layer);
-      this.container = document.getElementsByClassName("container")[0] as HTMLDivElement;
+      this.container = document.getElementsByClassName(
+         "container"
+      )[0] as HTMLDivElement;
    }
 
-   show() {
+   show(): void {
       this.layer.classList.add(GuiComponent.CLASS_VISIBLE);
       this.container.classList.add(GuiComponent.CLASS_VISIBLE);
    }
 
-   hide() {
+   hide(): void {
       this.layer.classList.remove(GuiComponent.CLASS_VISIBLE);
       this.container.classList.remove(GuiComponent.CLASS_VISIBLE);
    }

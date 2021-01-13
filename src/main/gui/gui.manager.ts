@@ -4,11 +4,13 @@ import {MainControllerComponent} from "../controller/main-controller.component";
 
 @Singleton
 export class GuiManager {
-   constructor(@Inject private readonly component: GuiComponent,
-               @Inject private readonly controller: MainControllerComponent) {
-      controller.pointerLock$.subscribe(status => {
+   constructor(
+      @Inject private readonly component: GuiComponent,
+      @Inject private readonly controller: MainControllerComponent
+   ) {
+      controller.pointerLock$.subscribe((status) => {
          if (status) component.hide();
          else component.show();
-      })
+      });
    }
 }

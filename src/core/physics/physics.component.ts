@@ -9,23 +9,24 @@ import {PortalWorldObject} from "../object/portal-world-object";
 @Singleton
 export class PhysicsComponent {
    private static readonly MAX_RECURSION_LEVEL = 3;
-   private static readonly EPS = .01;
+   private static readonly EPS = 0.01;
    private readonly raycaster = new Raycaster();
-   private readonly physicalObjectToWorldObject = new Map<Object3D, WorldObject>();
+   private readonly physicalObjectToWorldObject = new Map<Object3D,
+      WorldObject>();
    private physicalObjects: Object3D[] = [];
-   private worldLoaded: boolean = false;
+   private worldLoaded = false;
 
    constructor(@Inject private readonly world: WorldComponent) {
    }
 
-   setWorld(world: World) {
+   setWorld(world: World): void {
       this.clear();
-      world.getObjects().forEach(object => {
-         object.getPhysicalObjects().forEach(physicalObject => {
+      world.getObjects().forEach((object) => {
+         object.getPhysicalObjects().forEach((physicalObject) => {
             this.physicalObjectToWorldObject.set(physicalObject, object);
             this.physicalObjects.push(physicalObject);
          });
-      })
+      });
       this.worldLoaded = true;
    }
 
@@ -33,11 +34,10 @@ export class PhysicsComponent {
       return this.worldLoaded;
    }
 
-   private clear() {
+   private clear(): void {
       this.physicalObjectToWorldObject.clear();
       this.physicalObjects = [];
    }
-
 
    private readonly tmpPosition = new Vector3();
    private readonly tmpMovement = new Vector3();
@@ -45,17 +45,28 @@ export class PhysicsComponent {
    // Returns the last collision if there is at least one
    handleCollision(position: Vector3, movement: Vector3): Collision | null {
       // TODO: Use multiple origins to represent the player's hitbox (cylinder)
-      const [collision, newMovement] = this.getRecursiveCollisionMovement(this.tmpPosition.copy(position), movement);
+      const [collision, newMovement] = this.getRecursiveCollisionMovement(
+         this.tmpPosition.copy(position),
+         movement
+      );
       movement.copy(newMovement);
       return collision;
    }
 
-   private getRecursiveCollisionMovement(position: Vector3, movement: Vector3, recursionLevelLeft: number = PhysicsComponent.MAX_RECURSION_LEVEL): [Collision | null, Vector3] {
+   private getRecursiveCollisionMovement(
+      position: Vector3,
+      movement: Vector3,
+      recursionLevelLeft: number = PhysicsComponent.MAX_RECURSION_LEVEL
+   ): [Collision | null, Vector3] {
       const collision = this.checkCollision(position, movement);
       if (collision) {
          const movementBefore = this.tmpMovement.copy(movement);
          if (!collision.isPortal) {
-            collision.ratioToPosition = Math.max(collision.ratioToPosition - PhysicsComponent.EPS / movement.length(), 0);
+            collision.ratioToPosition = Math.max(
+               collision.ratioToPosition -
+               PhysicsComponent.EPS / movement.length(),
+               0
+            );
          }
          movement.multiplyScalar(collision.ratioToPosition);
 
@@ -66,7 +77,15 @@ export class PhysicsComponent {
                .projectOnPlane(collision.normal)
                .multiplyScalar(ratioAfterPosition);
             if (movementProjectedOnPlane.length() > PhysicsComponent.EPS) {
-               const [_, recursionMovement] = this.getRecursiveCollisionMovement(position, movementProjectedOnPlane.clone(), recursionLevelLeft--);
+               const [
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  _,
+                  recursionMovement,
+               ] = this.getRecursiveCollisionMovement(
+                  position,
+                  movementProjectedOnPlane.clone(),
+                  recursionLevelLeft--
+               );
                movement.add(recursionMovement);
             }
          }
@@ -74,11 +93,17 @@ export class PhysicsComponent {
       return [collision, movement];
    }
 
-   private checkCollision(position: Vector3, movement: Vector3): Collision | null {
+   private checkCollision(
+      position: Vector3,
+      movement: Vector3
+   ): Collision | null {
       const movementLength = movement.length();
       this.raycaster.set(position, movement);
       this.raycaster.far = movementLength + PhysicsComponent.EPS;
-      const intersections = this.raycaster.intersectObjects(this.physicalObjects, true);
+      const intersections = this.raycaster.intersectObjects(
+         this.physicalObjects,
+         true
+      );
       if (!intersections.length) {
          return null;
       }
@@ -93,9 +118,11 @@ export class PhysicsComponent {
          ratioAfterPosition: 1 - ratioToPosition,
          object,
          intersection,
-         normal: intersection.face.normal.transformDirection(intersection.object.matrixWorld),
+         normal: intersection.face.normal.transformDirection(
+            intersection.object.matrixWorld
+         ),
          movement,
-         isPortal: object instanceof PortalWorldObject
-      }
+         isPortal: object instanceof PortalWorldObject,
+      };
    }
 }

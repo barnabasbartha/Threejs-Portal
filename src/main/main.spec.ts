@@ -1,5 +1,5 @@
-describe('Hello world', () => {
-   it('should do nothing', () => {
+describe("Hello world", () => {
+   it("should do nothing", () => {
       // Do nothing
    });
 });

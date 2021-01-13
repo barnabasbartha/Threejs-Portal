@@ -4,8 +4,12 @@ import {WorldComponent} from "../world/world.component";
 
 @Singleton
 export class PhysicsManager {
-   constructor(@Inject private readonly component: PhysicsComponent,
-               @Inject private readonly worldComponent: WorldComponent) {
-      worldComponent.worldChanged$.subscribe(world => component.setWorld(world));
+   constructor(
+      @Inject private readonly component: PhysicsComponent,
+      @Inject private readonly worldComponent: WorldComponent
+   ) {
+      worldComponent.worldChanged$.subscribe((world) =>
+         component.setWorld(world)
+      );
    }
 }

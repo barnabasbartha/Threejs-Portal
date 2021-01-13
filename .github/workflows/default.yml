@@ -17,9 +17,7 @@ jobs:
             uses: actions/checkout@master
          -  name: Install Dependencies
             run: npm ci
-         -  name: Build Server
-            run: npm run build:prod:server
-         -  name: Build Client
+         -  name: Build
             run: npm run build
          -  name: Archive Production Artifact
             uses: actions/upload-artifact@master

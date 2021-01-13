@@ -70,7 +70,7 @@ rules:
    indentation:
       - 2
       -  size: 3
-   leading-zero: 2
+   leading-zero: 0
    max-line-length: 0
    max-file-line-count: 0
    nesting-depth: 2

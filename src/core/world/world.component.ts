@@ -1,7 +1,7 @@
-import {Singleton} from "typescript-ioc";
-import {World} from "./world";
-import {PortalWorldObject} from "../object/portal-world-object";
-import {Subject} from "rxjs";
+import { Singleton } from 'typescript-ioc';
+import { World } from './world';
+import { PortalWorldObject } from '../object/portal-world-object';
+import { Subject } from 'rxjs';
 
 @Singleton
 export class WorldComponent {
@@ -35,9 +35,7 @@ export class WorldComponent {
    getPortals(): Map<string, PortalWorldObject> {
       const portals = new Map<string, PortalWorldObject>();
       Array.from(this.worlds.values()).forEach((world) =>
-         world
-            .getPortals()
-            .forEach((portal) => portals.set(portal.getName(), portal))
+         world.getPortals().forEach((portal) => portals.set(portal.getName(), portal)),
       );
       return portals;
    }
@@ -50,10 +48,7 @@ export class WorldComponent {
    private updatePortals(): void {
       const portals = this.getPortals();
       Array.from(portals.values()).forEach((portal: PortalWorldObject) => {
-         if (
-            !portal.getDestination() &&
-            portals.has(portal.getDestinationPortalName())
-         ) {
+         if (!portal.getDestination() && portals.has(portal.getDestinationPortalName())) {
             const otherPortal = portals.get(portal.getDestinationPortalName());
             portal.setDestination(otherPortal);
             otherPortal.setDestination(portal);

@@ -1,5 +1,5 @@
-import {WorldObject} from "./world-object";
-import {Object3D} from "three";
+import { WorldObject } from './world-object';
+import { Object3D } from 'three';
 
 export class PortalWorldObject extends WorldObject {
    private destination?: PortalWorldObject;
@@ -9,7 +9,7 @@ export class PortalWorldObject extends WorldObject {
       private name: string,
       private destinationWorldName: string,
       private destinationPortalName: string,
-      private teleportEnabled: boolean
+      private teleportEnabled: boolean,
    ) {
       super();
       this.addPhysicalObject(object);

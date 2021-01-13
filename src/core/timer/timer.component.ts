@@ -1,6 +1,6 @@
-import {Singleton} from "typescript-ioc";
-import {Subject} from "rxjs";
-import {Clock} from "three";
+import { Singleton } from 'typescript-ioc';
+import { Subject } from 'rxjs';
+import { Clock } from 'three';
 
 @Singleton
 export class TimerComponent {

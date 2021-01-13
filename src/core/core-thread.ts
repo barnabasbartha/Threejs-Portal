@@ -1,16 +1,16 @@
-import {expose} from "threads/worker";
-import {Container, Inject, Singleton} from "typescript-ioc";
-import {RendererComponent} from "./renderer/renderer.component";
-import {RendererManager} from "./renderer/renderer.manager";
-import {WorldManager} from "./world/world.manager";
-import {CoreControllerComponent} from "./controller/core-controller.component";
-import {CameraManager} from "./camera/camera.manager";
-import {KeyEvent} from "../common/controller/controller.model";
-import {TimerManager} from "./timer/timer.manager";
-import {EventStatus} from "../common/event.model";
-import {MapComponent} from "./map/map.component";
-import {TeleportManager} from "./teleport/teleport.manager";
-import {PhysicsManager} from "./physics/physics.manager";
+import { expose } from 'threads/worker';
+import { Container, Inject, Singleton } from 'typescript-ioc';
+import { RendererComponent } from './renderer/renderer.component';
+import { RendererManager } from './renderer/renderer.manager';
+import { WorldManager } from './world/world.manager';
+import { CoreControllerComponent } from './controller/core-controller.component';
+import { CameraManager } from './camera/camera.manager';
+import { KeyEvent } from '../common/controller/controller.model';
+import { TimerManager } from './timer/timer.manager';
+import { EventStatus } from '../common/event.model';
+import { MapComponent } from './map/map.component';
+import { TeleportManager } from './teleport/teleport.manager';
+import { PhysicsManager } from './physics/physics.manager';
 
 @Singleton
 export class CoreThread {
@@ -23,7 +23,7 @@ export class CoreThread {
       @Inject private readonly teleport: TeleportManager,
       @Inject private readonly timer: TimerManager,
       @Inject private readonly physics: PhysicsManager,
-      @Inject private readonly map: MapComponent
+      @Inject private readonly map: MapComponent,
    ) {
       this.waitForCanvas();
    }
@@ -56,7 +56,7 @@ export class CoreThread {
    private init(canvas: HTMLCanvasElement): void {
       this.rendererComponent.init(canvas);
       this.setSize(canvas.width, canvas.height);
-      console.log("Core thread OK");
+      console.log('Core thread OK');
       this.map.load();
    }
 }

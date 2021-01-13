@@ -1,4 +1,4 @@
-import {EventStatus} from "../event.model";
+import { EventStatus } from '../event.model';
 
 export interface KeyEvent {
    status: EventStatus;

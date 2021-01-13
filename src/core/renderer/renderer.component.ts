@@ -9,12 +9,12 @@ import {
    Vector3,
    Vector4,
    WebGLRenderer,
-} from "three";
-import {Subject} from "rxjs";
-import {PortalWorldObject} from "../object/portal-world-object";
-import {World} from "../world/world";
-import {Config} from "../../config/config";
-import {Singleton} from "typescript-ioc";
+} from 'three';
+import { Subject } from 'rxjs';
+import { PortalWorldObject } from '../object/portal-world-object';
+import { World } from '../world/world';
+import { Config } from '../../config/config';
+import { Singleton } from 'typescript-ioc';
 
 @Singleton
 export class RendererComponent {
@@ -28,16 +28,16 @@ export class RendererComponent {
    init(canvas: HTMLCanvasElement): void {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      canvas["style"] = {width: canvas.width, height: canvas.height};
+      canvas['style'] = { width: canvas.width, height: canvas.height };
       this.renderer = new WebGLRenderer({
          canvas,
-         context: canvas.getContext("webgl2", {
+         context: canvas.getContext('webgl2', {
             stencil: true,
             depth: true,
-            powerPreference: "high-performance" as WebGLPowerPreference,
+            powerPreference: 'high-performance' as WebGLPowerPreference,
             antialias: true,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
-         powerPreference: "high-performance",
+         powerPreference: 'high-performance',
          stencil: true,
          depth: true,
          antialias: true,
@@ -66,7 +66,7 @@ export class RendererComponent {
             null,
             camera,
             camera.matrixWorld.clone(),
-            camera.projectionMatrix.clone()
+            camera.projectionMatrix.clone(),
          );
       }
    }
@@ -79,17 +79,14 @@ export class RendererComponent {
       viewMat: Matrix4,
       projMat: Matrix4,
       // eslint-disable-next-line @typescript-eslint/typedef
-      recursionLevel = 0
+      recursionLevel = 0,
    ): void {
-      const recursionLevelLeft =
-         Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
+      const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
          .filter((portal) => portal !== excludePortal)
          .forEach((portal) => {
-            const destinationWorld = worlds.get(
-               portal.getDestinationWorldName()
-            );
+            const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
             this.gl.colorMask(false, false, false, false);
             this.gl.depthMask(false);
@@ -100,15 +97,8 @@ export class RendererComponent {
             this.gl.stencilMask(0xff);
             this.renderScene(camera, [portal.getGroup()], viewMat, projMat);
 
-            const destViewMat = this.computePortalViewMatrix(
-               portal,
-               viewMat
-            ).clone();
-            const destProjMat = this.computePortalProjectionMatrix(
-               portal,
-               destViewMat,
-               projMat
-            ).clone();
+            const destViewMat = this.computePortalViewMatrix(portal, viewMat).clone();
+            const destProjMat = this.computePortalProjectionMatrix(portal, destViewMat, projMat).clone();
 
             if (recursionLevelLeft > 0) {
                this.renderWorldPortals(
@@ -118,7 +108,7 @@ export class RendererComponent {
                   camera,
                   destViewMat,
                   destProjMat,
-                  recursionLevel + 1
+                  recursionLevel + 1,
                );
             } else {
                this.gl.colorMask(true, true, true, true);
@@ -131,13 +121,9 @@ export class RendererComponent {
 
                this.renderScene(
                   camera,
-                  destinationWorld
-                     .getGroup()
-                     .children.filter(
-                     (object) => object !== excludePortal?.getGroup()
-                  ),
+                  destinationWorld.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
                   destViewMat,
-                  destProjMat
+                  destProjMat,
                );
             }
 
@@ -161,11 +147,9 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         portalsInWorld
-            .filter((portal) => portal !== excludePortal)
-            .map((portal) => portal.getGroup()),
+         portalsInWorld.filter((portal) => portal !== excludePortal).map((portal) => portal.getGroup()),
          viewMat,
-         projMat
+         projMat,
       );
 
       this.gl.depthFunc(this.gl.LESS);
@@ -177,23 +161,16 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         world
-            .getGroup()
-            .children.filter((object) => object !== excludePortal?.getGroup()),
+         world.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
          viewMat,
-         projMat
+         projMat,
       );
    }
 
    private originalCameraMatrixWorld = new Matrix4();
    private originalCameraProjectionMatrix = new Matrix4();
 
-   private renderScene(
-      camera: PerspectiveCamera,
-      children: Object3D[],
-      viewMat: Matrix4,
-      projMat: Matrix4
-   ): void {
+   private renderScene(camera: PerspectiveCamera, children: Object3D[], viewMat: Matrix4, projMat: Matrix4): void {
       this.tmpScene.children = children;
       this.originalCameraMatrixWorld.copy(camera.matrixWorld);
       this.originalCameraProjectionMatrix.copy(camera.projectionMatrix);
@@ -215,22 +192,10 @@ export class RendererComponent {
    private readonly srcToDst = new Matrix4();
    private readonly result = new Matrix4();
 
-   private computePortalViewMatrix(
-      sourcePortal: PortalWorldObject,
-      viewMat: Matrix4
-   ): Matrix4 {
-      this.srcToCam.multiplyMatrices(
-         this.inverse.getInverse(viewMat),
-         sourcePortal.getMatrix().clone()
-      );
-      this.dstInverse.getInverse(
-         sourcePortal.getDestination().getMatrix().clone()
-      );
-      this.srcToDst
-         .identity()
-         .multiply(this.srcToCam)
-         .multiply(this.rotationYMatrix)
-         .multiply(this.dstInverse);
+   private computePortalViewMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4): Matrix4 {
+      this.srcToCam.multiplyMatrices(this.inverse.getInverse(viewMat), sourcePortal.getMatrix().clone());
+      this.dstInverse.getInverse(sourcePortal.getDestination().getMatrix().clone());
+      this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
       this.result.getInverse(this.srcToDst);
       return this.result;
    }
@@ -246,43 +211,29 @@ export class RendererComponent {
    // Use custom projection matrix to align portal camera's near clip plane with the surface of the portal
    // See http://www.terathon.com/code/oblique.html
    // See www.terathon.com/lengyel/Lengyel-Oblique.pdf
-   private computePortalProjectionMatrix(
-      sourcePortal: PortalWorldObject,
-      viewMat: Matrix4,
-      projMat: Matrix4
-   ): Matrix4 {
+   private computePortalProjectionMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4, projMat: Matrix4): Matrix4 {
       const destinationPortal = sourcePortal.getDestination();
       this.cameraInverseViewMat.getInverse(viewMat);
-      this.dstRotationMatrix
-         .identity()
-         .extractRotation(destinationPortal.getMatrix());
+      this.dstRotationMatrix.identity().extractRotation(destinationPortal.getMatrix());
 
       // TODO: Use -1 if dot product is negative (?)
       this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
 
-      this.clipPlane.setFromNormalAndCoplanarPoint(
-         this.normal,
-         destinationPortal.getAbsolutePosition()
-      );
+      this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());
       this.clipPlane.applyMatrix4(this.cameraInverseViewMat);
 
       this.clipVector.set(
          this.clipPlane.normal.x,
          this.clipPlane.normal.y,
          this.clipPlane.normal.z,
-         this.clipPlane.constant
+         this.clipPlane.constant,
       );
       this.projectionMatrix.copy(projMat);
 
-      this.q.x =
-         (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) /
-         this.projectionMatrix.elements[0];
-      this.q.y =
-         (Math.sign(this.clipVector.y) + this.projectionMatrix.elements[9]) /
-         this.projectionMatrix.elements[5];
+      this.q.x = (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) / this.projectionMatrix.elements[0];
+      this.q.y = (Math.sign(this.clipVector.y) + this.projectionMatrix.elements[9]) / this.projectionMatrix.elements[5];
       this.q.z = -1.0;
-      this.q.w =
-         (1.0 + this.projectionMatrix.elements[10]) / projMat.elements[14];
+      this.q.w = (1.0 + this.projectionMatrix.elements[10]) / projMat.elements[14];
 
       this.clipVector.multiplyScalar(2 / this.clipVector.dot(this.q));
 

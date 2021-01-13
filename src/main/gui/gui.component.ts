@@ -1,14 +1,14 @@
-import {Singleton} from "typescript-ioc";
+import { Singleton } from 'typescript-ioc';
 
 @Singleton
 export class GuiComponent {
-   private static readonly CLASS_VISIBLE = "visible";
+   private static readonly CLASS_VISIBLE = 'visible';
    private readonly layer: HTMLDivElement;
    private readonly container: HTMLDivElement;
 
    constructor() {
-      this.layer = document.createElement("div");
-      this.layer.classList.add("gui-layer", GuiComponent.CLASS_VISIBLE);
+      this.layer = document.createElement('div');
+      this.layer.classList.add('gui-layer', GuiComponent.CLASS_VISIBLE);
 
       this.layer.innerHTML = `<div class="container visible">
 
@@ -17,10 +17,8 @@ export class GuiComponent {
 
 </div>`;
 
-      document.getElementsByTagName("body")[0].appendChild(this.layer);
-      this.container = document.getElementsByClassName(
-         "container"
-      )[0] as HTMLDivElement;
+      document.getElementsByTagName('body')[0].appendChild(this.layer);
+      this.container = document.getElementsByClassName('container')[0] as HTMLDivElement;
    }
 
    show(): void {

@@ -2,12 +2,12 @@ name: Default
 on:
    push:
       branches:
-         - dev
          - main
+         - prod
    pull_request:
       branches:
-         - dev
          - main
+         - prod
 jobs:
    build:
       name: Build

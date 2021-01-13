@@ -1,5 +1,5 @@
-import {WorldObject} from "../object/world-object";
-import {Intersection, Vector3} from "three";
+import { WorldObject } from '../object/world-object';
+import { Intersection, Vector3 } from 'three';
 
 export interface Collision {
    ratioToPosition: number;

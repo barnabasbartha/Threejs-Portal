@@ -1,0 +1,66 @@
+name: Default
+on:
+   push:
+      branches:
+         - main
+         - prod
+   pull_request:
+      branches:
+         - main
+         - prod
+jobs:
+   build:
+      name: Build
+      runs-on: ubuntu-latest
+      steps:
+         -  name: Checkout Repo
+            uses: actions/checkout@master
+         -  name: Install Dependencies
+            run: npm ci
+         -  name: Build
+            run: npm run build
+         -  name: Archive Production Artifact
+            uses: actions/upload-artifact@master
+            with:
+               name: dist
+               path: dist
+   test:
+      name: Test
+      runs-on: ubuntu-latest
+      steps:
+         -  name: Checkout Repo
+            uses: actions/checkout@master
+         -  name: Install Dependencies
+            run: npm ci
+         -  name: Test
+            run: npm run test
+   lint:
+      name: Lint
+      runs-on: ubuntu-latest
+      steps:
+         -  name: Checkout Repo
+            uses: actions/checkout@master
+         -  name: Install Dependencies
+            run: npm ci
+         -  name: Lint
+            run: npm run lint
+   sass-lint:
+      name: Sass Lint
+      runs-on: ubuntu-latest
+      steps:
+         -  name: Checkout Repo
+            uses: actions/checkout@master
+         -  name: Install Dependencies
+            run: npm ci
+         -  name: Sass Lint
+            run: npm run sass-lint
+   prettier:
+      name: Prettier
+      runs-on: ubuntu-latest
+      steps:
+         -  name: Checkout Repo
+            uses: actions/checkout@master
+         -  name: Install Dependencies
+            run: npm ci
+         -  name: Prettier
+            run: npm run prettier

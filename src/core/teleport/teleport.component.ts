@@ -1,20 +1,20 @@
-import {Inject, Singleton} from "typescript-ioc";
-import {MovementComponent} from "../controller/movement-component";
-import {CoreCameraControllerComponent} from "../controller/core-camera-controller.component";
-import {WorldComponent} from "../world/world.component";
-import {Euler} from "three";
-import {TeleportContext} from "./teleport.model";
-import {TeleportUtils} from "./teleport-utils";
+import { Inject, Singleton } from 'typescript-ioc';
+import { MovementComponent } from '../controller/movement-component';
+import { CoreCameraControllerComponent } from '../controller/core-camera-controller.component';
+import { WorldComponent } from '../world/world.component';
+import { Euler } from 'three';
+import { TeleportContext } from './teleport.model';
+import { TeleportUtils } from './teleport-utils';
 
 @Singleton
 export class TeleportComponent {
+   constructor(
+      @Inject private readonly movement: MovementComponent,
+      @Inject private readonly camera: CoreCameraControllerComponent,
+      @Inject private readonly world: WorldComponent,
+   ) {}
 
-   constructor(@Inject private readonly movement: MovementComponent,
-               @Inject private readonly camera: CoreCameraControllerComponent,
-               @Inject private readonly world: WorldComponent) {
-   }
-
-   teleport(teleport: TeleportContext) {
+   teleport(teleport: TeleportContext): void {
       const sourcePortal = teleport.sourcePortal;
       const targetWorld = this.world.getWorld(sourcePortal.getDestinationWorldName());
       const targetPortal = targetWorld.getPortal(sourcePortal.getDestinationPortalName());
@@ -22,7 +22,9 @@ export class TeleportComponent {
       // Switch world
       this.world.setCurrentWorld(targetWorld);
 
-      const collisionSourcePortalDeltaPosition = teleport.collision.intersection.point.clone().sub(sourcePortal.getAbsolutePosition());
+      const collisionSourcePortalDeltaPosition = teleport.collision.intersection.point
+         .clone()
+         .sub(sourcePortal.getAbsolutePosition());
       const cameraRotation = this.camera.getRotation();
       const targetPortalRotation = targetPortal.getAbsoluteRotation();
       const sourcePortalRotation = sourcePortal.getAbsoluteRotation();
@@ -40,14 +42,16 @@ export class TeleportComponent {
       // cameraRotation.z += deltaRotation.z;
       collisionSourcePortalDeltaPosition.applyEuler(deltaRotation);
 
-      const remainingMovementAfterCollision = teleport.collision.movement.clone().multiplyScalar(teleport.collision.ratioAfterPosition);
+      const remainingMovementAfterCollision = teleport.collision.movement
+         .clone()
+         .multiplyScalar(teleport.collision.ratioAfterPosition);
       remainingMovementAfterCollision.applyEuler(deltaRotation);
 
       this.camera.setRotation(cameraRotation);
       this.movement.setPosition(
          collisionSourcePortalDeltaPosition
             .add(remainingMovementAfterCollision)
-            .add(targetPortal.getAbsolutePosition())
+            .add(targetPortal.getAbsolutePosition()),
       );
    }
 }

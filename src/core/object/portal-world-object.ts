@@ -1,14 +1,16 @@
-import {WorldObject} from "./world-object";
-import {Object3D} from "three";
+import { WorldObject } from './world-object';
+import { Object3D } from 'three';
 
 export class PortalWorldObject extends WorldObject {
    private destination?: PortalWorldObject;
 
-   constructor(object: Object3D | null,
-               private name: string,
-               private destinationWorldName: string,
-               private destinationPortalName: string,
-               private teleportEnabled: boolean) {
+   constructor(
+      object: Object3D | null,
+      private name: string,
+      private destinationWorldName: string,
+      private destinationPortalName: string,
+      private teleportEnabled: boolean,
+   ) {
       super();
       this.addPhysicalObject(object);
    }
@@ -21,7 +23,7 @@ export class PortalWorldObject extends WorldObject {
       return this.destinationPortalName;
    }
 
-   setDestination(portal: PortalWorldObject) {
+   setDestination(portal: PortalWorldObject): void {
       this.destination = portal;
    }
 

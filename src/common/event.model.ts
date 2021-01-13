@@ -1,5 +1,6 @@
 export enum EventStatus {
-   OFF, ON
+   OFF,
+   ON,
 }
 
 export interface IVector2 {

@@ -1,31 +1,30 @@
-import {Inject, Singleton} from "typescript-ioc";
-import {Object3D, Raycaster, Vector3} from "three";
-import {WorldObject} from "../object/world-object";
-import {Collision} from "./physics.model";
-import {WorldComponent} from "../world/world.component";
-import {World} from "../world/world";
-import {PortalWorldObject} from "../object/portal-world-object";
+import { Inject, Singleton } from 'typescript-ioc';
+import { Object3D, Raycaster, Vector3 } from 'three';
+import { WorldObject } from '../object/world-object';
+import { Collision } from './physics.model';
+import { WorldComponent } from '../world/world.component';
+import { World } from '../world/world';
+import { PortalWorldObject } from '../object/portal-world-object';
 
 @Singleton
 export class PhysicsComponent {
    private static readonly MAX_RECURSION_LEVEL = 3;
-   private static readonly EPS = .01;
+   private static readonly EPS = 0.01;
    private readonly raycaster = new Raycaster();
    private readonly physicalObjectToWorldObject = new Map<Object3D, WorldObject>();
    private physicalObjects: Object3D[] = [];
-   private worldLoaded: boolean = false;
+   private worldLoaded = false;
 
-   constructor(@Inject private readonly world: WorldComponent) {
-   }
+   constructor(@Inject private readonly world: WorldComponent) {}
 
-   setWorld(world: World) {
+   setWorld(world: World): void {
       this.clear();
-      world.getObjects().forEach(object => {
-         object.getPhysicalObjects().forEach(physicalObject => {
+      world.getObjects().forEach((object) => {
+         object.getPhysicalObjects().forEach((physicalObject) => {
             this.physicalObjectToWorldObject.set(physicalObject, object);
             this.physicalObjects.push(physicalObject);
          });
-      })
+      });
       this.worldLoaded = true;
    }
 
@@ -33,11 +32,10 @@ export class PhysicsComponent {
       return this.worldLoaded;
    }
 
-   private clear() {
+   private clear(): void {
       this.physicalObjectToWorldObject.clear();
       this.physicalObjects = [];
    }
-
 
    private readonly tmpPosition = new Vector3();
    private readonly tmpMovement = new Vector3();
@@ -50,12 +48,19 @@ export class PhysicsComponent {
       return collision;
    }
 
-   private getRecursiveCollisionMovement(position: Vector3, movement: Vector3, recursionLevelLeft: number = PhysicsComponent.MAX_RECURSION_LEVEL): [Collision | null, Vector3] {
+   private getRecursiveCollisionMovement(
+      position: Vector3,
+      movement: Vector3,
+      recursionLevelLeft: number = PhysicsComponent.MAX_RECURSION_LEVEL,
+   ): [Collision | null, Vector3] {
       const collision = this.checkCollision(position, movement);
       if (collision) {
          const movementBefore = this.tmpMovement.copy(movement);
          if (!collision.isPortal) {
-            collision.ratioToPosition = Math.max(collision.ratioToPosition - PhysicsComponent.EPS / movement.length(), 0);
+            collision.ratioToPosition = Math.max(
+               collision.ratioToPosition - PhysicsComponent.EPS / movement.length(),
+               0,
+            );
          }
          movement.multiplyScalar(collision.ratioToPosition);
 
@@ -66,7 +71,11 @@ export class PhysicsComponent {
                .projectOnPlane(collision.normal)
                .multiplyScalar(ratioAfterPosition);
             if (movementProjectedOnPlane.length() > PhysicsComponent.EPS) {
-               const [_, recursionMovement] = this.getRecursiveCollisionMovement(position, movementProjectedOnPlane.clone(), recursionLevelLeft--);
+               const [
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  _,
+                  recursionMovement,
+               ] = this.getRecursiveCollisionMovement(position, movementProjectedOnPlane.clone(), recursionLevelLeft--);
                movement.add(recursionMovement);
             }
          }
@@ -95,7 +104,7 @@ export class PhysicsComponent {
          intersection,
          normal: intersection.face.normal.transformDirection(intersection.object.matrixWorld),
          movement,
-         isPortal: object instanceof PortalWorldObject
-      }
+         isPortal: object instanceof PortalWorldObject,
+      };
    }
 }

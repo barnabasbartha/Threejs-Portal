@@ -9,37 +9,38 @@ import {
    Vector3,
    Vector4,
    WebGLRenderer,
-} from "three";
-import {Subject} from "rxjs";
-import {PortalWorldObject} from "../object/portal-world-object";
-import {World} from "../world/world";
-import {Config} from "../../config/config";
-import {Singleton} from "typescript-ioc";
+} from 'three';
+import { Subject } from 'rxjs';
+import { PortalWorldObject } from '../object/portal-world-object';
+import { World } from '../world/world';
+import { Config } from '../../config/config';
+import { Singleton } from 'typescript-ioc';
 
 @Singleton
 export class RendererComponent {
    private readonly initSubject = new Subject<void>();
-   public readonly init$ = this.initSubject.pipe();
+   readonly init$ = this.initSubject.pipe();
 
    private renderer?: WebGLRenderer;
    private tmpScene = new Scene();
    private gl?: WebGLRenderingContext;
 
-   init(canvas: HTMLCanvasElement) {
+   init(canvas: HTMLCanvasElement): void {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      canvas['style'] = {width: canvas.width, height: canvas.height};
+      canvas['style'] = { width: canvas.width, height: canvas.height };
       this.renderer = new WebGLRenderer({
          canvas,
          context: canvas.getContext('webgl2', {
             stencil: true,
             depth: true,
             powerPreference: 'high-performance' as WebGLPowerPreference,
-            antialias: true
+            antialias: true,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
          stencil: true,
          depth: true,
-         antialias: true
+         antialias: true,
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);
@@ -51,40 +52,64 @@ export class RendererComponent {
       this.initSubject.next();
    }
 
-   setSize(width: number, height: number) {
+   setSize(width: number, height: number): void {
       this.renderer?.setSize(width, height);
    }
 
-   render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera) {
+   render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera): void {
       if (this.renderer) {
          this.renderer.clear();
          camera.updateMatrixWorld(true);
-         this.renderWorldPortals(worlds, world, null, camera, camera.matrixWorld.clone(), camera.projectionMatrix.clone());
+         this.renderWorldPortals(
+            worlds,
+            world,
+            null,
+            camera,
+            camera.matrixWorld.clone(),
+            camera.projectionMatrix.clone(),
+         );
       }
    }
 
-   private renderWorldPortals(worlds: Map<string, World>, world: World, excludePortal: PortalWorldObject | null, camera: PerspectiveCamera, viewMat: Matrix4, projMat: Matrix4, recursionLevel: number = 0) {
+   private renderWorldPortals(
+      worlds: Map<string, World>,
+      world: World,
+      excludePortal: PortalWorldObject | null,
+      camera: PerspectiveCamera,
+      viewMat: Matrix4,
+      projMat: Matrix4,
+      // eslint-disable-next-line @typescript-eslint/typedef
+      recursionLevel = 0,
+   ): void {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
-         .filter(portal => portal !== excludePortal)
-         .forEach(portal => {
+         .filter((portal) => portal !== excludePortal)
+         .forEach((portal) => {
             const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
             this.gl.colorMask(false, false, false, false);
             this.gl.depthMask(false);
             this.gl.disable(this.gl.DEPTH_TEST);
             this.gl.enable(this.gl.STENCIL_TEST);
-            this.gl.stencilFunc(this.gl.NOTEQUAL, recursionLevel, 0xFF);
+            this.gl.stencilFunc(this.gl.NOTEQUAL, recursionLevel, 0xff);
             this.gl.stencilOp(this.gl.INCR, this.gl.KEEP, this.gl.KEEP);
-            this.gl.stencilMask(0xFF);
+            this.gl.stencilMask(0xff);
             this.renderScene(camera, [portal.getGroup()], viewMat, projMat);
 
             const destViewMat = this.computePortalViewMatrix(portal, viewMat).clone();
             const destProjMat = this.computePortalProjectionMatrix(portal, destViewMat, projMat).clone();
 
             if (recursionLevelLeft > 0) {
-               this.renderWorldPortals(worlds, destinationWorld, portal.getDestination(), camera, destViewMat, destProjMat, recursionLevel + 1);
+               this.renderWorldPortals(
+                  worlds,
+                  destinationWorld,
+                  portal.getDestination(),
+                  camera,
+                  destViewMat,
+                  destProjMat,
+                  recursionLevel + 1,
+               );
             } else {
                this.gl.colorMask(true, true, true, true);
                this.gl.depthMask(true);
@@ -92,17 +117,21 @@ export class RendererComponent {
                this.gl.enable(this.gl.DEPTH_TEST);
                this.gl.enable(this.gl.STENCIL_TEST);
                this.gl.stencilMask(0x00);
-               this.gl.stencilFunc(this.gl.EQUAL, recursionLevel + 1, 0xFF);
+               this.gl.stencilFunc(this.gl.EQUAL, recursionLevel + 1, 0xff);
 
-               this.renderScene(camera, destinationWorld.getGroup().children
-                  .filter(object => object !== excludePortal?.getGroup()), destViewMat, destProjMat);
+               this.renderScene(
+                  camera,
+                  destinationWorld.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+                  destViewMat,
+                  destProjMat,
+               );
             }
 
             this.gl.colorMask(false, false, false, false);
             this.gl.depthMask(false);
             this.gl.enable(this.gl.STENCIL_TEST);
-            this.gl.stencilMask(0xFF);
-            this.gl.stencilFunc(this.gl.NOTEQUAL, recursionLevel + 1, 0xFF);
+            this.gl.stencilMask(0xff);
+            this.gl.stencilFunc(this.gl.NOTEQUAL, recursionLevel + 1, 0xff);
             this.gl.stencilOp(this.gl.DECR, this.gl.KEEP, this.gl.KEEP);
 
             this.renderScene(camera, [portal.getGroup()], viewMat, projMat);
@@ -116,25 +145,32 @@ export class RendererComponent {
       this.gl.depthFunc(this.gl.ALWAYS);
       this.renderer.clear(false, true, false);
 
-      this.renderScene(camera, portalsInWorld
-         .filter(portal => portal !== excludePortal)
-         .map(portal => portal.getGroup()), viewMat, projMat);
+      this.renderScene(
+         camera,
+         portalsInWorld.filter((portal) => portal !== excludePortal).map((portal) => portal.getGroup()),
+         viewMat,
+         projMat,
+      );
 
       this.gl.depthFunc(this.gl.LESS);
       this.gl.enable(this.gl.STENCIL_TEST);
       this.gl.stencilMask(0x00);
-      this.gl.stencilFunc(this.gl.LEQUAL, recursionLevel, 0xFF);
+      this.gl.stencilFunc(this.gl.LEQUAL, recursionLevel, 0xff);
       this.gl.colorMask(true, true, true, true);
       this.gl.depthMask(true);
 
-      this.renderScene(camera, world.getGroup().children
-         .filter(object => object !== excludePortal?.getGroup()), viewMat, projMat);
+      this.renderScene(
+         camera,
+         world.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+         viewMat,
+         projMat,
+      );
    }
 
    private originalCameraMatrixWorld = new Matrix4();
    private originalCameraProjectionMatrix = new Matrix4();
 
-   private renderScene(camera: PerspectiveCamera, children: Object3D[], viewMat: Matrix4, projMat: Matrix4) {
+   private renderScene(camera: PerspectiveCamera, children: Object3D[], viewMat: Matrix4, projMat: Matrix4): void {
       this.tmpScene.children = children;
       this.originalCameraMatrixWorld.copy(camera.matrixWorld);
       this.originalCameraProjectionMatrix.copy(camera.projectionMatrix);
@@ -186,7 +222,12 @@ export class RendererComponent {
       this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());
       this.clipPlane.applyMatrix4(this.cameraInverseViewMat);
 
-      this.clipVector.set(this.clipPlane.normal.x, this.clipPlane.normal.y, this.clipPlane.normal.z, this.clipPlane.constant);
+      this.clipVector.set(
+         this.clipPlane.normal.x,
+         this.clipPlane.normal.y,
+         this.clipPlane.normal.z,
+         this.clipPlane.constant,
+      );
       this.projectionMatrix.copy(projMat);
 
       this.q.x = (Math.sign(this.clipVector.x) + this.projectionMatrix.elements[8]) / this.projectionMatrix.elements[0];

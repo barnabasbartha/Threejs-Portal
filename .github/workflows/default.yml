@@ -20,7 +20,7 @@ jobs:
          -  name: Build Server
             run: npm run build:prod:server
          -  name: Build Client
-            run: npm run build:prod:client
+            run: npm run build
          -  name: Archive Production Artifact
             uses: actions/upload-artifact@master
             with:

@@ -1,11 +1,11 @@
 {
    "name": "Threejs-Portal",
-   "description": "",
+   "description": "Experiment with WebGL, Three.js, OffscreenCanvas with Web Worker, stencil buffer and an event-driven architecture using RxJs with a DI lib.",
    "license": "",
    "scripts": {
-      "start": "./node_modules/.bin/webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
-      "build": "./node_modules/.bin/webpack --mode production",
-      "test": "./node_modules/.bin/mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
+      "start": "webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
+      "build": "webpack --mode production",
+      "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
       "lint": "eslint . --ext .ts",
       "sass-lint": "sass-lint \"src/**/*.scss\" -v -q",
       "lint:fix": "sass-lint-auto-fix -c .sass-lint.yml"

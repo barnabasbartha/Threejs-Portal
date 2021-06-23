@@ -3,6 +3,7 @@ import OptimizeCssAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import HtmlWebPackPlugin from 'html-webpack-plugin';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import * as webpack from 'webpack';
 import {Configuration, HotModuleReplacementPlugin} from 'webpack';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 // @ts-ignore
@@ -10,7 +11,6 @@ import ReplaceInFileWebpackPlugin from 'replace-in-file-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 // @ts-ignore
 import ThreadsPlugin from 'threads-plugin';
-import webpack = require("webpack");
 
 interface Target {
    readonly entry: string;

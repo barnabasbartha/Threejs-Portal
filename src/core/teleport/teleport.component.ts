@@ -1,10 +1,10 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { MovementComponent } from '../controller/movement-component';
-import { CoreCameraControllerComponent } from '../controller/core-camera-controller.component';
-import { WorldComponent } from '../world/world.component';
-import { Euler } from 'three';
-import { TeleportContext } from './teleport.model';
-import { TeleportUtils } from './teleport-utils';
+import {Inject, Singleton} from 'typescript-ioc';
+import {MovementComponent} from '../controller/movement-component';
+import {CoreCameraControllerComponent} from '../controller/core-camera-controller.component';
+import {WorldComponent} from '../world/world.component';
+import {Euler} from 'three';
+import {TeleportContext} from './teleport.model';
+import {TeleportUtils} from './teleport-utils';
 
 @Singleton
 export class TeleportComponent {
@@ -12,7 +12,8 @@ export class TeleportComponent {
       @Inject private readonly movement: MovementComponent,
       @Inject private readonly camera: CoreCameraControllerComponent,
       @Inject private readonly world: WorldComponent,
-   ) {}
+   ) {
+   }
 
    teleport(teleport: TeleportContext): void {
       const sourcePortal = teleport.sourcePortal;

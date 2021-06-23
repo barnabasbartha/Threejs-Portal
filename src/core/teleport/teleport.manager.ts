@@ -1,6 +1,6 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { TeleportComponent } from './teleport.component';
-import { MovementComponent } from '../controller/movement-component';
+import {Inject, Singleton} from 'typescript-ioc';
+import {TeleportComponent} from './teleport.component';
+import {MovementComponent} from '../controller/movement-component';
 
 @Singleton
 export class TeleportManager {

@@ -1,16 +1,16 @@
-import { Singleton } from 'typescript-ioc';
-import { KeyEvent } from '../../common/controller/controller.model';
-import { EventStatus, IVector2 } from '../../common/event.model';
-import { fromEvent, merge, Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import {Singleton} from 'typescript-ioc';
+import {KeyEvent} from '../../common/controller/controller.model';
+import {EventStatus, IVector2} from '../../common/event.model';
+import {fromEvent, merge, Observable, Subject} from 'rxjs';
+import {distinctUntilChanged, map, tap} from 'rxjs/operators';
 
 @Singleton
 export class MainControllerComponent {
-   private readonly resizeObject: IVector2 = { x: 0, y: 0 };
+   private readonly resizeObject: IVector2 = {x: 0, y: 0};
    readonly resize$: Observable<IVector2>;
    readonly key$: Observable<KeyEvent>;
 
-   private readonly mouseMoveObject: IVector2 = { x: 0, y: 0 };
+   private readonly mouseMoveObject: IVector2 = {x: 0, y: 0};
    private readonly mouseMoveSubject = new Subject<IVector2>();
    readonly mouseMove$ = this.mouseMoveSubject.pipe();
 
@@ -59,12 +59,10 @@ export class MainControllerComponent {
 
       fromEvent(document, 'pointerlockchange')
          .pipe(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             map(
                () =>
                   document.pointerLockElement === canvas ||
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
                   document.mozPointerLockElement === canvas,
             ),

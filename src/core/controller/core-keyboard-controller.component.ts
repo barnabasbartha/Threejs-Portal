@@ -1,7 +1,7 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { CoreControllerComponent } from './core-controller.component';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import {Inject, Singleton} from 'typescript-ioc';
+import {CoreControllerComponent} from './core-controller.component';
+import {Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 
 @Singleton
 export class CoreKeyboardControllerComponent {

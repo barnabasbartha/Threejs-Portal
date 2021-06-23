@@ -1,8 +1,8 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { CoreControllerComponent } from './core-controller.component';
-import { Euler, Object3D, Quaternion, Vector3 } from 'three';
-import { MathUtil } from '../../util/math-util';
-import { Subject } from 'rxjs';
+import {Inject, Singleton} from 'typescript-ioc';
+import {CoreControllerComponent} from './core-controller.component';
+import {Euler, Object3D, Quaternion, Vector3} from 'three';
+import {MathUtil} from '../../util/math-util';
+import {Subject} from 'rxjs';
 
 @Singleton
 export class CoreCameraControllerComponent {

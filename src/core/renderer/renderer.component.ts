@@ -10,11 +10,11 @@ import {
    Vector4,
    WebGLRenderer,
 } from 'three';
-import { Subject } from 'rxjs';
-import { PortalWorldObject } from '../object/portal-world-object';
-import { World } from '../world/world';
-import { Config } from '../../config/config';
-import { Singleton } from 'typescript-ioc';
+import {Subject} from 'rxjs';
+import {PortalWorldObject} from '../object/portal-world-object';
+import {World} from '../world/world';
+import {Config} from '../../config/config';
+import {Singleton} from 'typescript-ioc';
 
 @Singleton
 export class RendererComponent {
@@ -26,9 +26,8 @@ export class RendererComponent {
    private gl?: WebGLRenderingContext;
 
    init(canvas: HTMLCanvasElement): void {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      canvas['style'] = { width: canvas.width, height: canvas.height };
+      canvas['style'] = {width: canvas.width, height: canvas.height};
       this.renderer = new WebGLRenderer({
          canvas,
          context: canvas.getContext('webgl2', {
@@ -176,12 +175,12 @@ export class RendererComponent {
       this.originalCameraProjectionMatrix.copy(camera.projectionMatrix);
       camera.matrixAutoUpdate = false;
       camera.matrixWorld.copy(viewMat);
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
       camera.projectionMatrix.copy(projMat);
       this.renderer.render(this.tmpScene, camera);
       camera.matrixAutoUpdate = true;
       camera.matrixWorld.copy(this.originalCameraMatrixWorld);
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
       camera.projectionMatrix.copy(this.originalCameraProjectionMatrix);
    }
 
@@ -193,10 +192,10 @@ export class RendererComponent {
    private readonly result = new Matrix4();
 
    private computePortalViewMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4): Matrix4 {
-      this.srcToCam.multiplyMatrices(this.inverse.getInverse(viewMat), sourcePortal.getMatrix().clone());
-      this.dstInverse.getInverse(sourcePortal.getDestination().getMatrix().clone());
+      this.srcToCam.multiplyMatrices(this.inverse.copy(viewMat).invert(), sourcePortal.getMatrix());
+      this.dstInverse.copy(sourcePortal.getDestination().getMatrix()).invert();
       this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
-      this.result.getInverse(this.srcToDst);
+      this.result.copy(this.srcToDst).invert();
       return this.result;
    }
 
@@ -213,7 +212,7 @@ export class RendererComponent {
    // See www.terathon.com/lengyel/Lengyel-Oblique.pdf
    private computePortalProjectionMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4, projMat: Matrix4): Matrix4 {
       const destinationPortal = sourcePortal.getDestination();
-      this.cameraInverseViewMat.getInverse(viewMat);
+      this.cameraInverseViewMat.copy(viewMat).invert();
       this.dstRotationMatrix.identity().extractRotation(destinationPortal.getMatrix());
 
       // TODO: Use -1 if dot product is negative (?)

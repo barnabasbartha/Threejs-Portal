@@ -34,13 +34,3 @@ jobs:
             run: npm ci
          -  name: Lint
             run: npm run lint
-   sass-lint:
-      name: Sass Lint
-      runs-on: ubuntu-latest
-      steps:
-         -  name: Checkout Repo
-            uses: actions/checkout@master
-         -  name: Install Dependencies
-            run: npm ci
-         -  name: Sass Lint
-            run: npm run sass-lint

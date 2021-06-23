@@ -2,22 +2,16 @@ import * as path from 'path';
 import OptimizeCssAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import HtmlWebPackPlugin from 'html-webpack-plugin';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import { Configuration, HotModuleReplacementPlugin } from 'webpack';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import {Configuration, HotModuleReplacementPlugin} from 'webpack';
 // @ts-ignore
 import OptimizeJsPlugin from 'optimize-js-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import ReplaceInFileWebpackPlugin from 'replace-in-file-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import ThreadsPlugin from 'threads-plugin';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import nodeExternals from 'webpack-node-externals';
 
 interface Target {
    readonly entry: string;
@@ -105,7 +99,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
                ],
             },
          ]),
-         new CopyWebpackPlugin({ patterns: [{ from: target.assetDir, to: target.distAssetDir }] }),
+         new CopyWebpackPlugin({patterns: [{from: target.assetDir, to: target.distAssetDir}]}),
       );
    } else {
       plugins.push(new HotModuleReplacementPlugin());
@@ -130,7 +124,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
       }),
       new OptimizeCssAssetsPlugin({
          cssProcessorPluginOptions: {
-            preset: ['default', { discardComments: { removeAll: true } }],
+            preset: ['default', {discardComments: {removeAll: true}}],
          },
       }),
    ];

@@ -1,9 +1,9 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { RendererComponent } from './renderer.component';
-import { TimerComponent } from '../timer/timer.component';
-import { WorldComponent } from '../world/world.component';
-import { CameraComponent } from '../camera/camera.component';
-import { CoreControllerComponent } from '../controller/core-controller.component';
+import {Inject, Singleton} from 'typescript-ioc';
+import {RendererComponent} from './renderer.component';
+import {TimerComponent} from '../timer/timer.component';
+import {WorldComponent} from '../world/world.component';
+import {CameraComponent} from '../camera/camera.component';
+import {CoreControllerComponent} from '../controller/core-controller.component';
 
 @Singleton
 export class RendererManager {

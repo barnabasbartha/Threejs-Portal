@@ -6,8 +6,6 @@
       "start": "./node_modules/.bin/webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
       "build": "./node_modules/.bin/webpack --mode production",
       "test": "./node_modules/.bin/mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
-      "prettier": "prettier -l \"src/**/*.{ts,scss,html}\"",
-      "prettier:fix": "npm run prettier -- --write",
       "lint": "eslint . --ext .ts",
       "sass-lint": "sass-lint \"src/**/*.scss\" -v -q",
       "lint:fix": "sass-lint-auto-fix -c .sass-lint.yml"
@@ -45,7 +43,6 @@
       "optimize-css-assets-webpack-plugin": "^5.0.3",
       "optimize-js-plugin": "^0.0.4",
       "path": "^0.12.7",
-      "prettier": "^2.1.2",
       "replace-in-file-webpack-plugin": "^1.0.6",
       "rxjs": "^6.6.2",
       "sass-lint": "^1.13.1",

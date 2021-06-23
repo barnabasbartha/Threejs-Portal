@@ -1,10 +1,10 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { Vector3 } from 'three';
-import { ReplaySubject } from 'rxjs';
-import { CoreKeyboardControllerComponent } from './core-keyboard-controller.component';
-import { CoreCameraControllerComponent } from './core-camera-controller.component';
-import { TimerComponent } from '../timer/timer.component';
-import { Config } from '../../config/config';
+import {Inject, Singleton} from 'typescript-ioc';
+import {Vector3} from 'three';
+import {ReplaySubject} from 'rxjs';
+import {CoreKeyboardControllerComponent} from './core-keyboard-controller.component';
+import {CoreCameraControllerComponent} from './core-camera-controller.component';
+import {TimerComponent} from '../timer/timer.component';
+import {Config} from '../../config/config';
 
 @Singleton
 export class CoreMovementControllerComponent {

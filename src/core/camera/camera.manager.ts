@@ -1,9 +1,9 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { CameraComponent } from './camera.component';
-import { CoreControllerComponent } from '../controller/core-controller.component';
-import { CoreCameraControllerComponent } from '../controller/core-camera-controller.component';
-import { MovementComponent } from '../controller/movement-component';
-import { TimerComponent } from '../timer/timer.component';
+import {Inject, Singleton} from 'typescript-ioc';
+import {CameraComponent} from './camera.component';
+import {CoreControllerComponent} from '../controller/core-controller.component';
+import {CoreCameraControllerComponent} from '../controller/core-camera-controller.component';
+import {MovementComponent} from '../controller/movement-component';
+import {TimerComponent} from '../timer/timer.component';
 
 @Singleton
 export class CameraManager {

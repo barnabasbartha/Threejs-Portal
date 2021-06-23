@@ -1,5 +1,5 @@
-import { Euler, Group, Matrix4, Object3D, Quaternion, Vector3 } from 'three';
-import { AbstractObject } from './abstract-object';
+import {Euler, Group, Matrix4, Object3D, Quaternion, Vector3} from 'three';
+import {AbstractObject} from './abstract-object';
 
 export class WorldObject extends AbstractObject<Group> {
    protected readonly group = new Group();

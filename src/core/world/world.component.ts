@@ -1,7 +1,7 @@
-import { Singleton } from 'typescript-ioc';
-import { World } from './world';
-import { PortalWorldObject } from '../object/portal-world-object';
-import { Subject } from 'rxjs';
+import {Singleton} from 'typescript-ioc';
+import {World} from './world';
+import {PortalWorldObject} from '../object/portal-world-object';
+import {Subject} from 'rxjs';
 
 @Singleton
 export class WorldComponent {

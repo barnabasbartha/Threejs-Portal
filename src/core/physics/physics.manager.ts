@@ -1,6 +1,6 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { PhysicsComponent } from './physics.component';
-import { WorldComponent } from '../world/world.component';
+import {Inject, Singleton} from 'typescript-ioc';
+import {PhysicsComponent} from './physics.component';
+import {WorldComponent} from '../world/world.component';
 
 @Singleton
 export class PhysicsManager {

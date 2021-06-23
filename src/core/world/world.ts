@@ -1,7 +1,7 @@
-import { WorldObject } from '../object/world-object';
-import { Scene } from 'three';
-import { AbstractObject } from '../object/abstract-object';
-import { PortalWorldObject } from '../object/portal-world-object';
+import {WorldObject} from '../object/world-object';
+import {Scene} from 'three';
+import {AbstractObject} from '../object/abstract-object';
+import {PortalWorldObject} from '../object/portal-world-object';
 
 export class World extends AbstractObject<Scene> {
    protected readonly group = new Scene();

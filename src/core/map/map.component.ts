@@ -1,7 +1,7 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { WorldComponent } from '../world/world.component';
-import { World } from '../world/world';
+import {Inject, Singleton} from 'typescript-ioc';
+import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
+import {WorldComponent} from '../world/world.component';
+import {World} from '../world/world';
 import {
    DoubleSide,
    EdgesGeometry,
@@ -13,10 +13,10 @@ import {
    Object3D,
    PlaneBufferGeometry,
 } from 'three';
-import { WorldObject } from '../object/world-object';
-import { Subject } from 'rxjs';
-import { PortalWorldObject } from '../object/portal-world-object';
-import { Config } from '../../config/config';
+import {WorldObject} from '../object/world-object';
+import {Subject} from 'rxjs';
+import {PortalWorldObject} from '../object/portal-world-object';
+import {Config} from '../../config/config';
 
 type ObjectType = 'world' | 'mesh' | 'portal';
 
@@ -50,7 +50,8 @@ export class MapComponent {
       polygonOffsetFactor: -1,
    });
 
-   constructor(@Inject private readonly worldComponent: WorldComponent) {}
+   constructor(@Inject private readonly worldComponent: WorldComponent) {
+   }
 
    load(): void {
       const url = Config.ASSET_DIR + 'map04.glb';
@@ -66,7 +67,8 @@ export class MapComponent {
             this.mapLoadedSubject.next();
          },
          // eslint-disable-next-line  @typescript-eslint/no-empty-function
-         () => {},
+         () => {
+         },
          () => {
             console.error('Error during loading model', url);
          },

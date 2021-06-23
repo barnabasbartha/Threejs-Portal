@@ -45,7 +45,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
    /*
     * Plugins
     */
-   const plugins = [
+   const plugins: unknown[] = [
       new MiniCssExtractPlugin({
          filename: '[name].bundle.css',
          chunkFilename: '[id].css',
@@ -236,6 +236,6 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
          minimize: isProd(),
          minimizer: minimizers as webpack.Plugin[],
       },
-      plugins: plugins,
+      plugins: plugins as webpack.Plugin[],
    };
 };

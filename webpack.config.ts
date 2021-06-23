@@ -4,14 +4,13 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import HtmlWebPackPlugin from 'html-webpack-plugin';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import {Configuration, HotModuleReplacementPlugin} from 'webpack';
-// @ts-ignore
-import OptimizeJsPlugin from 'optimize-js-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 // @ts-ignore
 import ReplaceInFileWebpackPlugin from 'replace-in-file-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 // @ts-ignore
 import ThreadsPlugin from 'threads-plugin';
+import webpack = require("webpack");
 
 interface Target {
    readonly entry: string;
@@ -118,10 +117,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
    /*
     * Minimizers
     */
-   const minimizers = [
-      new OptimizeJsPlugin({
-         sourceMap: !isProd(),
-      }),
+   const minimizers: unknown[] = [
       new OptimizeCssAssetsPlugin({
          cssProcessorPluginOptions: {
             preset: ['default', {discardComments: {removeAll: true}}],
@@ -238,7 +234,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
       },
       optimization: {
          minimize: isProd(),
-         minimizer: minimizers,
+         minimizer: minimizers as webpack.Plugin[],
       },
       plugins: plugins,
    };

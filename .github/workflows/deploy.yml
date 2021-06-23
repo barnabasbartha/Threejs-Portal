@@ -8,30 +8,33 @@ jobs:
       name: Build
       runs-on: ubuntu-latest
       steps:
-         - name: Checkout Repo
-           uses: actions/checkout@master
-         - name: Install Dependencies
-           run: npm ci
-         - name: Build
-           run: npm run build
-         - name: Archive Production Artifact
-           uses: actions/upload-artifact@master
-           with:
-              name: dist
-              path: dist
+         -  name: Checkout Repo
+            uses: actions/checkout@master
+            with:
+               persist-credentials: false
+         -  name: Install Dependencies
+            run: npm ci
+         -  name: Build
+            run: npm run build
+         -  name: Archive Production Artifact
+            uses: actions/upload-artifact@master
+            with:
+               name: dist
+               path: dist
    deploy:
       name: Deploy GitHub Pages
-      needs: [build]
+      needs: [ build ]
       runs-on: ubuntu-latest
       steps:
-         - name: Download Artifact
-           uses: actions/download-artifact@master
-           with:
-              name: dist
-              path: dist
-         - name: Deploy 🚀
-           uses: JamesIves/github-pages-deploy-action@3.7.1
-           with:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              BRANCH: gh-pages
-              FOLDER: dist
+         -  name: Download Artifact
+            uses: actions/download-artifact@master
+            with:
+               name: dist
+               path: dist
+               persist-credentials: false
+         -  name: Deploy 🚀
+            uses: JamesIves/github-pages-deploy-action@3.7.1
+            with:
+               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+               BRANCH: gh-pages
+               FOLDER: dist

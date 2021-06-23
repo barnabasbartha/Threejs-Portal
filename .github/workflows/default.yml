@@ -24,16 +24,6 @@ jobs:
             with:
                name: dist
                path: dist
-   test:
-      name: Test
-      runs-on: ubuntu-latest
-      steps:
-         -  name: Checkout Repo
-            uses: actions/checkout@master
-         -  name: Install Dependencies
-            run: npm ci
-         -  name: Test
-            run: npm run test
    lint:
       name: Lint
       runs-on: ubuntu-latest
@@ -54,13 +44,3 @@ jobs:
             run: npm ci
          -  name: Sass Lint
             run: npm run sass-lint
-   prettier:
-      name: Prettier
-      runs-on: ubuntu-latest
-      steps:
-         -  name: Checkout Repo
-            uses: actions/checkout@master
-         -  name: Install Dependencies
-            run: npm ci
-         -  name: Prettier
-            run: npm run prettier

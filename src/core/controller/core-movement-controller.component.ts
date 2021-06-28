@@ -77,10 +77,14 @@ export class CoreMovementControllerComponent {
          moveVectorDeg -= additionalAngle;
          this.movement.x = Math.sin(moveVectorDeg);
          this.movement.z = Math.cos(moveVectorDeg);
-         this.movement.y *= -1;
+         this.movement.y *= this.isGoingBackward() ? 1 : -1;
          this.movement.multiplyScalar(CoreMovementControllerComponent.SENSITIVITY).multiplyScalar(delta);
          this.movementSubject.next(this.movement);
       }
+   }
+
+   private isGoingBackward(): boolean {
+      return this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_BACKWARDS);
    }
 }
 

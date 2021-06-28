@@ -2,22 +2,15 @@ import {Inject, Singleton} from 'typescript-ioc';
 import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import {WorldComponent} from '../world/world.component';
 import {World} from '../world/world';
-import {
-   DoubleSide,
-   EdgesGeometry,
-   Group,
-   LineBasicMaterial,
-   LineSegments,
-   Mesh,
-   MeshStandardMaterial,
-   Object3D,
-   PlaneBufferGeometry,
-} from 'three';
+import {DoubleSide, EdgesGeometry, Group, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry,} from 'three';
 import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
 import {PortalWorldObject} from '../object/portal-world-object';
 import {Config} from '../../config/config';
 import {GameColor, GameColorValue} from "../model";
+import {LineSegmentsGeometry} from "three/examples/jsm/lines/LineSegmentsGeometry";
+import {Wireframe} from "three/examples/jsm/lines/Wireframe";
+import {LineMaterial} from "three/examples/jsm/lines/LineMaterial";
 
 type ObjectType = 'world' | 'mesh' | 'portal';
 
@@ -40,14 +33,14 @@ export class MapComponent {
    private static MESH_MATERIAL = new MeshStandardMaterial({
       side: DoubleSide,
       polygonOffset: true,
-      polygonOffsetFactor: 1,
       polygonOffsetUnits: 1,
+      polygonOffsetFactor: 1,
       metalness: 0,
       roughness: 1,
    });
-   private static MESH_LINE_MATERIAL = new LineBasicMaterial({
-      color: 0x000000,
-      linewidth: 3,
+   private static MESH_LINE_MATERIAL = new LineMaterial({
+      color: 0x222222,
+      linewidth: 0.002,
       polygonOffset: true,
       polygonOffsetUnits: -1,
       polygonOffsetFactor: -1,
@@ -106,7 +99,6 @@ export class MapComponent {
 
    private getObjects(parent: Object3D, type: ObjectType): [Object3D, ObjectParameters][] {
       return this.getObjectsParameters(parent.children).filter(
-         // eslint-disable-next-line @typescript-eslint/no-unused-vars
          ([_, parameters]) => parameters.type === type,
       );
    }
@@ -139,7 +131,8 @@ export class MapComponent {
    }
 
    private createMeshOutline(mesh: Mesh): Object3D {
-      return new LineSegments(new EdgesGeometry(mesh.geometry), MapComponent.MESH_LINE_MATERIAL);
+      const lineGeometry = new LineSegmentsGeometry().fromEdgesGeometry(new EdgesGeometry(mesh.geometry));
+      return new Wireframe(lineGeometry, MapComponent.MESH_LINE_MATERIAL);
    }
 
    private addPortal(

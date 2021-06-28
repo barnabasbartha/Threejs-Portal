@@ -2,15 +2,12 @@ import {Inject, Singleton} from 'typescript-ioc';
 import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import {WorldComponent} from '../world/world.component';
 import {World} from '../world/world';
-import {DoubleSide, EdgesGeometry, Group, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry,} from 'three';
+import {DoubleSide, Group, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry,} from 'three';
 import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
 import {PortalWorldObject} from '../object/portal-world-object';
 import {Config} from '../../config/config';
 import {GameColor, GameColorValue} from "../model";
-import {LineSegmentsGeometry} from "three/examples/jsm/lines/LineSegmentsGeometry";
-import {Wireframe} from "three/examples/jsm/lines/Wireframe";
-import {LineMaterial} from "three/examples/jsm/lines/LineMaterial";
 
 type ObjectType = 'world' | 'mesh' | 'portal';
 
@@ -32,18 +29,8 @@ export class MapComponent {
    readonly mapLoaded$ = this.mapLoadedSubject.pipe();
    private static MESH_MATERIAL = new MeshStandardMaterial({
       side: DoubleSide,
-      polygonOffset: true,
-      polygonOffsetUnits: 1,
-      polygonOffsetFactor: 1,
       metalness: 0,
       roughness: 1,
-   });
-   private static MESH_LINE_MATERIAL = new LineMaterial({
-      color: 0x222222,
-      linewidth: 0.002,
-      polygonOffset: true,
-      polygonOffsetUnits: -1,
-      polygonOffsetFactor: -1,
    });
 
    constructor(@Inject private readonly worldComponent: WorldComponent) {
@@ -122,17 +109,11 @@ export class MapComponent {
       const worldObject = new WorldObject();
       this.handleMeshMaterial(mesh);
       worldObject.addPhysicalObject(mesh);
-      worldObject.add(this.createMeshOutline(mesh));
       return worldObject;
    }
 
    private handleMeshMaterial(mesh: Mesh): void {
       mesh.material = MapComponent.MESH_MATERIAL;
-   }
-
-   private createMeshOutline(mesh: Mesh): Object3D {
-      const lineGeometry = new LineSegmentsGeometry().fromEdgesGeometry(new EdgesGeometry(mesh.geometry));
-      return new Wireframe(lineGeometry, MapComponent.MESH_LINE_MATERIAL);
    }
 
    private addPortal(

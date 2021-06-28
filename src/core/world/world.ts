@@ -12,7 +12,7 @@ export class World extends AbstractObject<Scene> {
    constructor(private name: string) {
       super();
 
-      const ambientLight = new AmbientLight(0xffffff, .5);
+      const ambientLight = new AmbientLight(0xffffff, .7);
       this.group.add(ambientLight);
    }
 

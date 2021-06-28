@@ -9,7 +9,7 @@ import {
    LineBasicMaterial,
    LineSegments,
    Mesh,
-   MeshBasicMaterial,
+   MeshStandardMaterial,
    Object3D,
    PlaneBufferGeometry,
 } from 'three';
@@ -17,6 +17,7 @@ import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
 import {PortalWorldObject} from '../object/portal-world-object';
 import {Config} from '../../config/config';
+import {GameColor, GameColorValue} from "../model";
 
 type ObjectType = 'world' | 'mesh' | 'portal';
 
@@ -29,18 +30,20 @@ interface ObjectParameters {
 interface PortalObjectParameters extends ObjectParameters {
    targetWorld: string;
    target: string;
+   color: GameColor;
 }
 
 @Singleton
 export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    readonly mapLoaded$ = this.mapLoadedSubject.pipe();
-   private static MESH_MATERIAL = new MeshBasicMaterial({
-      color: 0xffffff,
+   private static MESH_MATERIAL = new MeshStandardMaterial({
       side: DoubleSide,
       polygonOffset: true,
       polygonOffsetFactor: 1,
       polygonOffsetUnits: 1,
+      metalness: 0,
+      roughness: 1,
    });
    private static MESH_LINE_MATERIAL = new LineBasicMaterial({
       color: 0x000000,
@@ -118,6 +121,7 @@ export class MapComponent {
          };
          if (parametersString[3]) (parameters as PortalObjectParameters).targetWorld = parametersString[3];
          if (parametersString[4]) (parameters as PortalObjectParameters).target = parametersString[4];
+         (parameters as PortalObjectParameters).color = parametersString[5] ? parametersString[5] as GameColor : GameColor.BLUE;
          return [object, parameters];
       });
    }
@@ -152,6 +156,7 @@ export class MapComponent {
          parameters.targetWorld,
          parameters.target,
          true,
+         GameColorValue[parameters.color],
       );
       portal.getGroup().position.copy(portalObject.position);
       portal.getGroup().quaternion.copy(portalObject.quaternion);

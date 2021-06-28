@@ -62,7 +62,6 @@ export class RendererComponent {
          this.renderWorldPortals(
             worlds,
             world,
-            null,
             camera,
             camera.matrixWorld.clone(),
             camera.projectionMatrix.clone(),
@@ -73,7 +72,6 @@ export class RendererComponent {
    private renderWorldPortals(
       worlds: Map<string, World>,
       world: World,
-      excludePortal: PortalWorldObject | null,
       camera: PerspectiveCamera,
       viewMat: Matrix4,
       projMat: Matrix4,
@@ -82,7 +80,6 @@ export class RendererComponent {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
-         .filter((portal) => portal !== excludePortal)
          .forEach((portal) => {
             const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
@@ -102,7 +99,6 @@ export class RendererComponent {
                this.renderWorldPortals(
                   worlds,
                   destinationWorld,
-                  portal.getDestination(),
                   camera,
                   destViewMat,
                   destProjMat,
@@ -119,7 +115,7 @@ export class RendererComponent {
 
                this.renderScene(
                   camera,
-                  destinationWorld.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+                  destinationWorld.getGroup().children,
                   destViewMat,
                   destProjMat,
                );
@@ -145,7 +141,7 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         portalsInWorld.filter((portal) => portal !== excludePortal).map((portal) => portal.getGroup()),
+         portalsInWorld.map((portal) => portal.getGroup()),
          viewMat,
          projMat,
       );
@@ -159,7 +155,7 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         world.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+         world.getGroup().children,
          viewMat,
          projMat,
       );

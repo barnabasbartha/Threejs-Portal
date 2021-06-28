@@ -20,7 +20,7 @@ export abstract class AbstractObject<T extends Object3D> {
       this.group.remove(object);
    }
 
-   step(): void {
+   step(delta: number): void {
       //
    }
 }

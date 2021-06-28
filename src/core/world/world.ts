@@ -1,5 +1,5 @@
 import {WorldObject} from '../object/world-object';
-import {Scene} from 'three';
+import {AmbientLight, Scene} from 'three';
 import {AbstractObject} from '../object/abstract-object';
 import {PortalWorldObject} from '../object/portal-world-object';
 
@@ -11,6 +11,9 @@ export class World extends AbstractObject<Scene> {
 
    constructor(private name: string) {
       super();
+
+      const ambientLight = new AmbientLight(0xffffff, .5);
+      this.group.add(ambientLight);
    }
 
    getGroupWithoutPortals(): Scene {
@@ -22,7 +25,7 @@ export class World extends AbstractObject<Scene> {
    }
 
    step(delta: number): void {
-      for (const object of Array.from(this.objects.values())) {
+      for (const object of this.getObjects()) {
          object.step(delta);
       }
    }

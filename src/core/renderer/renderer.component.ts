@@ -77,8 +77,7 @@ export class RendererComponent {
       camera: PerspectiveCamera,
       viewMat: Matrix4,
       projMat: Matrix4,
-      // eslint-disable-next-line @typescript-eslint/typedef
-      recursionLevel = 0,
+      recursionLevel: number = 0,
    ): void {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();

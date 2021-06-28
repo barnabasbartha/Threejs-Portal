@@ -10,10 +10,12 @@ export class PortalWorldObject extends WorldObject {
       private destinationWorldName: string,
       private destinationPortalName: string,
       private teleportEnabled: boolean,
-      private color: number,
+      private color?: number,
    ) {
       super();
-      this.addLight();
+      if (this.color) {
+         this.addLight();
+      }
       this.addPhysicalObject(object);
    }
 

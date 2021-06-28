@@ -34,12 +34,8 @@ export class RendererComponent {
             stencil: true,
             depth: true,
             powerPreference: 'high-performance' as WebGLPowerPreference,
-            antialias: true,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
-         stencil: true,
-         depth: true,
-         antialias: true,
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);

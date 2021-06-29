@@ -7,9 +7,10 @@ import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
 import {PortalWorldObject} from '../object/portal-world-object';
 import {Config} from '../../config/config';
-import {GameColor, GameColorValue} from "../model";
+import {LightColor} from "../light/light.model";
+import {createLight} from "../light/light.utils";
 
-type ObjectType = 'world' | 'mesh' | 'portal';
+type ObjectType = 'world' | 'mesh' | 'portal' | 'light';
 
 interface ObjectParameters {
    type: ObjectType;
@@ -17,10 +18,13 @@ interface ObjectParameters {
    name: string;
 }
 
-interface PortalObjectParameters extends ObjectParameters {
+interface LightObjectParamteres extends ObjectParameters {
+   color: LightColor;
+}
+
+interface PortalObjectParameters extends LightObjectParamteres {
    targetWorld: string;
    target: string;
-   color: GameColor;
 }
 
 @Singleton
@@ -61,16 +65,25 @@ export class MapComponent {
    private parseMap(scene: Group): [World[], World] {
       const worlds: World[] = [];
       let mainWorld: World = null;
-      this.getObjects(scene, 'world').forEach(([mapObject, parameters]) => {
+      const objects = this.parseObjectParameters(scene.children);
+
+      this.filterObjectsByType(objects, 'world').forEach(([mapObject, parameters]) => {
          const world = new World(parameters.world);
          world.addObject(this.createWorldObject(mapObject as Mesh));
 
-         this.getObjects(mapObject, 'portal').forEach(([portalObject, parameters]) => {
+         const objectsInWorld = this.parseObjectParameters(mapObject.children);
+
+         this.filterObjectsByType(objectsInWorld, 'portal').forEach(([portalObject, parameters]) => {
             this.addPortal(world, mapObject, portalObject, parameters as PortalObjectParameters);
          });
 
-         this.getObjects(mapObject, 'mesh').forEach(([meshObject]) => {
+         this.filterObjectsByType(objectsInWorld, 'mesh').forEach(([meshObject]) => {
             world.addObject(this.createWorldObject(meshObject as Mesh));
+         });
+
+         this.filterObjectsByType(objectsInWorld, 'light').forEach(([meshObject, parameters]) => {
+            mapObject.remove(meshObject);
+            world.addObject(this.createLight(meshObject as Mesh, parameters as LightObjectParamteres));
          });
 
          worlds.push(world);
@@ -84,13 +97,11 @@ export class MapComponent {
       return [worlds, mainWorld];
    }
 
-   private getObjects(parent: Object3D, type: ObjectType): [Object3D, ObjectParameters][] {
-      return this.getObjectsParameters(parent.children).filter(
-         ([_, parameters]) => parameters.type === type,
-      );
+   private filterObjectsByType(objects: [Object3D, ObjectParameters][], type: ObjectType): [Object3D, ObjectParameters][] {
+      return objects.filter(([_, parameters]) => parameters.type === type);
    }
 
-   private getObjectsParameters(objects: Object3D[]): [Object3D, ObjectParameters][] {
+   private parseObjectParameters(objects: Object3D[]): [Object3D, ObjectParameters][] {
       return objects.map((object) => {
          const parametersString = object.name.split('_');
          const parameters: ObjectParameters = {
@@ -98,9 +109,14 @@ export class MapComponent {
             world: parametersString[1],
             name: parametersString[2],
          };
-         if (parametersString[3]) (parameters as PortalObjectParameters).targetWorld = parametersString[3];
-         if (parametersString[4]) (parameters as PortalObjectParameters).target = parametersString[4];
-         (parameters as PortalObjectParameters).color = parametersString[5] ? parametersString[5] as GameColor : GameColor.BLUE;
+         if (parameters.type === 'portal') {
+            (parameters as PortalObjectParameters).targetWorld = parametersString[3];
+            (parameters as PortalObjectParameters).target = parametersString[4];
+            (parameters as PortalObjectParameters).color = parametersString[5] ? parametersString[5] as LightColor : LightColor.BLUE;
+         } else if (parameters.type === 'light') {
+            (parameters as PortalObjectParameters).name = parametersString[1];
+            (parameters as PortalObjectParameters).color = parametersString[2] as LightColor;
+         }
          return [object, parameters];
       });
    }
@@ -109,6 +125,13 @@ export class MapComponent {
       const worldObject = new WorldObject();
       this.handleMeshMaterial(mesh);
       worldObject.addPhysicalObject(mesh);
+      return worldObject;
+   }
+
+   private createLight(mesh: Mesh, parameters: LightObjectParamteres): WorldObject {
+      const worldObject = new WorldObject();
+      worldObject.add(createLight(parameters.color));
+      worldObject.getGroup().position.copy(mesh.position);
       return worldObject;
    }
 
@@ -130,7 +153,7 @@ export class MapComponent {
          parameters.targetWorld,
          parameters.target,
          true,
-         GameColorValue[parameters.color],
+         parameters.color,
       );
       portal.getGroup().position.copy(portalObject.position);
       portal.getGroup().quaternion.copy(portalObject.quaternion);

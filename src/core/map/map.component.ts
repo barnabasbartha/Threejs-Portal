@@ -2,7 +2,7 @@ import {Inject, Singleton} from 'typescript-ioc';
 import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import {WorldComponent} from '../world/world.component';
 import {World} from '../world/world';
-import {DoubleSide, Group, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry,} from 'three';
+import {DoubleSide, Group, Material, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry,} from 'three';
 import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
 import {PortalWorldObject} from '../object/portal-world-object';
@@ -10,7 +10,7 @@ import {Config} from '../../config/config';
 import {LightColor} from "../light/light.model";
 import {createLight} from "../light/light.utils";
 
-type ObjectType = 'world' | 'mesh' | 'portal' | 'light';
+type ObjectType = 'world' | 'mesh' | 'portal' | 'light' | 'raw';
 
 interface ObjectParameters {
    type: ObjectType;
@@ -77,6 +77,10 @@ export class MapComponent {
             this.addPortal(world, mapObject, portalObject, parameters as PortalObjectParameters);
          });
 
+         this.filterObjectsByType(objectsInWorld, 'raw').forEach(([meshObject]) => {
+            world.addObject(this.createRawWorldObject(meshObject as Mesh));
+         });
+
          this.filterObjectsByType(objectsInWorld, 'mesh').forEach(([meshObject]) => {
             world.addObject(this.createWorldObject(meshObject as Mesh));
          });
@@ -121,10 +125,20 @@ export class MapComponent {
       });
    }
 
-   private createWorldObject(mesh: Mesh): WorldObject {
+   private createRawWorldObject(mesh: Mesh): WorldObject {
       const worldObject = new WorldObject();
-      this.handleMeshMaterial(mesh);
       worldObject.addPhysicalObject(mesh);
+      const material = (mesh.material as Material);
+      material.polygonOffset = true;
+      material.polygonOffsetFactor = -1;
+      material.polygonOffsetUnits = -1;
+      material.needsUpdate = true;
+      return worldObject;
+   }
+
+   private createWorldObject(mesh: Mesh): WorldObject {
+      const worldObject = this.createRawWorldObject(mesh);
+      this.handleMeshMaterial(mesh);
       return worldObject;
    }
 

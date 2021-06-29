@@ -7,7 +7,8 @@ export class PortalWorldObject extends WorldObject {
    private destination?: PortalWorldObject;
 
    constructor(
-      object: Object3D | null,
+      private object: Object3D | null,
+      private worldName: string,
       private name: string,
       private destinationWorldName: string,
       private destinationPortalName: string,
@@ -21,27 +22,45 @@ export class PortalWorldObject extends WorldObject {
       this.addPhysicalObject(object);
    }
 
+   getWorldName(): string {
+      return this.worldName;
+   }
+
    getDestinationWorldName(): string {
       return this.destinationWorldName;
    }
 
-   getDestinationPortalName(): string {
+   getDestinationPortalName(): string | undefined {
       return this.destinationPortalName;
    }
 
    setDestination(portal: PortalWorldObject): void {
       this.destination = portal;
+      this.destinationWorldName = portal.getWorldName();
+      this.destinationPortalName = portal.getName();
+      this.object.visible = true;
    }
 
-   getDestination(): PortalWorldObject {
+   getDestination(): PortalWorldObject | undefined {
       return this.destination;
+   }
+
+   removeDestination(): void {
+      this.destination = undefined;
+      this.destinationWorldName = undefined;
+      this.destinationPortalName = undefined;
+      this.object.visible = false;
    }
 
    getName(): string {
       return this.name;
    }
 
-   isTeleportEnabled(): boolean {
-      return this.teleportEnabled;
+   isVisible(): boolean {
+      return this.object.visible;
+   }
+
+   isEnabled(): boolean {
+      return this.teleportEnabled && this.isVisible();
    }
 }

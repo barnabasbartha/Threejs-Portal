@@ -11,6 +11,7 @@ import {EventStatus} from '../common/event.model';
 import {MapComponent} from './map/map.component';
 import {TeleportManager} from './teleport/teleport.manager';
 import {PhysicsManager} from './physics/physics.manager';
+import {GameManager} from "./game/game-manager";
 
 @Singleton
 export class CoreThread {
@@ -24,6 +25,7 @@ export class CoreThread {
       @Inject private readonly timer: TimerManager,
       @Inject private readonly physics: PhysicsManager,
       @Inject private readonly map: MapComponent,
+      @Inject private readonly game: GameManager,
    ) {
       this.waitForCanvas();
    }

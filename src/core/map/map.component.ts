@@ -149,6 +149,7 @@ export class MapComponent {
 
       const portal = new PortalWorldObject(
          new Mesh(new PlaneBufferGeometry(2, 2)),
+         world.getName(),
          parameters.name,
          parameters.targetWorld,
          parameters.target,

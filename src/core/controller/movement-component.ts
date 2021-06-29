@@ -33,14 +33,17 @@ export class MovementComponent {
                const collision = physics.handleCollision(this.position, movement);
                if (collision?.isPortal) {
                   const sourcePortal = collision.object as PortalWorldObject;
-                  if (sourcePortal.isTeleportEnabled()) {
-                     // TODO: Check the rest of the movement vector in the destination world as well to avoid jumping across the wall there
-                     this.teleportSubject.next({
-                        sourcePortal,
-                        collision,
-                     } as TeleportContext);
+                  if (!sourcePortal.isVisible()) {
+                     return movement;
                   }
-                  return null;
+                  if (!sourcePortal.isEnabled()) {
+                     return null;
+                  }
+                  // TODO: Check the rest of the movement vector in the destination world as well to avoid jumping across the wall there
+                  this.teleportSubject.next({
+                     sourcePortal,
+                     collision,
+                  } as TeleportContext);
                }
                return movement;
             }),

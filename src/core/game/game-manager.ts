@@ -27,6 +27,8 @@ export class GameManager {
       const portalRBB1 = worldRotBBack.getPortal('rBB1');
       portalRoomsA1.setDestination(portalRBB1);
       portalRBB1.setDestination(portalRoomsA1);
+
+      this.worlds.getWorld('rotBBack').getObject('lightForPortal').hide();
    }
 
    private switchPortalRoomsARoomsA1TargetBackToRotB2RB2(portalRoomsA1: PortalWorldObject): void {
@@ -35,6 +37,8 @@ export class GameManager {
       portalRoomsA1.getDestination().removeDestination();
       portalRoomsA1.setDestination(portalRB2);
       portalRB2.setDestination(portalRoomsA1);
+
+      this.worlds.getWorld('rotBBack').getObject('lightForPortal').show();
    }
 
    private initInvisibleRotBBackPortals(): void {

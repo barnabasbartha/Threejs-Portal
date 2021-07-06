@@ -9,6 +9,10 @@ export class WorldObject extends AbstractObject<Group> {
    private readonly tmpQuaternion = new Quaternion();
    private invisible = false;
 
+   constructor(protected name: string) {
+      super(name);
+   }
+
    getMatrix(): Matrix4 {
       this.group.updateMatrixWorld(true);
       return this.group.matrixWorld;

@@ -9,8 +9,8 @@ export class World extends AbstractObject<Scene> {
    protected readonly groupWithoutPortals = new Scene();
    private portals = new Map<string, PortalWorldObject>();
 
-   constructor(private name: string) {
-      super();
+   constructor(protected readonly name: string) {
+      super(name);
 
       const ambientLight = new AmbientLight(0xffffff, .7);
       this.group.add(ambientLight);
@@ -18,10 +18,6 @@ export class World extends AbstractObject<Scene> {
 
    getGroupWithoutPortals(): Scene {
       return this.groupWithoutPortals;
-   }
-
-   getName(): string {
-      return this.name;
    }
 
    step(delta: number): void {
@@ -55,5 +51,10 @@ export class World extends AbstractObject<Scene> {
 
    getPortal(name: string): PortalWorldObject {
       return this.portals.get(name);
+   }
+
+   getObject(name: string): WorldObject | undefined {
+      return this.getObjects()
+         .filter(object => object.getName() === name)?.[0];
    }
 }

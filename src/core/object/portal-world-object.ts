@@ -7,15 +7,15 @@ export class PortalWorldObject extends WorldObject {
    private destination?: PortalWorldObject;
 
    constructor(
-      private object: Object3D | null,
-      private worldName: string,
-      private name: string,
+      private readonly object: Object3D | null,
+      private readonly worldName: string,
+      protected readonly name: string,
       private destinationWorldName: string,
       private destinationPortalName: string,
       private teleportEnabled: boolean,
-      private color: LightColor,
+      private readonly color: LightColor,
    ) {
-      super();
+      super(name);
       if (this.color !== LightColor.NO_COLOR) {
          this.add(createLight(color));
       }

@@ -127,7 +127,7 @@ export class MapComponent {
    }
 
    private createRawWorldObject(mesh: Mesh): WorldObject {
-      const worldObject = new WorldObject();
+      const worldObject = new WorldObject(mesh.name);
       worldObject.addPhysicalObject(mesh);
       const material = (mesh.material as Material);
       material.polygonOffset = true;
@@ -144,7 +144,7 @@ export class MapComponent {
    }
 
    private createLight(mesh: Mesh, parameters: LightObjectParamteres): WorldObject {
-      const worldObject = new WorldObject();
+      const worldObject = new WorldObject(parameters.name);
       worldObject.add(createLight(parameters.color));
       worldObject.getGroup().position.copy(mesh.position);
       return worldObject;

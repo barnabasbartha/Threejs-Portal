@@ -39,14 +39,8 @@ export class TeleportComponent {
       // For some reason, if the source/target portal's rotation is less than EPS, it will rotate 180 deg
       const extraRotation = TeleportUtils.getBuggyRotationConstant(sourcePortalRotation.y, targetPortalRotation.y);
 
-      const deltaRotation = new Euler(
-         0, //targetPortalRotation.x - sourcePortalRotation.x,
-         targetPortalRotation.y - sourcePortalRotation.y + extraRotation,
-         0, //targetPortalRotation.z - sourcePortalRotation.z
-      );
-      // cameraRotation.x += deltaRotation.x;
+      const deltaRotation = new Euler(0, targetPortalRotation.y - sourcePortalRotation.y + extraRotation, 0);
       cameraRotation.y += deltaRotation.y;
-      // cameraRotation.z += deltaRotation.z;
       collisionSourcePortalDeltaPosition.applyEuler(deltaRotation);
 
       const remainingMovementAfterCollision = context.collision.movement

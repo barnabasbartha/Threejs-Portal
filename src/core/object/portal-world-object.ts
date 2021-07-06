@@ -16,7 +16,7 @@ export class PortalWorldObject extends WorldObject {
       private color: LightColor,
    ) {
       super();
-      if (this.color) {
+      if (this.color !== LightColor.NO_COLOR) {
          this.add(createLight(color));
       }
       this.addPhysicalObject(object);
@@ -38,7 +38,7 @@ export class PortalWorldObject extends WorldObject {
       this.destination = portal;
       this.destinationWorldName = portal.getWorldName();
       this.destinationPortalName = portal.getName();
-      this.object.visible = true;
+      this.show();
    }
 
    getDestination(): PortalWorldObject | undefined {
@@ -49,18 +49,32 @@ export class PortalWorldObject extends WorldObject {
       this.destination = undefined;
       this.destinationWorldName = undefined;
       this.destinationPortalName = undefined;
-      this.object.visible = false;
+      this.hide();
    }
 
    getName(): string {
       return this.name;
    }
 
-   isVisible(): boolean {
-      return this.object.visible;
+   disable(): void {
+      this.teleportEnabled = false;
+   }
+
+   enable(): void {
+      this.teleportEnabled = true;
    }
 
    isEnabled(): boolean {
-      return this.teleportEnabled && this.isVisible();
+      return this.teleportEnabled;
+   }
+
+   makeInvisible(): void {
+      super.makeInvisible();
+      this.object.visible = false;
+   }
+
+   makeVisible(): void {
+      super.makeVisible();
+      this.object.visible = true;
    }
 }

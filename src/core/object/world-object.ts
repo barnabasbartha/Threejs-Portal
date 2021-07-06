@@ -7,6 +7,7 @@ export class WorldObject extends AbstractObject<Group> {
    private readonly tmpVector = new Vector3();
    private readonly tmpEuler = new Euler();
    private readonly tmpQuaternion = new Quaternion();
+   private invisible = false;
 
    getMatrix(): Matrix4 {
       this.group.updateMatrixWorld(true);
@@ -34,5 +35,29 @@ export class WorldObject extends AbstractObject<Group> {
 
    getPhysicalObjects(): Object3D[] {
       return this.physicalObjects;
+   }
+
+   hide(): void {
+      this.group.visible = false;
+   }
+
+   show(): void {
+      this.group.visible = true;
+   }
+
+   makeInvisible(): void {
+      this.invisible = true;
+   }
+
+   makeVisible(): void {
+      this.invisible = false;
+   }
+
+   isVisible(): boolean {
+      return this.group.visible && !this.invisible;
+   }
+
+   isInvisible(): boolean {
+      return this.invisible;
    }
 }

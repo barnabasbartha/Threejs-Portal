@@ -2,12 +2,17 @@ import {Inject, Singleton} from "typescript-ioc";
 import {TeleportComponent} from "../teleport/teleport.component";
 import {WorldComponent} from "../world/world.component";
 import {PortalWorldObject} from "../object/portal-world-object";
+import {MapComponent} from "../map/map.component";
 
 @Singleton
 export class GameManager {
-   constructor(@Inject private readonly teleport: TeleportComponent,
+   constructor(@Inject private readonly map: MapComponent,
+               @Inject private readonly teleport: TeleportComponent,
                @Inject private readonly worlds: WorldComponent) {
-      this.initRoomsARoomsA1PortalTargetSwitchingWhenUsed();
+      map.mapLoaded$.subscribe(() => {
+         this.initRoomsARoomsA1PortalTargetSwitchingWhenUsed();
+         this.initInvisibleRotBBackPortals();
+      });
    }
 
    private initRoomsARoomsA1PortalTargetSwitchingWhenUsed(): void {
@@ -30,5 +35,10 @@ export class GameManager {
       portalRoomsA1.getDestination().removeDestination();
       portalRoomsA1.setDestination(portalRB2);
       portalRB2.setDestination(portalRoomsA1);
+   }
+
+   private initInvisibleRotBBackPortals(): void {
+      this.worlds.getWorld('rotBBack').getPortal('toInvisible').makeInvisible();
+      this.worlds.getWorld('main').getPortal('invisible').hide();
    }
 }

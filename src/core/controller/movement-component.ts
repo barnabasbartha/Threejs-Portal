@@ -30,10 +30,11 @@ export class MovementComponent {
          movementController.movement$.pipe(
             filter(() => physics.isWorldLoaded()),
             map((movement) => {
+               // TODO: It should be extracted to a teleport specific context instead of movement
                const collision = physics.handleCollision(this.position, movement);
                if (collision?.isPortal) {
                   const sourcePortal = collision.object as PortalWorldObject;
-                  if (!sourcePortal.isVisible()) {
+                  if (!sourcePortal.isVisible() && !sourcePortal.isInvisible()) {
                      return movement;
                   }
                   if (!sourcePortal.isEnabled()) {

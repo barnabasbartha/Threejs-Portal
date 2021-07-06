@@ -76,7 +76,7 @@ export class RendererComponent {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
-         .filter((portal) => portal.isEnabled())
+         .filter((portal) => portal.isVisible())
          .forEach((portal) => {
             const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
@@ -207,7 +207,6 @@ export class RendererComponent {
       this.cameraInverseViewMat.copy(viewMat).invert();
       this.dstRotationMatrix.identity().extractRotation(destinationPortal.getMatrix());
 
-      // TODO: Use -1 if dot product is negative (?)
       this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
 
       this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());

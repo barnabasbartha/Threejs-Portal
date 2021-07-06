@@ -31,6 +31,7 @@ interface PortalObjectParameters extends LightObjectParamteres {
 export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    readonly mapLoaded$ = this.mapLoadedSubject.pipe();
+
    private static MESH_MATERIAL = new MeshStandardMaterial({
       side: DoubleSide,
       metalness: 0,

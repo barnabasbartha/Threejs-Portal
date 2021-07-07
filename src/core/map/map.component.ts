@@ -2,7 +2,17 @@ import {Inject, Singleton} from 'typescript-ioc';
 import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import {WorldComponent} from '../world/world.component';
 import {World} from '../world/world';
-import {DoubleSide, Group, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry,} from 'three';
+import {
+   DoubleSide,
+   EdgesGeometry,
+   Group,
+   LineBasicMaterial,
+   LineSegments,
+   Mesh,
+   MeshBasicMaterial,
+   Object3D,
+   PlaneBufferGeometry,
+} from 'three';
 import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
 import {PortalWorldObject} from '../object/portal-world-object';
@@ -26,11 +36,18 @@ export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    readonly mapLoaded$ = this.mapLoadedSubject.pipe();
 
-   private static MESH_MATERIAL = new MeshStandardMaterial({
+   private static MESH_MATERIAL = new MeshBasicMaterial({
+      color: 0xffffff,
       side: DoubleSide,
-      metalness: 0,
-      roughness: 1,
-      shadowSide: DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
+   });
+   private static MESH_LINE_MATERIAL = new LineBasicMaterial({
+      color: 0x000000,
+      polygonOffset: true,
+      polygonOffsetUnits: -1,
+      polygonOffsetFactor: -1,
    });
 
    constructor(@Inject private readonly worldComponent: WorldComponent) {
@@ -111,10 +128,15 @@ export class MapComponent {
    private createWorldObject(mesh: Mesh): WorldObject {
       const worldObject = new WorldObject(mesh.name);
       worldObject.addPhysicalObject(mesh);
+      worldObject.add(this.createMeshOutline(mesh));
       mesh.material = MapComponent.MESH_MATERIAL;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       return worldObject;
+   }
+
+   private createMeshOutline(mesh: Mesh): Object3D {
+      return new LineSegments(new EdgesGeometry(mesh.geometry), MapComponent.MESH_LINE_MATERIAL);
    }
 
    private addPortal(

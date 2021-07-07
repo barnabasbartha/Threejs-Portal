@@ -74,7 +74,7 @@ export class RendererComponent {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
-         .filter((portal) => portal.isVisible())
+         .filter((portal) => portal.isVisible() && portal.isEnabled())
          .forEach((portal) => {
             const destinationWorld = worlds.get(portal.getDestinationWorldName());
 

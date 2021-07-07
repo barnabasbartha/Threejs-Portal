@@ -39,6 +39,18 @@ export class MainControllerComponent {
                key: event.code,
             })),
          ),
+         (fromEvent(window, 'mousedown') as Observable<MouseEvent>).pipe(
+            map((event) => ({
+               status: EventStatus.ON,
+               key: event.button.toString(),
+            })),
+         ),
+         (fromEvent(window, 'mouseup') as Observable<MouseEvent>).pipe(
+            map((event) => ({
+               status: EventStatus.OFF,
+               key: event.button.toString(),
+            })),
+         ),
       ).pipe(
          distinctUntilChanged((prev, curr) => {
             return prev.key === curr.key && prev.status === curr.status;

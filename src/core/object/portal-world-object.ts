@@ -59,7 +59,7 @@ export class PortalWorldObject extends WorldObject {
    }
 
    isEnabled(): boolean {
-      return this.teleportEnabled;
+      return this.teleportEnabled && !!this.destination;
    }
 
    makeInvisible(): void {

@@ -1,5 +1,5 @@
 import {WorldObject} from '../object/world-object';
-import {AmbientLight, Scene} from 'three';
+import {AmbientLight, Object3D, Scene} from 'three';
 import {AbstractObject} from '../object/abstract-object';
 import {PortalWorldObject} from '../object/portal-world-object';
 
@@ -36,8 +36,18 @@ export class World extends AbstractObject<Scene> {
       }
    }
 
+   add(object: Object3D): void {
+      super.add(object);
+   }
+
    getObjects(): WorldObject[] {
       return Array.from(this.objects.values());
+   }
+
+   getRawObjects(): Object3D[] {
+      const objects = [] as Object3D[];
+      this.getObjects().forEach(object => objects.push(...object.getGroup().children));
+      return objects;
    }
 
    addPortal(portal: PortalWorldObject): void {

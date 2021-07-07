@@ -1,8 +1,11 @@
-import { Object3D } from 'three';
-import { WorldObject } from './world-object';
+import {Object3D} from 'three';
+import {WorldObject} from './world-object';
 
 export abstract class AbstractObject<T extends Object3D> {
    protected abstract readonly group: T;
+
+   protected constructor(protected readonly name: string) {
+   }
 
    getGroup(): T {
       return this.group;
@@ -20,7 +23,11 @@ export abstract class AbstractObject<T extends Object3D> {
       this.group.remove(object);
    }
 
-   step(): void {
+   step(delta: number): void {
       //
+   }
+
+   getName(): string{
+      return this.name;
    }
 }

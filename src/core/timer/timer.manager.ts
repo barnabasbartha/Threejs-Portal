@@ -1,7 +1,7 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { TimerComponent } from './timer.component';
-import { CoreControllerComponent } from '../controller/core-controller.component';
-import { MapComponent } from '../map/map.component';
+import {Inject, Singleton} from 'typescript-ioc';
+import {TimerComponent} from './timer.component';
+import {CoreControllerComponent} from '../controller/core-controller.component';
+import {MapComponent} from '../map/map.component';
 
 @Singleton
 export class TimerManager {

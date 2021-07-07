@@ -1,7 +1,7 @@
-import { WorldObject } from '../object/world-object';
-import { Scene } from 'three';
-import { AbstractObject } from '../object/abstract-object';
-import { PortalWorldObject } from '../object/portal-world-object';
+import {WorldObject} from '../object/world-object';
+import {AmbientLight, Object3D, Scene} from 'three';
+import {AbstractObject} from '../object/abstract-object';
+import {PortalWorldObject} from '../object/portal-world-object';
 
 export class World extends AbstractObject<Scene> {
    protected readonly group = new Scene();
@@ -9,20 +9,19 @@ export class World extends AbstractObject<Scene> {
    protected readonly groupWithoutPortals = new Scene();
    private portals = new Map<string, PortalWorldObject>();
 
-   constructor(private name: string) {
-      super();
+   constructor(protected readonly name: string) {
+      super(name);
+
+      const ambientLight = new AmbientLight(0xffffff, .7);
+      this.group.add(ambientLight);
    }
 
    getGroupWithoutPortals(): Scene {
       return this.groupWithoutPortals;
    }
 
-   getName(): string {
-      return this.name;
-   }
-
    step(delta: number): void {
-      for (const object of Array.from(this.objects.values())) {
+      for (const object of this.getObjects()) {
          object.step(delta);
       }
    }
@@ -37,8 +36,18 @@ export class World extends AbstractObject<Scene> {
       }
    }
 
+   add(object: Object3D): void {
+      super.add(object);
+   }
+
    getObjects(): WorldObject[] {
       return Array.from(this.objects.values());
+   }
+
+   getRawObjects(): Object3D[] {
+      const objects = [] as Object3D[];
+      this.getObjects().forEach(object => objects.push(...object.getGroup().children));
+      return objects;
    }
 
    addPortal(portal: PortalWorldObject): void {

@@ -1,10 +1,10 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { Object3D, Raycaster, Vector3 } from 'three';
-import { WorldObject } from '../object/world-object';
-import { Collision } from './physics.model';
-import { WorldComponent } from '../world/world.component';
-import { World } from '../world/world';
-import { PortalWorldObject } from '../object/portal-world-object';
+import {Inject, Singleton} from 'typescript-ioc';
+import {Object3D, Raycaster, Vector3} from 'three';
+import {WorldObject} from '../object/world-object';
+import {Collision} from './physics.model';
+import {WorldComponent} from '../world/world.component';
+import {World} from '../world/world';
+import {PortalWorldObject} from '../object/portal-world-object';
 
 @Singleton
 export class PhysicsComponent {
@@ -15,7 +15,8 @@ export class PhysicsComponent {
    private physicalObjects: Object3D[] = [];
    private worldLoaded = false;
 
-   constructor(@Inject private readonly world: WorldComponent) {}
+   constructor(@Inject private readonly world: WorldComponent) {
+   }
 
    setWorld(world: World): void {
       this.clear();

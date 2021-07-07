@@ -1,11 +1,11 @@
-import { spawn, Worker } from 'threads/dist';
-import { CoreThread } from '../core/core-thread';
+import {spawn, Worker} from 'threads/dist';
+import {CoreThread} from '../core/core-thread';
 import './main.scss';
-import { Container, Inject, Singleton } from 'typescript-ioc';
-import { WorkerImplementation } from 'threads/dist/types/master';
-import { MainControllerComponent } from './controller/main-controller.component';
-import { GuiManager } from './gui/gui.manager';
-import { GuiComponent } from './gui/gui.component';
+import {Container, Inject, Singleton} from 'typescript-ioc';
+import {WorkerImplementation} from 'threads/dist/types/master';
+import {MainControllerComponent} from './controller/main-controller.component';
+import {GuiManager} from './gui/gui.manager';
+import {GuiComponent} from './gui/gui.component';
 
 @Singleton
 class Main {
@@ -23,7 +23,6 @@ class Main {
    }
 
    private async initThread<T>(worker: WorkerImplementation): Promise<[T, WorkerImplementation]> {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const thread = ((await spawn<unknown>(worker)) as unknown) as T;
       return [thread, worker];
@@ -38,12 +37,13 @@ class Main {
       const offscreenCanvas = this.canvas.transferControlToOffscreen();
       offscreenCanvas.width = this.canvas.clientWidth;
       offscreenCanvas.height = this.canvas.clientHeight;
-      this.initThread<CoreThread>(new Worker('../core/core-thread')).then(([coreThread, coreWorker]) => {
-         this.coreThread = coreThread;
-         console.log('Core thread created');
-         this.initComponents();
-         coreWorker.postMessage({ canvas: offscreenCanvas }, [offscreenCanvas]);
-      });
+      this.initThread<CoreThread>(new Worker('../core/core-thread'))
+         .then(([coreThread, coreWorker]) => {
+            this.coreThread = coreThread;
+            console.log('Core thread created');
+            this.initComponents();
+            coreWorker.postMessage({canvas: offscreenCanvas}, [offscreenCanvas]);
+         });
    }
 
    private initComponents(): void {

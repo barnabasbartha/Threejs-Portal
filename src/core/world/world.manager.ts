@@ -1,8 +1,8 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { WorldComponent } from './world.component';
-import { TimerComponent } from '../timer/timer.component';
-import { CoreControllerComponent } from '../controller/core-controller.component';
-import { RendererComponent } from '../renderer/renderer.component';
+import {Inject, Singleton} from 'typescript-ioc';
+import {WorldComponent} from './world.component';
+import {TimerComponent} from '../timer/timer.component';
+import {CoreControllerComponent} from '../controller/core-controller.component';
+import {RendererComponent} from '../renderer/renderer.component';
 
 @Singleton
 export class WorldManager {

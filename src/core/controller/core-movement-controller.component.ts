@@ -1,10 +1,10 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { Vector3 } from 'three';
-import { ReplaySubject } from 'rxjs';
-import { CoreKeyboardControllerComponent } from './core-keyboard-controller.component';
-import { CoreCameraControllerComponent } from './core-camera-controller.component';
-import { TimerComponent } from '../timer/timer.component';
-import { Config } from '../../config/config';
+import {Inject, Singleton} from 'typescript-ioc';
+import {Vector3} from 'three';
+import {ReplaySubject} from 'rxjs';
+import {CoreKeyboardControllerComponent} from './core-keyboard-controller.component';
+import {CoreCameraControllerComponent} from './core-camera-controller.component';
+import {TimerComponent} from '../timer/timer.component';
+import {Config} from '../../config/config';
 
 @Singleton
 export class CoreMovementControllerComponent {
@@ -77,10 +77,18 @@ export class CoreMovementControllerComponent {
          moveVectorDeg -= additionalAngle;
          this.movement.x = Math.sin(moveVectorDeg);
          this.movement.z = Math.cos(moveVectorDeg);
-         this.movement.y *= -1;
+         this.movement.y *= this.isGoingBackward() ? 1 : this.isGoingForward() ? -1 : 0;
          this.movement.multiplyScalar(CoreMovementControllerComponent.SENSITIVITY).multiplyScalar(delta);
          this.movementSubject.next(this.movement);
       }
+   }
+
+   private isGoingForward(): boolean {
+      return this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_FORWARD);
+   }
+
+   private isGoingBackward(): boolean {
+      return this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_BACKWARDS);
    }
 }
 

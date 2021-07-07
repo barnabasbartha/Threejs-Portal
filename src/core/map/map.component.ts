@@ -1,7 +1,7 @@
-import { Inject, Singleton } from 'typescript-ioc';
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { WorldComponent } from '../world/world.component';
-import { World } from '../world/world';
+import {Inject, Singleton} from 'typescript-ioc';
+import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
+import {WorldComponent} from '../world/world.component';
+import {World} from '../world/world';
 import {
    DoubleSide,
    EdgesGeometry,
@@ -13,12 +13,12 @@ import {
    Object3D,
    PlaneBufferGeometry,
 } from 'three';
-import { WorldObject } from '../object/world-object';
-import { Subject } from 'rxjs';
-import { PortalWorldObject } from '../object/portal-world-object';
-import { Config } from '../../config/config';
+import {WorldObject} from '../object/world-object';
+import {Subject} from 'rxjs';
+import {PortalWorldObject} from '../object/portal-world-object';
+import {Config} from '../../config/config';
 
-type ObjectType = 'world' | 'mesh' | 'portal';
+type ObjectType = 'world' | 'mesh' | 'portal' | 'raw';
 
 interface ObjectParameters {
    type: ObjectType;
@@ -35,6 +35,7 @@ interface PortalObjectParameters extends ObjectParameters {
 export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    readonly mapLoaded$ = this.mapLoadedSubject.pipe();
+
    private static MESH_MATERIAL = new MeshBasicMaterial({
       color: 0xffffff,
       side: DoubleSide,
@@ -44,13 +45,13 @@ export class MapComponent {
    });
    private static MESH_LINE_MATERIAL = new LineBasicMaterial({
       color: 0x000000,
-      linewidth: 3,
       polygonOffset: true,
       polygonOffsetUnits: -1,
       polygonOffsetFactor: -1,
    });
 
-   constructor(@Inject private readonly worldComponent: WorldComponent) {}
+   constructor(@Inject private readonly worldComponent: WorldComponent) {
+   }
 
    load(): void {
       const url = Config.ASSET_DIR + 'map04.glb';
@@ -66,7 +67,8 @@ export class MapComponent {
             this.mapLoadedSubject.next();
          },
          // eslint-disable-next-line  @typescript-eslint/no-empty-function
-         () => {},
+         () => {
+         },
          () => {
             console.error('Error during loading model', url);
          },
@@ -76,15 +78,19 @@ export class MapComponent {
    private parseMap(scene: Group): [World[], World] {
       const worlds: World[] = [];
       let mainWorld: World = null;
-      this.getObjects(scene, 'world').forEach(([mapObject, parameters]) => {
+      const objects = this.parseObjectParameters(scene.children);
+
+      this.filterObjectsByType(objects, 'world').forEach(([mapObject, parameters]) => {
          const world = new World(parameters.world);
          world.addObject(this.createWorldObject(mapObject as Mesh));
 
-         this.getObjects(mapObject, 'portal').forEach(([portalObject, parameters]) => {
+         const objectsInWorld = this.parseObjectParameters(mapObject.children);
+
+         this.filterObjectsByType(objectsInWorld, 'portal').forEach(([portalObject, parameters]) => {
             this.addPortal(world, mapObject, portalObject, parameters as PortalObjectParameters);
          });
 
-         this.getObjects(mapObject, 'mesh').forEach(([meshObject]) => {
+         this.filterObjectsByType(objectsInWorld, 'mesh').forEach(([meshObject]) => {
             world.addObject(this.createWorldObject(meshObject as Mesh));
          });
 
@@ -99,14 +105,11 @@ export class MapComponent {
       return [worlds, mainWorld];
    }
 
-   private getObjects(parent: Object3D, type: ObjectType): [Object3D, ObjectParameters][] {
-      return this.getObjectsParameters(parent.children).filter(
-         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-         ([_, parameters]) => parameters.type === type,
-      );
+   private filterObjectsByType(objects: [Object3D, ObjectParameters][], type: ObjectType): [Object3D, ObjectParameters][] {
+      return objects.filter(([_, parameters]) => parameters.type === type);
    }
 
-   private getObjectsParameters(objects: Object3D[]): [Object3D, ObjectParameters][] {
+   private parseObjectParameters(objects: Object3D[]): [Object3D, ObjectParameters][] {
       return objects.map((object) => {
          const parametersString = object.name.split('_');
          const parameters: ObjectParameters = {
@@ -114,22 +117,22 @@ export class MapComponent {
             world: parametersString[1],
             name: parametersString[2],
          };
-         if (parametersString[3]) (parameters as PortalObjectParameters).targetWorld = parametersString[3];
-         if (parametersString[4]) (parameters as PortalObjectParameters).target = parametersString[4];
+         if (parameters.type === 'portal') {
+            (parameters as PortalObjectParameters).targetWorld = parametersString[3];
+            (parameters as PortalObjectParameters).target = parametersString[4];
+         }
          return [object, parameters];
       });
    }
 
    private createWorldObject(mesh: Mesh): WorldObject {
-      const worldObject = new WorldObject();
-      this.handleMeshMaterial(mesh);
+      const worldObject = new WorldObject(mesh.name);
       worldObject.addPhysicalObject(mesh);
       worldObject.add(this.createMeshOutline(mesh));
-      return worldObject;
-   }
-
-   private handleMeshMaterial(mesh: Mesh): void {
       mesh.material = MapComponent.MESH_MATERIAL;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      return worldObject;
    }
 
    private createMeshOutline(mesh: Mesh): Object3D {
@@ -145,7 +148,8 @@ export class MapComponent {
       mapObject.remove(portalObject);
 
       const portal = new PortalWorldObject(
-         new Mesh(new PlaneBufferGeometry(2, 2)),
+         new Mesh(new PlaneBufferGeometry()),
+         world.getName(),
          parameters.name,
          parameters.targetWorld,
          parameters.target,
@@ -153,7 +157,7 @@ export class MapComponent {
       );
       portal.getGroup().position.copy(portalObject.position);
       portal.getGroup().quaternion.copy(portalObject.quaternion);
-      portal.getGroup().scale.copy(portalObject.scale);
+      portal.getGroup().scale.copy(portalObject.scale).multiplyScalar(2);
       world.addPortal(portal);
    }
 }

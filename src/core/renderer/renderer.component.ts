@@ -1,20 +1,19 @@
 import {
-   LinearEncoding,
    Matrix4,
-   NoToneMapping,
    Object3D,
    PerspectiveCamera,
    Plane,
    Scene,
+   sRGBEncoding,
    Vector3,
    Vector4,
    WebGLRenderer,
 } from 'three';
-import { Subject } from 'rxjs';
-import { PortalWorldObject } from '../object/portal-world-object';
-import { World } from '../world/world';
-import { Config } from '../../config/config';
-import { Singleton } from 'typescript-ioc';
+import {Subject} from 'rxjs';
+import {PortalWorldObject} from '../object/portal-world-object';
+import {World} from '../world/world';
+import {Config} from '../../config/config';
+import {Singleton} from 'typescript-ioc';
 
 @Singleton
 export class RendererComponent {
@@ -26,28 +25,22 @@ export class RendererComponent {
    private gl?: WebGLRenderingContext;
 
    init(canvas: HTMLCanvasElement): void {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      canvas['style'] = { width: canvas.width, height: canvas.height };
+      canvas['style'] = {width: canvas.width, height: canvas.height};
       this.renderer = new WebGLRenderer({
          canvas,
          context: canvas.getContext('webgl2', {
             stencil: true,
             depth: true,
             powerPreference: 'high-performance' as WebGLPowerPreference,
-            antialias: true,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
-         stencil: true,
-         depth: true,
-         antialias: true,
+
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);
-      this.renderer.shadowMap.enabled = false;
-      this.renderer.outputEncoding = LinearEncoding; //sRGBEncoding;
-      this.renderer.toneMapping = NoToneMapping;
-      this.renderer.toneMappingExposure = 1;
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.outputEncoding = sRGBEncoding;
       this.gl = this.renderer.getContext();
       this.initSubject.next();
    }
@@ -63,7 +56,6 @@ export class RendererComponent {
          this.renderWorldPortals(
             worlds,
             world,
-            null,
             camera,
             camera.matrixWorld.clone(),
             camera.projectionMatrix.clone(),
@@ -74,17 +66,15 @@ export class RendererComponent {
    private renderWorldPortals(
       worlds: Map<string, World>,
       world: World,
-      excludePortal: PortalWorldObject | null,
       camera: PerspectiveCamera,
       viewMat: Matrix4,
       projMat: Matrix4,
-      // eslint-disable-next-line @typescript-eslint/typedef
-      recursionLevel = 0,
+      recursionLevel: number = 0,
    ): void {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
-         .filter((portal) => portal !== excludePortal)
+         .filter((portal) => portal.isVisible() && portal.isEnabled())
          .forEach((portal) => {
             const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
@@ -104,7 +94,6 @@ export class RendererComponent {
                this.renderWorldPortals(
                   worlds,
                   destinationWorld,
-                  portal.getDestination(),
                   camera,
                   destViewMat,
                   destProjMat,
@@ -121,7 +110,7 @@ export class RendererComponent {
 
                this.renderScene(
                   camera,
-                  destinationWorld.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+                  destinationWorld.getGroup().children,
                   destViewMat,
                   destProjMat,
                );
@@ -147,7 +136,7 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         portalsInWorld.filter((portal) => portal !== excludePortal).map((portal) => portal.getGroup()),
+         portalsInWorld.map((portal) => portal.getGroup()),
          viewMat,
          projMat,
       );
@@ -161,7 +150,7 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         world.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+         world.getGroup().children,
          viewMat,
          projMat,
       );
@@ -176,12 +165,12 @@ export class RendererComponent {
       this.originalCameraProjectionMatrix.copy(camera.projectionMatrix);
       camera.matrixAutoUpdate = false;
       camera.matrixWorld.copy(viewMat);
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
       camera.projectionMatrix.copy(projMat);
       this.renderer.render(this.tmpScene, camera);
       camera.matrixAutoUpdate = true;
       camera.matrixWorld.copy(this.originalCameraMatrixWorld);
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
       camera.projectionMatrix.copy(this.originalCameraProjectionMatrix);
    }
 
@@ -193,10 +182,10 @@ export class RendererComponent {
    private readonly result = new Matrix4();
 
    private computePortalViewMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4): Matrix4 {
-      this.srcToCam.multiplyMatrices(this.inverse.getInverse(viewMat), sourcePortal.getMatrix().clone());
-      this.dstInverse.getInverse(sourcePortal.getDestination().getMatrix().clone());
+      this.srcToCam.multiplyMatrices(this.inverse.copy(viewMat).invert(), sourcePortal.getMatrix());
+      this.dstInverse.copy(sourcePortal.getDestination().getMatrix()).invert();
       this.srcToDst.identity().multiply(this.srcToCam).multiply(this.rotationYMatrix).multiply(this.dstInverse);
-      this.result.getInverse(this.srcToDst);
+      this.result.copy(this.srcToDst).invert();
       return this.result;
    }
 
@@ -213,10 +202,9 @@ export class RendererComponent {
    // See www.terathon.com/lengyel/Lengyel-Oblique.pdf
    private computePortalProjectionMatrix(sourcePortal: PortalWorldObject, viewMat: Matrix4, projMat: Matrix4): Matrix4 {
       const destinationPortal = sourcePortal.getDestination();
-      this.cameraInverseViewMat.getInverse(viewMat);
+      this.cameraInverseViewMat.copy(viewMat).invert();
       this.dstRotationMatrix.identity().extractRotation(destinationPortal.getMatrix());
 
-      // TODO: Use -1 if dot product is negative (?)
       this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
 
       this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());

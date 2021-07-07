@@ -1,5 +1,5 @@
-import { Singleton } from 'typescript-ioc';
-import { PerspectiveCamera, Quaternion, Vector3 } from 'three';
+import {Singleton} from 'typescript-ioc';
+import {PerspectiveCamera, Quaternion, Vector3} from 'three';
 
 @Singleton
 export class CameraComponent {

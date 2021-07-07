@@ -1,15 +1,15 @@
-import { Singleton } from 'typescript-ioc';
-import { KeyEvent } from '../../common/controller/controller.model';
-import { EventStatus, IVector2 } from '../../common/event.model';
-import { Subject } from 'rxjs';
+import {Singleton} from 'typescript-ioc';
+import {KeyEvent} from '../../common/controller/controller.model';
+import {EventStatus, IVector2} from '../../common/event.model';
+import {Subject} from 'rxjs';
 
 @Singleton
 export class CoreControllerComponent {
-   private readonly resizeObject: IVector2 = { x: 0, y: 0 };
+   private readonly resizeObject: IVector2 = {x: 0, y: 0};
    private readonly resizeSubject = new Subject<IVector2>();
    readonly resize$ = this.resizeSubject.pipe();
 
-   private readonly mouseMoveObject: IVector2 = { x: 0, y: 0 };
+   private readonly mouseMoveObject: IVector2 = {x: 0, y: 0};
    private readonly mouseMoveSubject = new Subject<IVector2>();
    readonly mouseMove$ = this.mouseMoveSubject.pipe();
 

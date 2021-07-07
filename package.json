@@ -1,26 +1,27 @@
 {
    "name": "Threejs-Portal",
-   "description": "",
+   "description": "Experiment with WebGL, Three.js, OffscreenCanvas with Web Worker, stencil buffer and an event-driven architecture using RxJs with a DI lib.",
    "license": "",
    "scripts": {
-      "start": "./node_modules/.bin/webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
-      "build": "./node_modules/.bin/webpack --mode production",
-      "test": "./node_modules/.bin/mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
-      "prettier": "prettier -l \"src/**/*.{ts,scss,html}\"",
-      "prettier:fix": "npm run prettier -- --write",
-      "lint": "eslint . --ext .ts",
-      "sass-lint": "sass-lint \"src/**/*.scss\" -v -q",
-      "lint:fix": "sass-lint-auto-fix -c .sass-lint.yml"
+      "start": "webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
+      "build": "webpack --mode production",
+      "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
+      "lint": "eslint . --ext .ts"
    },
    "devDependencies": {
       "@babel/core": "^7.11.1",
       "@babel/plugin-transform-for-of": "^7.10.4",
       "@babel/preset-env": "^7.11.0",
       "@types/chai": "^4.2.12",
+      "@types/copy-webpack-plugin": "^6.2.0",
       "@types/lodash": "^4.14.159",
+      "@types/mini-css-extract-plugin": "^1.2.2",
       "@types/mocha": "^8.0.2",
       "@types/node-fetch": "^2.5.7",
+      "@types/optimize-css-assets-webpack-plugin": "^5.0.2",
       "@types/rx": "^4.1.2",
+      "@types/terser-webpack-plugin": "^5.0.2",
+      "@types/three": "^0.129.1",
       "@types/tween.js": "^18.5.1",
       "@typescript-eslint/eslint-plugin": "^4.6.1",
       "@typescript-eslint/parser": "^4.6.1",
@@ -28,7 +29,7 @@
       "babel-plugin-loop-optimizer": "^1.4.1",
       "chai": "^4.2.0",
       "clean-webpack-plugin": "^3.0.0",
-      "copy-webpack-plugin": "5.1.1",
+      "copy-webpack-plugin": "6.1.1",
       "css-loader": "^4.2.1",
       "eslint": "^7.12.1",
       "file-loader": "^6.0.0",
@@ -39,13 +40,9 @@
       "mocha": "^8.1.1",
       "node-sass": "4.14.1",
       "optimize-css-assets-webpack-plugin": "^5.0.3",
-      "optimize-js-plugin": "^0.0.4",
       "path": "^0.12.7",
-      "prettier": "^2.1.2",
       "replace-in-file-webpack-plugin": "^1.0.6",
       "rxjs": "^6.6.2",
-      "sass-lint": "^1.13.1",
-      "sass-lint-auto-fix": "^0.21.2",
       "sass-loader": "^9.0.3",
       "style-loader": "^1.2.1",
       "terser-webpack-plugin": "^4.1.0",
@@ -53,7 +50,7 @@
       "ts-loader": "^8.0.2",
       "ts-node": "^8.10.2",
       "tsconfig-paths": "^3.9.0",
-      "typescript": "^4.0.3",
+      "typescript": "^4.3.4",
       "typescript-ioc": "3.2.2",
       "webpack": "^4.44.1",
       "webpack-cli": "^3.3.12",
@@ -61,6 +58,6 @@
    },
    "dependencies": {
       "threads": "1.6.3",
-      "three": "0.119.1"
+      "three": "0.129.0"
    }
 }

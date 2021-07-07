@@ -1,4 +1,4 @@
-import { Singleton } from 'typescript-ioc';
+import {Singleton} from 'typescript-ioc';
 
 @Singleton
 export class GuiComponent {

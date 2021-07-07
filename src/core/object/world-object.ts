@@ -1,5 +1,5 @@
-import { Euler, Group, Matrix4, Object3D, Quaternion, Vector3 } from 'three';
-import { AbstractObject } from './abstract-object';
+import {Euler, Group, Matrix4, Object3D, Quaternion, Vector3} from 'three';
+import {AbstractObject} from './abstract-object';
 
 export class WorldObject extends AbstractObject<Group> {
    protected readonly group = new Group();
@@ -7,6 +7,11 @@ export class WorldObject extends AbstractObject<Group> {
    private readonly tmpVector = new Vector3();
    private readonly tmpEuler = new Euler();
    private readonly tmpQuaternion = new Quaternion();
+   private invisible = false;
+
+   constructor(protected name: string) {
+      super(name);
+   }
 
    getMatrix(): Matrix4 {
       this.group.updateMatrixWorld(true);
@@ -34,5 +39,29 @@ export class WorldObject extends AbstractObject<Group> {
 
    getPhysicalObjects(): Object3D[] {
       return this.physicalObjects;
+   }
+
+   hide(): void {
+      this.group.visible = false;
+   }
+
+   show(): void {
+      this.group.visible = true;
+   }
+
+   makeInvisible(): void {
+      this.invisible = true;
+   }
+
+   makeVisible(): void {
+      this.invisible = false;
+   }
+
+   isVisible(): boolean {
+      return this.group.visible && !this.invisible;
+   }
+
+   isInvisible(): boolean {
+      return this.invisible;
    }
 }

@@ -1,11 +1,10 @@
 import {
-   LinearEncoding,
    Matrix4,
-   NoToneMapping,
    Object3D,
    PerspectiveCamera,
    Plane,
    Scene,
+   sRGBEncoding,
    Vector3,
    Vector4,
    WebGLRenderer,
@@ -36,13 +35,12 @@ export class RendererComponent {
             powerPreference: 'high-performance' as WebGLPowerPreference,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
+
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);
-      this.renderer.shadowMap.enabled = false;
-      this.renderer.outputEncoding = LinearEncoding; //sRGBEncoding;
-      this.renderer.toneMapping = NoToneMapping;
-      this.renderer.toneMappingExposure = 1;
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.outputEncoding = sRGBEncoding;
       this.gl = this.renderer.getContext();
       this.initSubject.next();
    }

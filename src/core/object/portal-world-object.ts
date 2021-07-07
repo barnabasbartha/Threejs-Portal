@@ -1,7 +1,5 @@
 import {WorldObject} from './world-object';
 import {Object3D} from 'three';
-import {createLight} from "../light/light.utils";
-import {LightColor} from "../light/light.model";
 
 export class PortalWorldObject extends WorldObject {
    private destination?: PortalWorldObject;
@@ -13,12 +11,8 @@ export class PortalWorldObject extends WorldObject {
       private destinationWorldName: string,
       private destinationPortalName: string,
       private teleportEnabled: boolean,
-      private readonly color: LightColor,
    ) {
       super(name);
-      if (this.color !== LightColor.NO_COLOR) {
-         this.add(createLight(color));
-      }
       this.addPhysicalObject(object);
    }
 

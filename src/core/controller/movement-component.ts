@@ -16,7 +16,7 @@ export class MovementComponent {
    readonly teleport$ = this.teleportSubject.pipe();
 
    private readonly positionSubject = new ReplaySubject<Vector3>();
-   private readonly position = new Vector3();
+   private readonly position = new Vector3(0, 1, 3);
 
    constructor(
       @Inject private readonly movementController: CoreMovementControllerComponent,
@@ -30,17 +30,21 @@ export class MovementComponent {
          movementController.movement$.pipe(
             filter(() => physics.isWorldLoaded()),
             map((movement) => {
+               // TODO: It should be extracted to a teleport specific context instead of movement
                const collision = physics.handleCollision(this.position, movement);
                if (collision?.isPortal) {
                   const sourcePortal = collision.object as PortalWorldObject;
-                  if (sourcePortal.isTeleportEnabled()) {
-                     // TODO: Check the rest of the movement vector in the destination world as well to avoid jumping across the wall there
-                     this.teleportSubject.next({
-                        sourcePortal,
-                        collision,
-                     } as TeleportContext);
+                  if (!sourcePortal.isVisible() && !sourcePortal.isInvisible()) {
+                     return movement;
                   }
-                  return null;
+                  if (!sourcePortal.isEnabled()) {
+                     return null;
+                  }
+                  // TODO: Check the rest of the movement vector in the destination world as well to avoid jumping across the wall there
+                  this.teleportSubject.next({
+                     sourcePortal,
+                     collision,
+                  } as TeleportContext);
                }
                return movement;
             }),
@@ -48,6 +52,7 @@ export class MovementComponent {
             map((movement) => this.position.add(movement)),
          ),
       );
+      this.update();
    }
 
    setPosition(position: Vector3): void {

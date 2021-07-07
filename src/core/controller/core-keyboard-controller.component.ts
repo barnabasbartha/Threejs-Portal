@@ -1,11 +1,12 @@
 import {Inject, Singleton} from 'typescript-ioc';
 import {CoreControllerComponent} from './core-controller.component';
 import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
+import {KeyEvent} from "../../common/controller/controller.model";
 
 @Singleton
 export class CoreKeyboardControllerComponent {
-   readonly keys$: Observable<void>;
+   readonly keys$: Observable<KeyEvent>;
    private readonly pressedKeys = new Set<string>();
 
    constructor(@Inject private readonly controller: CoreControllerComponent) {
@@ -17,7 +18,6 @@ export class CoreKeyboardControllerComponent {
                this.pressedKeys.delete(keyEvent.key);
             }
          }),
-         map(() => null),
       );
    }
 

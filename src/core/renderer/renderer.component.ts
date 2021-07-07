@@ -1,11 +1,10 @@
 import {
-   LinearEncoding,
    Matrix4,
-   NoToneMapping,
    Object3D,
    PerspectiveCamera,
    Plane,
    Scene,
+   sRGBEncoding,
    Vector3,
    Vector4,
    WebGLRenderer,
@@ -34,19 +33,14 @@ export class RendererComponent {
             stencil: true,
             depth: true,
             powerPreference: 'high-performance' as WebGLPowerPreference,
-            antialias: true,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
-         stencil: true,
-         depth: true,
-         antialias: true,
+
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);
-      this.renderer.shadowMap.enabled = false;
-      this.renderer.outputEncoding = LinearEncoding; //sRGBEncoding;
-      this.renderer.toneMapping = NoToneMapping;
-      this.renderer.toneMappingExposure = 1;
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.outputEncoding = sRGBEncoding;
       this.gl = this.renderer.getContext();
       this.initSubject.next();
    }
@@ -62,7 +56,6 @@ export class RendererComponent {
          this.renderWorldPortals(
             worlds,
             world,
-            null,
             camera,
             camera.matrixWorld.clone(),
             camera.projectionMatrix.clone(),
@@ -73,17 +66,15 @@ export class RendererComponent {
    private renderWorldPortals(
       worlds: Map<string, World>,
       world: World,
-      excludePortal: PortalWorldObject | null,
       camera: PerspectiveCamera,
       viewMat: Matrix4,
       projMat: Matrix4,
-      // eslint-disable-next-line @typescript-eslint/typedef
-      recursionLevel = 0,
+      recursionLevel: number = 0,
    ): void {
       const recursionLevelLeft = Config.MAX_PORTAL_RENDERING_RECURSION_LEVEL - recursionLevel;
       const portalsInWorld = world.getPortals();
       portalsInWorld
-         .filter((portal) => portal !== excludePortal)
+         .filter((portal) => portal.isVisible() && portal.isEnabled())
          .forEach((portal) => {
             const destinationWorld = worlds.get(portal.getDestinationWorldName());
 
@@ -103,7 +94,6 @@ export class RendererComponent {
                this.renderWorldPortals(
                   worlds,
                   destinationWorld,
-                  portal.getDestination(),
                   camera,
                   destViewMat,
                   destProjMat,
@@ -120,7 +110,7 @@ export class RendererComponent {
 
                this.renderScene(
                   camera,
-                  destinationWorld.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+                  destinationWorld.getGroup().children,
                   destViewMat,
                   destProjMat,
                );
@@ -146,7 +136,7 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         portalsInWorld.filter((portal) => portal !== excludePortal).map((portal) => portal.getGroup()),
+         portalsInWorld.map((portal) => portal.getGroup()),
          viewMat,
          projMat,
       );
@@ -160,7 +150,7 @@ export class RendererComponent {
 
       this.renderScene(
          camera,
-         world.getGroup().children.filter((object) => object !== excludePortal?.getGroup()),
+         world.getGroup().children,
          viewMat,
          projMat,
       );
@@ -215,7 +205,6 @@ export class RendererComponent {
       this.cameraInverseViewMat.copy(viewMat).invert();
       this.dstRotationMatrix.identity().extractRotation(destinationPortal.getMatrix());
 
-      // TODO: Use -1 if dot product is negative (?)
       this.normal.set(0, 0, 1).applyMatrix4(this.dstRotationMatrix);
 
       this.clipPlane.setFromNormalAndCoplanarPoint(this.normal, destinationPortal.getAbsolutePosition());

@@ -49,9 +49,12 @@ export class WorldComponent {
       const portals = this.getPortals();
       Array.from(portals.values()).forEach((portal: PortalWorldObject) => {
          if (!portal.getDestination() && portals.has(portal.getDestinationPortalName())) {
-            const otherPortal = portals.get(portal.getDestinationPortalName());
-            portal.setDestination(otherPortal);
-            otherPortal.setDestination(portal);
+            const otherPortalName = portal.getDestinationPortalName();
+            if (otherPortalName) {
+               const otherPortal = portals.get(otherPortalName);
+               portal.setDestination(otherPortal);
+               otherPortal.setDestination(portal);
+            }
          }
       });
    }

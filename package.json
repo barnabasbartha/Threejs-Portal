@@ -58,6 +58,6 @@
    },
    "dependencies": {
       "threads": "1.6.3",
-      "three": "0.129.0"
+      "three": "0.137.0"
    }
 }

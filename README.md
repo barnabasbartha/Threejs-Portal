@@ -7,16 +7,16 @@ Portal experiment with recursive rendering, [OffscreenCanvas](https://developer.
 
 ---
 
-[Live demo](https://barthabrw.github.io/Threejs-Portal)
+[Live demo](https://barnabasbartha.github.io/Threejs-Portal)
 
 [Youtube video](https://youtu.be/2dgGjEWTZRo)
 
 [Article](https://barthaweb.com/2020/09/webgl-portal/)
 
 ## Rendering
-If you are mainly interested in the portal rendering itself, open [src/core/renderer/renderer.component.ts:59](https://github.com/BarthaBRW/Threejs-Portal/blob/1bf1c9f9342f720601144e19a68538f0f1fe215d/src/core/renderer/renderer.component.ts#L59)
+If you are mainly interested in the portal rendering itself, open [src/core/renderer/renderer.component.ts:59](https://github.com/barnabasbartha/Threejs-Portal/blob/1bf1c9f9342f720601144e19a68538f0f1fe215d/src/core/renderer/renderer.component.ts#L59)
 
-[github-actions-workflow-image]: https://github.com/BarthaBRW/Threejs-Portal/workflows/Default/badge.svg
-[github-actions-workflow-url]: https://github.com/BarthaBRW/Threejs-Portal/actions
-[github-actions-deploy-workflow-image]: https://github.com/BarthaBRW/Threejs-Portal/workflows/Deploy/badge.svg
-[github-actions-deploy-workflow-url]: https://github.com/BarthaBRW/Threejs-Portal/actions
+[github-actions-workflow-image]: https://github.com/barnabasbartha/Threejs-Portal/workflows/Default/badge.svg
+[github-actions-workflow-url]: https://github.com/barnabasbartha/Threejs-Portal/actions
+[github-actions-deploy-workflow-image]: https://github.com/barnabasbartha/Threejs-Portal/workflows/Deploy/badge.svg
+[github-actions-deploy-workflow-url]: https://github.com/barnabasbartha/Threejs-Portal/actions

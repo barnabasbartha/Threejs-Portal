@@ -15,6 +15,8 @@ export class CoreMovementControllerComponent {
    private static readonly KEY_LEFT = 'KeyA';
    private static readonly KEY_BACKWARDS = 'KeyS';
    private static readonly KEY_RIGHT = 'KeyD';
+   private static readonly KEY_UP = 'Space';
+   private static readonly KEY_DOWN = 'KeyC';
 
    private readonly movementSubject = new ReplaySubject<Vector3>();
    readonly movement$ = this.movementSubject.pipe();
@@ -62,6 +64,8 @@ export class CoreMovementControllerComponent {
          return KeyDirection.BACKWARDS;
       if (this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_LEFT)) return KeyDirection.LEFT;
       if (this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_RIGHT)) return KeyDirection.RIGHT;
+      if (this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_UP)) return KeyDirection.UPWARDS;
+      if (this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_DOWN)) return KeyDirection.DOWNWARDS;
       return KeyDirection.IDLE;
    }
 
@@ -78,6 +82,16 @@ export class CoreMovementControllerComponent {
          this.movement.x = Math.sin(moveVectorDeg);
          this.movement.z = Math.cos(moveVectorDeg);
          this.movement.y *= this.isGoingBackward() ? 1 : this.isGoingForward() ? -1 : 0;
+         if (this.isGoingUpwards()) {
+            this.movement.x = 0;
+            this.movement.z = 0;
+            this.movement.y = .5;
+         }
+         if (this.isGoingDownwards()) {
+            this.movement.x = 0;
+            this.movement.z = 0;
+            this.movement.y = -.5;
+         }
          this.movement.multiplyScalar(CoreMovementControllerComponent.SENSITIVITY).multiplyScalar(delta);
          this.movementSubject.next(this.movement);
       }
@@ -89,6 +103,14 @@ export class CoreMovementControllerComponent {
 
    private isGoingBackward(): boolean {
       return this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_BACKWARDS);
+   }
+
+   private isGoingUpwards(): boolean {
+      return this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_UP);
+   }
+
+   private isGoingDownwards(): boolean {
+      return this.keyboardController.isPressed(CoreMovementControllerComponent.KEY_DOWN);
    }
 }
 
@@ -102,4 +124,6 @@ enum KeyDirection {
    LEFT,
    FORWARD_LEFT,
    IDLE,
+   UPWARDS,
+   DOWNWARDS
 }

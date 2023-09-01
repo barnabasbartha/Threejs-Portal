@@ -6,7 +6,7 @@ export class CameraComponent {
    private readonly camera: PerspectiveCamera;
 
    constructor() {
-      this.camera = new PerspectiveCamera(70, 1, 0.0001, 5000);
+      this.camera = new PerspectiveCamera(70, 1, 0.0001, 1000);
    }
 
    getCamera(): PerspectiveCamera {

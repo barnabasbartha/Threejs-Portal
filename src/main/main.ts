@@ -1,6 +1,6 @@
 import {spawn, Worker} from 'threads/dist';
 import {CoreThread} from '../core/core-thread';
-import './main.scss';
+import './main.css';
 import {Container, Inject, Singleton} from 'typescript-ioc';
 import {WorkerImplementation} from 'threads/dist/types/master';
 import {MainControllerComponent} from './controller/main-controller.component';

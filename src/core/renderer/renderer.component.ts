@@ -31,36 +31,35 @@ export class RendererComponent {
          canvas,
          context: canvas.getContext('webgl2', {
             stencil: true,
-            depth: true,
             powerPreference: 'high-performance' as WebGLPowerPreference,
          } as WebGLContextAttributes) as WebGL2RenderingContext,
          powerPreference: 'high-performance',
-
+         depth: true,
+         antialias: true,
       });
       this.renderer.autoClear = false;
       this.renderer.setPixelRatio(Config.RENDERER_PIXEL_RATIO);
-      this.renderer.shadowMap.enabled = true;
+      this.renderer.setClearColor(0x000000, 0);
+      this.renderer.shadowMap.enabled = false;
       this.renderer.outputEncoding = sRGBEncoding;
       this.gl = this.renderer.getContext();
       this.initSubject.next();
    }
 
    setSize(width: number, height: number): void {
-      this.renderer?.setSize(width, height);
+      this.renderer.setSize(width, height);
    }
 
    render(worlds: Map<string, World>, world: World, camera: PerspectiveCamera): void {
-      if (this.renderer) {
-         this.renderer.clear();
-         camera.updateMatrixWorld(true);
-         this.renderWorldPortals(
-            worlds,
-            world,
-            camera,
-            camera.matrixWorld.clone(),
-            camera.projectionMatrix.clone(),
-         );
-      }
+      this.renderer.clear();
+      camera.updateMatrixWorld(true);
+      this.renderWorldPortals(
+         worlds,
+         world,
+         camera,
+         camera.matrixWorld.clone(),
+         camera.projectionMatrix.clone(),
+      );
    }
 
    private renderWorldPortals(
@@ -90,7 +89,7 @@ export class RendererComponent {
             const destViewMat = this.computePortalViewMatrix(portal, viewMat).clone();
             const destProjMat = this.computePortalProjectionMatrix(portal, destViewMat, projMat).clone();
 
-            if (recursionLevelLeft > 0) {
+            if (recursionLevelLeft > 0 && destinationWorld.getPortals().length > 1) {
                this.renderWorldPortals(
                   worlds,
                   destinationWorld,

@@ -171,7 +171,6 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
                use: [
                   'style-loader',
                   'css-loader',
-                  'sass-loader',
                ],
             },
             {

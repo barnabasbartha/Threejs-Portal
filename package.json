@@ -3,8 +3,8 @@
    "description": "Experiment with WebGL, Three.js, OffscreenCanvas with Web Worker, stencil buffer and an event-driven architecture using RxJs with a DI lib.",
    "license": "",
    "scripts": {
-      "start": "webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
-      "build": "webpack --mode production",
+      "start": "export NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
+      "build": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --mode production",
       "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
       "lint": "eslint . --ext .ts"
    },
@@ -38,12 +38,10 @@
       "html-webpack-plugin": "^4.3.0",
       "mini-css-extract-plugin": "^0.10.0",
       "mocha": "^8.1.1",
-      "node-sass": "4.14.1",
       "optimize-css-assets-webpack-plugin": "^5.0.3",
       "path": "^0.12.7",
       "replace-in-file-webpack-plugin": "^1.0.6",
       "rxjs": "^6.6.2",
-      "sass-loader": "^9.0.3",
       "style-loader": "^1.2.1",
       "terser-webpack-plugin": "^4.1.0",
       "threads-plugin": "^1.3.2",

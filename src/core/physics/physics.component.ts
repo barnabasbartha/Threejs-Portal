@@ -73,7 +73,6 @@ export class PhysicsComponent {
                .multiplyScalar(ratioAfterPosition);
             if (movementProjectedOnPlane.length() > PhysicsComponent.EPS) {
                const [
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   _,
                   recursionMovement,
                ] = this.getRecursiveCollisionMovement(position, movementProjectedOnPlane.clone(), recursionLevelLeft--);

@@ -14,7 +14,6 @@ export class WorldObject extends AbstractObject<Group> {
    }
 
    getMatrix(): Matrix4 {
-      this.group.updateMatrixWorld(true);
       return this.group.matrixWorld;
    }
 

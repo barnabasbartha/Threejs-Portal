@@ -3,15 +3,17 @@ import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import {WorldComponent} from '../world/world.component';
 import {World} from '../world/world';
 import {
+   BackSide,
    DoubleSide,
    EdgesGeometry,
    Group,
    LineBasicMaterial,
    LineSegments,
    Mesh,
-   MeshBasicMaterial,
+   MeshStandardMaterial,
    Object3D,
    PlaneBufferGeometry,
+   PointLight,
 } from 'three';
 import {WorldObject} from '../object/world-object';
 import {Subject} from 'rxjs';
@@ -36,18 +38,19 @@ export class MapComponent {
    private readonly mapLoadedSubject = new Subject<void>();
    readonly mapLoaded$ = this.mapLoadedSubject.pipe();
 
-   private static MESH_MATERIAL = new MeshBasicMaterial({
-      color: 0xffffff,
-      side: DoubleSide,
+   private static MESH_MATERIAL = new MeshStandardMaterial({
+      color: 0xdddddd,
+      side: BackSide,
       polygonOffset: true,
       polygonOffsetFactor: 1,
       polygonOffsetUnits: 1,
    });
    private static MESH_LINE_MATERIAL = new LineBasicMaterial({
       color: 0x000000,
+      side: DoubleSide,
       polygonOffset: true,
-      polygonOffsetUnits: -1,
-      polygonOffsetFactor: -1,
+      polygonOffsetUnits: 1,
+      polygonOffsetFactor: 1,
    });
 
    constructor(@Inject private readonly worldComponent: WorldComponent) {
@@ -98,6 +101,17 @@ export class MapComponent {
          if (parameters.world === 'main') {
             mainWorld = world;
          }
+
+         if (parameters.world === "main") {
+            const pointLight = new PointLight(0xffffff, 1);
+            pointLight.distance = 7;
+            world.add(pointLight);
+         }
+         if (parameters.world === "gateway") {
+            const pointLight = new PointLight(0xffffff, 1);
+            pointLight.distance = 4;
+            world.add(pointLight);
+         }
       });
       if (!mainWorld) {
          throw new Error('Map does not have main world.');
@@ -130,8 +144,8 @@ export class MapComponent {
       worldObject.addPhysicalObject(mesh);
       worldObject.add(this.createMeshOutline(mesh));
       mesh.material = MapComponent.MESH_MATERIAL;
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
       return worldObject;
    }
 

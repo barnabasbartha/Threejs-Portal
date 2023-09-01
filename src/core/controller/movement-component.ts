@@ -16,6 +16,7 @@ export class MovementComponent {
    readonly teleport$ = this.teleportSubject.pipe();
 
    private readonly positionSubject = new ReplaySubject<Vector3>();
+   // private readonly position = new Vector3(5.360922591621781, 2.6515323703404445, 0.22726754558671938);
    private readonly position = new Vector3(0, 1, 3);
 
    constructor(
@@ -46,6 +47,7 @@ export class MovementComponent {
                      collision,
                   } as TeleportContext);
                }
+               // console.log(this.position)
                return movement;
             }),
             filter((movement) => !!movement),

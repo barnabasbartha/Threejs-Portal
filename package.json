@@ -4,7 +4,7 @@
    "license": "",
    "scripts": {
       "start": "export NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --progress --content-base \"./\" --open-page \"index.html\"",
-      "build": "webpack --mode production",
+      "build": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --mode production",
       "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
       "lint": "eslint . --ext .ts"
    },
